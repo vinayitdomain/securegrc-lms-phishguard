@@ -95,15 +95,6 @@ export default function AuthPage() {
                     brand: '#2563eb',
                     brandAccent: '#1d4ed8',
                   },
-                  borderWidths: {
-                    buttonBorderWidth: '1px',
-                    inputBorderWidth: '1px',
-                  },
-                  borderRadius: {
-                    borderRadiusButton: '0.375rem',
-                    buttonBorderRadius: '0.375rem',
-                    inputBorderRadius: '0.375rem',
-                  },
                 },
               },
               className: {
