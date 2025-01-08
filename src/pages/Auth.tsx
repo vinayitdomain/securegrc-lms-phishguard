@@ -11,12 +11,17 @@ export default function AuthPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
       }
       if (event === 'USER_UPDATED') {
-        setErrorMessage("");
+        const { error } = await supabase.auth.getSession();
+        if (error) {
+          setErrorMessage(getErrorMessage(error));
+        } else {
+          setErrorMessage("");
+        }
       }
       if (event === 'SIGNED_OUT') {
         setErrorMessage("");
@@ -71,9 +76,6 @@ export default function AuthPage() {
             }}
             theme="light"
             providers={[]}
-            onError={(error) => {
-              setErrorMessage(getErrorMessage(error));
-            }}
           />
         </div>
       </div>
