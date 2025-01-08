@@ -3,6 +3,8 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 // Fetch functions
 const fetchCampaignCount = async () => {
@@ -49,11 +51,18 @@ const fetchCampaignMetrics = async () => {
   
   return data?.map(campaign => ({
     name: new Date(campaign.start_date).toLocaleDateString('en-US', { month: 'short' }),
-    value: 1 // For demo purposes, we're just counting campaigns per month
+    value: 1
   })) || [];
 };
 
 export default function Dashboard() {
+  const { toast } = useToast();
+  const [realtimeData, setRealtimeData] = useState({
+    campaigns: 0,
+    courses: 0,
+    compliance: 0,
+  });
+
   const { data: activeCampaigns = 0, isLoading: isLoadingCampaigns } = useQuery({
     queryKey: ['activeCampaigns'],
     queryFn: fetchCampaignCount,
@@ -73,6 +82,30 @@ export default function Dashboard() {
     queryKey: ['campaignMetrics'],
     queryFn: fetchCampaignMetrics,
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('dashboard-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public' },
+        (payload) => {
+          console.log('Change received!', payload);
+          toast({
+            title: "Dashboard Updated",
+            description: `${payload.table} has been updated.`,
+          });
+          
+          // Refresh queries
+          queryClient.invalidateQueries();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast]);
 
   return (
     <DashboardLayout>
