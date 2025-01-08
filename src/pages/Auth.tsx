@@ -99,7 +99,7 @@ export default function AuthPage() {
               },
               className: {
                 container: 'space-y-4',
-                button: 'w-full',
+                button: 'w-full rounded-md',
                 input: 'rounded-md border-gray-300',
                 label: 'text-sm font-medium text-gray-700',
               },
