@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -11,13 +12,35 @@ export default function AuthPage() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
+      if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
+      }
+      if (event === 'USER_UPDATED') {
+        setErrorMessage("");
+      }
+      if (event === 'SIGNED_OUT') {
+        setErrorMessage("");
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.code) {
+        case 'invalid_credentials':
+          return 'Invalid email or password. Please check your credentials and try again.';
+        case 'email_not_confirmed':
+          return 'Please verify your email address before signing in.';
+        case 'user_not_found':
+          return 'No user found with these credentials.';
+        default:
+          return error.message;
+      }
+    }
+    return error.message;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -35,9 +58,22 @@ export default function AuthPage() {
           )}
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#2563eb',
+                    brandAccent: '#1d4ed8',
+                  },
+                },
+              },
+            }}
             theme="light"
             providers={[]}
+            onError={(error) => {
+              setErrorMessage(getErrorMessage(error));
+            }}
           />
         </div>
       </div>
