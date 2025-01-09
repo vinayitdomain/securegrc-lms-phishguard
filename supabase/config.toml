@@ -1,2 +1,5 @@
+# Project ID from the Supabase project settings
+project_id = "rdllxeujmpzxjjzyrhmy"
+
 [functions.send-campaign-email]
 verify_jwt = true
