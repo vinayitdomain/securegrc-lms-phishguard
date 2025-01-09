@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -25,7 +26,11 @@ export default function AuthPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
+        toast.success('Successfully signed in!');
         navigate("/dashboard");
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        toast.info('Please check your email for password reset instructions');
       }
       if (event === 'USER_UPDATED') {
         const { error } = await supabase.auth.getSession();
@@ -37,6 +42,7 @@ export default function AuthPage() {
       }
       if (event === 'SIGNED_OUT') {
         setErrorMessage("");
+        toast.info('You have been signed out');
       }
     });
 
@@ -52,6 +58,10 @@ export default function AuthPage() {
           return 'Please verify your email address before signing in.';
         case 'user_not_found':
           return 'No user found with these credentials.';
+        case 'invalid_grant':
+          return 'Invalid login credentials.';
+        case 'too_many_requests':
+          return 'Too many login attempts. Please try again later.';
         default:
           return error.message;
       }
@@ -102,10 +112,48 @@ export default function AuthPage() {
                 button: 'w-full rounded-md',
                 input: 'rounded-md border-gray-300',
                 label: 'text-sm font-medium text-gray-700',
+                message: 'text-sm text-red-600',
+                anchor: 'text-sm text-blue-600 hover:text-blue-500',
               },
             }}
             theme="light"
-            providers={[]}
+            providers={["google"]}
+            redirectTo={window.location.origin}
+            onlyThirdPartyProviders={false}
+            magicLink={true}
+            showLinks={true}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'Email address',
+                  password_label: 'Password',
+                  button_label: 'Sign in',
+                  loading_button_label: 'Signing in...',
+                  social_provider_text: 'Sign in with {{provider}}',
+                  link_text: 'Already have an account? Sign in',
+                },
+                sign_up: {
+                  email_label: 'Email address',
+                  password_label: 'Create a password',
+                  button_label: 'Sign up',
+                  loading_button_label: 'Signing up...',
+                  social_provider_text: 'Sign up with {{provider}}',
+                  link_text: 'Don\'t have an account? Sign up',
+                },
+                magic_link: {
+                  email_input_label: 'Email address',
+                  button_label: 'Send magic link',
+                  loading_button_label: 'Sending magic link...',
+                  link_text: 'Send a magic link email',
+                },
+                forgotten_password: {
+                  email_label: 'Email address',
+                  button_label: 'Send reset instructions',
+                  loading_button_label: 'Sending reset instructions...',
+                  link_text: 'Forgot your password?',
+                },
+              },
+            }}
           />
         </div>
       </div>
