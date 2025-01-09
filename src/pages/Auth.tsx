@@ -85,7 +85,7 @@ export default function AuthPage() {
           SecureGRC
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Sign in to your account to access your security dashboard
+          Sign in with your organization credentials
         </p>
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -117,43 +117,10 @@ export default function AuthPage() {
               },
             }}
             theme="light"
-            providers={["google"]}
+            providers={["azure"]}
             redirectTo={window.location.origin}
-            onlyThirdPartyProviders={false}
-            magicLink={true}
-            showLinks={true}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'Email address',
-                  password_label: 'Password',
-                  button_label: 'Sign in',
-                  loading_button_label: 'Signing in...',
-                  social_provider_text: 'Sign in with {{provider}}',
-                  link_text: 'Already have an account? Sign in',
-                },
-                sign_up: {
-                  email_label: 'Email address',
-                  password_label: 'Create a password',
-                  button_label: 'Sign up',
-                  loading_button_label: 'Signing up...',
-                  social_provider_text: 'Sign up with {{provider}}',
-                  link_text: 'Don\'t have an account? Sign up',
-                },
-                magic_link: {
-                  email_input_label: 'Email address',
-                  button_label: 'Send magic link',
-                  loading_button_label: 'Sending magic link...',
-                  link_text: 'Send a magic link email',
-                },
-                forgotten_password: {
-                  email_label: 'Email address',
-                  button_label: 'Send reset instructions',
-                  loading_button_label: 'Sending reset instructions...',
-                  link_text: 'Forgot your password?',
-                },
-              },
-            }}
+            onlyThirdPartyProviders={true}
+            view="sign_in"
           />
         </div>
       </div>
