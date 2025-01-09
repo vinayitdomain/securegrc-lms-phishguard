@@ -14,6 +14,11 @@ interface Target {
 interface Campaign {
   id: string;
   name: string;
+  description: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+  created_at: string; // Added this field to match the database schema
 }
 
 interface CampaignDetailsProps {

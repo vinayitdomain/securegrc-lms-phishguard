@@ -8,6 +8,7 @@ interface Campaign {
   status: string;
   start_date: string;
   end_date: string;
+  created_at: string; // Added this field to match the database schema
 }
 
 interface CampaignListProps {
