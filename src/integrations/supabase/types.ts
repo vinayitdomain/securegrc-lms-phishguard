@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      campaign_targets: {
+        Row: {
+          campaign_id: string
+          clicked: boolean
+          clicked_at: string | null
+          created_at: string | null
+          email: string
+          id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          clicked?: boolean
+          clicked_at?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          clicked?: boolean
+          clicked_at?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_targets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "phishing_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_frameworks: {
         Row: {
           created_at: string | null
