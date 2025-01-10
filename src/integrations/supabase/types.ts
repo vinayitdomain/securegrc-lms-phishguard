@@ -270,6 +270,50 @@ export type Database = {
           },
         ]
       }
+      user_metrics: {
+        Row: {
+          courses_completed: number | null
+          created_at: string | null
+          id: string
+          last_activity: string | null
+          organization_id: string
+          phishing_tests_passed: number | null
+          security_score: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          courses_completed?: number | null
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          organization_id: string
+          phishing_tests_passed?: number | null
+          security_score?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          courses_completed?: number | null
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          organization_id?: string
+          phishing_tests_passed?: number | null
+          security_score?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

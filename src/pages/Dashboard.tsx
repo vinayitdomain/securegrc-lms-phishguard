@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Added useQueryClient
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -57,7 +57,7 @@ const fetchCampaignMetrics = async () => {
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const queryClient = useQueryClient(); // Get QueryClient instance
+  const queryClient = useQueryClient();
   const [realtimeData, setRealtimeData] = useState({
     campaigns: 0,
     courses: 0,
@@ -106,7 +106,7 @@ export default function Dashboard() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast, queryClient]); // Added queryClient to dependencies
+  }, [toast, queryClient]);
 
   return (
     <DashboardLayout>
