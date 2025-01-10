@@ -44,15 +44,19 @@ export default function AuthPage() {
     setErrorMessage("");
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (error) {
+        console.error("Auth error:", error);
         setErrorMessage(getErrorMessage(error));
+      } else if (!data.session) {
+        setErrorMessage("Failed to create session. Please try again.");
       }
     } catch (error) {
+      console.error("Unexpected error:", error);
       setErrorMessage("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -61,14 +65,12 @@ export default function AuthPage() {
 
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
-      switch (error.code) {
-        case 'invalid_credentials':
+      switch (error.status) {
+        case 400:
           return 'Invalid email or password. Please check your credentials and try again.';
-        case 'user_not_found':
-          return 'No user found with these credentials.';
-        case 'invalid_grant':
-          return 'Invalid login credentials.';
-        case 'too_many_requests':
+        case 422:
+          return 'Invalid email format. Please enter a valid email address.';
+        case 429:
           return 'Too many login attempts. Please try again later.';
         default:
           return error.message;
@@ -117,6 +119,7 @@ export default function AuthPage() {
                   required
                   className="block w-full"
                   placeholder="Enter your email"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -132,6 +135,7 @@ export default function AuthPage() {
                   required
                   className="block w-full"
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                 />
               </div>
             </div>
