@@ -279,6 +279,7 @@ export type Database = {
     }
     Enums: {
       notification_type: "info" | "warning" | "success" | "error"
+      user_role: "super_admin" | "org_admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never

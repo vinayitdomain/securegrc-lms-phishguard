@@ -1,17 +1,21 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -29,33 +33,37 @@ export default function AuthPage() {
         toast.success('Successfully signed in!');
         navigate("/dashboard");
       }
-      if (event === 'PASSWORD_RECOVERY') {
-        toast.info('Please check your email for password reset instructions');
-      }
-      if (event === 'USER_UPDATED') {
-        const { error } = await supabase.auth.getSession();
-        if (error) {
-          setErrorMessage(getErrorMessage(error));
-        } else {
-          setErrorMessage("");
-        }
-      }
-      if (event === 'SIGNED_OUT') {
-        setErrorMessage("");
-        toast.info('You have been signed out');
-      }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setErrorMessage(getErrorMessage(error));
+      }
+    } catch (error) {
+      setErrorMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
       switch (error.code) {
         case 'invalid_credentials':
           return 'Invalid email or password. Please check your credentials and try again.';
-        case 'email_not_confirmed':
-          return 'Please verify your email address before signing in.';
         case 'user_not_found':
           return 'No user found with these credentials.';
         case 'invalid_grant':
@@ -88,6 +96,7 @@ export default function AuthPage() {
           Sign in with your organization credentials
         </p>
       </div>
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {errorMessage && (
@@ -95,33 +104,53 @@ export default function AuthPage() {
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#2563eb',
-                    brandAccent: '#1d4ed8',
-                  },
-                },
-              },
-              className: {
-                container: 'space-y-4',
-                button: 'w-full rounded-md',
-                input: 'rounded-md border-gray-300',
-                label: 'text-sm font-medium text-gray-700',
-                message: 'text-sm text-red-600',
-                anchor: 'text-sm text-blue-600 hover:text-blue-500',
-              },
-            }}
-            theme="light"
-            providers={["azure"]}
-            redirectTo={window.location.origin}
-            onlyThirdPartyProviders={true}
-            view="sign_in"
-          />
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Label htmlFor="email">Email address</Label>
+              <div className="mt-2">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="block w-full"
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <div className="mt-2">
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="block w-full"
+                  placeholder="Enter your password"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
