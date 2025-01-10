@@ -20,10 +20,7 @@ export default function AuthPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-          console.error("Session check error:", sessionError);
-        }
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           navigate("/dashboard");
         }
@@ -36,15 +33,30 @@ export default function AuthPage() {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        toast.success('Successfully signed in!');
         navigate("/dashboard");
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 400:
+          return 'Invalid email or password. Please check your credentials and try again.';
+        case 422:
+          return 'Invalid email format. Please enter a valid email address.';
+        case 429:
+          return 'Too many login attempts. Please try again later.';
+        default:
+          return `Authentication error: ${error.message}`;
+      }
+    }
+    return error.message || 'An error occurred during authentication';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +69,7 @@ export default function AuthPage() {
 
       if (!trimmedEmail || !trimmedPassword) {
         setErrorMessage("Please enter both email and password");
+        setIsSubmitting(false);
         return;
       }
 
@@ -75,22 +88,6 @@ export default function AuthPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const getErrorMessage = (error: AuthError) => {
-    if (error instanceof AuthApiError) {
-      switch (error.status) {
-        case 400:
-          return 'Invalid email or password. Please check your credentials and try again.';
-        case 422:
-          return 'Invalid email format. Please enter a valid email address.';
-        case 429:
-          return 'Too many login attempts. Please try again later.';
-        default:
-          return `Authentication error: ${error.message}`;
-      }
-    }
-    return error.message || 'An error occurred during authentication';
   };
 
   if (isLoading) {
@@ -134,6 +131,7 @@ export default function AuthPage() {
                   className="block w-full"
                   placeholder="Enter your email"
                   autoComplete="email"
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
@@ -150,6 +148,7 @@ export default function AuthPage() {
                   className="block w-full"
                   placeholder="Enter your password"
                   autoComplete="current-password"
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
