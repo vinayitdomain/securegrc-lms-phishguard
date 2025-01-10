@@ -19,20 +19,24 @@ export default function AuthPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error("Session check error:", sessionError);
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.error("Session check error:", sessionError);
+        }
+        if (session) {
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+      } finally {
+        setIsLoading(false);
       }
-      if (session) {
-        navigate("/dashboard");
-      }
-      setIsLoading(false);
     };
 
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session);
       if (event === 'SIGNED_IN' && session) {
         toast.success('Successfully signed in!');
         navigate("/dashboard");
@@ -48,26 +52,22 @@ export default function AuthPage() {
     setErrorMessage("");
 
     try {
-      console.log("Attempting sign in with:", { email: email.trim() });
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
+
+      if (!trimmedEmail || !trimmedPassword) {
+        setErrorMessage("Please enter both email and password");
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password: trimmedPassword,
       });
 
-      console.log("Sign in response:", { data, error });
-
       if (error) {
-        console.error("Detailed auth error:", {
-          message: error.message,
-          status: error.status,
-          name: error.name,
-          stack: error.stack
-        });
+        console.error("Authentication error:", error);
         setErrorMessage(getErrorMessage(error));
-      } else if (!data.session) {
-        console.error("No session created");
-        setErrorMessage("Failed to create session. Please try again.");
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
@@ -78,8 +78,6 @@ export default function AuthPage() {
   };
 
   const getErrorMessage = (error: AuthError) => {
-    console.log("Processing error:", error);
-    
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
