@@ -16,6 +16,7 @@ export default function AuthPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -50,12 +51,36 @@ export default function AuthPage() {
         case 422:
           return 'Invalid email format. Please enter a valid email address.';
         case 429:
-          return 'Too many login attempts. Please try again later.';
+          return 'Too many attempts. Please try again later.';
         default:
           return `Authentication error: ${error.message}`;
       }
     }
     return error.message || 'An error occurred during authentication';
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) {
+        setErrorMessage(getErrorMessage(error));
+      } else {
+        toast.success("Password reset instructions have been sent to your email");
+        setIsResetMode(false);
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,7 +131,7 @@ export default function AuthPage() {
           SecureGRC
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Sign in with your organization credentials
+          {isResetMode ? "Reset your password" : "Sign in with your organization credentials"}
         </p>
       </div>
 
@@ -118,7 +143,7 @@ export default function AuthPage() {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={isResetMode ? handlePasswordReset : handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="email">Email address</Label>
               <div className="mt-2">
@@ -136,22 +161,24 @@ export default function AuthPage() {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="mt-2">
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="block w-full"
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  disabled={isSubmitting}
-                />
+            {!isResetMode && (
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <div className="mt-2">
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="block w-full"
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
@@ -161,13 +188,26 @@ export default function AuthPage() {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  {isResetMode ? 'Sending reset instructions...' : 'Signing in...'}
                 </>
               ) : (
-                'Sign in'
+                isResetMode ? 'Send reset instructions' : 'Sign in'
               )}
             </Button>
           </form>
+
+          <div className="mt-4 text-center">
+            <Button
+              variant="link"
+              className="text-sm text-primary"
+              onClick={() => {
+                setIsResetMode(!isResetMode);
+                setErrorMessage("");
+              }}
+            >
+              {isResetMode ? "Back to sign in" : "Forgot your password?"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
