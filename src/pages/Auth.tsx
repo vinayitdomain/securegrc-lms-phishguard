@@ -44,10 +44,11 @@ export default function AuthPage() {
   }, [navigate]);
 
   const getErrorMessage = (error: AuthError | Error) => {
+    console.error("Authentication error:", error);
+    
     if (error instanceof AuthApiError) {
-      // Handle specific API error codes
       if (error.message.includes("Invalid login credentials")) {
-        return "Invalid email or password. Please check your credentials and try again.";
+        return "Invalid email or password. Please check your credentials and try again. Note: Test accounts use the format: orgname.xxxx.role@example.com with password: Password123!";
       }
       
       switch (error.status) {
@@ -115,7 +116,7 @@ export default function AuthPage() {
         setErrorMessage(getErrorMessage(error));
       } else if (data?.user) {
         console.log("Login successful:", data.user);
-        // The navigation will be handled by the onAuthStateChange listener
+        toast.success("Login successful!");
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
@@ -142,6 +143,9 @@ export default function AuthPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           {isResetMode ? "Reset your password" : "Sign in with your organization credentials"}
+        </p>
+        <p className="mt-1 text-center text-xs text-gray-500">
+          Test accounts use format: orgname.xxxx.role@example.com
         </p>
       </div>
 
