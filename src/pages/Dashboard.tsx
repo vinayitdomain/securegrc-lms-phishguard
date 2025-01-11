@@ -115,6 +115,42 @@ export default function Dashboard() {
     enabled: profile?.role === 'super_admin',
   });
 
+  const { 
+    data: activeCampaigns = 0, 
+    isLoading: isLoadingCampaigns 
+  } = useQuery({
+    queryKey: ['activeCampaigns'],
+    queryFn: fetchCampaignCount,
+    enabled: profile?.role !== 'super_admin',
+  });
+
+  const { 
+    data: courseCompletion = 0, 
+    isLoading: isLoadingCourses 
+  } = useQuery({
+    queryKey: ['courseCompletion'],
+    queryFn: fetchCourses,
+    enabled: profile?.role !== 'super_admin',
+  });
+
+  const { 
+    data: complianceStatus = 0, 
+    isLoading: isLoadingCompliance 
+  } = useQuery({
+    queryKey: ['complianceStatus'],
+    queryFn: fetchComplianceStatus,
+    enabled: profile?.role !== 'super_admin',
+  });
+
+  const { 
+    data: campaignMetrics = [], 
+    isLoading: isLoadingMetrics 
+  } = useQuery({
+    queryKey: ['campaignMetrics'],
+    queryFn: fetchCampaignMetrics,
+    enabled: profile?.role !== 'super_admin',
+  });
+
   useEffect(() => {
     if (profileError) {
       console.error("Profile error:", profileError);
