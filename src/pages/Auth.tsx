@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AuthError, AuthApiError } from "@supabase/supabase-js";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { AuthHeader } from "@/components/auth/AuthHeader";
+import { AuthForm } from "@/components/auth/AuthForm";
+import { getErrorMessage } from "@/utils/auth";
+import { Loader2 } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -42,28 +41,6 @@ export default function AuthPage() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const getErrorMessage = (error: AuthError | Error) => {
-    console.error("Authentication error:", error);
-    
-    if (error instanceof AuthApiError) {
-      if (error.message.includes("Invalid login credentials")) {
-        return "Invalid email or password. Please check your credentials and try again.\n\nTest accounts format: orgname.xxxx.role@example.com\nPassword: Password123!";
-      }
-      
-      switch (error.status) {
-        case 400:
-          return "Invalid email or password. Please check your credentials and try again.";
-        case 422:
-          return "Invalid email format. Please enter a valid email address.";
-        case 429:
-          return "Too many attempts. Please try again later.";
-        default:
-          return error.message;
-      }
-    }
-    return "An unexpected error occurred. Please try again.";
-  };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,94 +114,24 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
-          SecureGRC
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          {isResetMode ? "Reset your password" : "Sign in with your organization credentials"}
-        </p>
-        <div className="mt-1 text-center text-xs space-y-1 text-gray-500">
-          <p>Test accounts format: orgname.xxxx.role@example.com</p>
-          <p>Password: Password123!</p>
+      <AuthHeader isResetMode={isResetMode} />
+      {errorMessage && (
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <Alert variant="destructive">
+            <AlertDescription className="whitespace-pre-line">{errorMessage}</AlertDescription>
+          </Alert>
         </div>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {errorMessage && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription className="whitespace-pre-line">{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={isResetMode ? handlePasswordReset : handleSubmit} className="space-y-6">
-            <div>
-              <Label htmlFor="email">Email address</Label>
-              <div className="mt-2">
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="block w-full"
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                  disabled={isSubmitting}
-                />
-              </div>
-            </div>
-
-            {!isResetMode && (
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <div className="mt-2">
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="block w-full"
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isResetMode ? 'Sending reset instructions...' : 'Signing in...'}
-                </>
-              ) : (
-                isResetMode ? 'Send reset instructions' : 'Sign in'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-4 text-center">
-            <Button
-              variant="link"
-              className="text-sm text-primary"
-              onClick={() => {
-                setIsResetMode(!isResetMode);
-                setErrorMessage("");
-              }}
-            >
-              {isResetMode ? "Back to sign in" : "Forgot your password?"}
-            </Button>
-          </div>
-        </div>
-      </div>
+      )}
+      <AuthForm
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        isSubmitting={isSubmitting}
+        isResetMode={isResetMode}
+        handleSubmit={isResetMode ? handlePasswordReset : handleSubmit}
+        setIsResetMode={setIsResetMode}
+      />
     </div>
   );
 }
