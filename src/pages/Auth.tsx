@@ -47,7 +47,10 @@ export default function AuthPage() {
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
-          return 'Invalid email or password. Please check your credentials and try again.';
+          if (error.message.includes("Invalid login credentials")) {
+            return 'Invalid email or password. Please check your credentials and try again.';
+          }
+          return 'Invalid email or password format. Please check your input.';
         case 422:
           return 'Invalid email format. Please enter a valid email address.';
         case 429:
@@ -89,7 +92,7 @@ export default function AuthPage() {
     setErrorMessage("");
 
     try {
-      const trimmedEmail = email.trim();
+      const trimmedEmail = email.trim().toLowerCase();
       const trimmedPassword = password.trim();
 
       if (!trimmedEmail || !trimmedPassword) {

@@ -331,7 +331,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_org_users: {
+        Args: {
+          org_id: string
+          org_name: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       notification_type: "info" | "warning" | "success" | "error"
