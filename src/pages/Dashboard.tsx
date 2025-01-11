@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Building2 } from "lucide-react";
 
 // Fetch functions
 const fetchUserProfile = async () => {
@@ -196,60 +196,67 @@ export default function Dashboard() {
     <DashboardLayout>
       {profile?.role === 'super_admin' ? (
         <>
-          <h2 className="text-2xl font-bold mb-6">Organizations Overview</h2>
+          <div className="flex items-center gap-3 mb-8">
+            <Building2 className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              Organizations Overview
+            </h1>
+          </div>
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
-              <Card>
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Organizations</CardTitle>
+                  <CardTitle className="text-sm font-medium text-blue-800">Total Organizations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-blue-900">
                     {isLoadingOrgs ? "Loading..." : organizations.length}
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Licenses</CardTitle>
+                  <CardTitle className="text-sm font-medium text-purple-800">Active Licenses</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-purple-900">
                     {isLoadingOrgs ? "Loading..." : organizations.reduce((acc, org) => acc + (org.license_count || 0), 0)}
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Organizations</CardTitle>
+                  <CardTitle className="text-sm font-medium text-green-800">Active Organizations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-green-900">
                     {isLoadingOrgs ? "Loading..." : organizations.filter(org => org.status === 'active').length}
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Organizations</CardTitle>
+            <Card className="border-t-4 border-t-primary shadow-lg">
+              <CardHeader className="bg-gray-50">
+                <CardTitle className="text-xl font-semibold text-gray-800">
+                  Organizations Directory
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-50">
                     <TableRow>
-                      <TableHead>Organization Name</TableHead>
-                      <TableHead>License Count</TableHead>
-                      <TableHead>License Start</TableHead>
-                      <TableHead>License End</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead className="font-semibold text-primary">Organization Name</TableHead>
+                      <TableHead className="font-semibold text-primary">License Count</TableHead>
+                      <TableHead className="font-semibold text-primary">License Start</TableHead>
+                      <TableHead className="font-semibold text-primary">License End</TableHead>
+                      <TableHead className="font-semibold text-primary">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {organizations.map((org) => (
-                      <TableRow key={org.id}>
-                        <TableCell>{org.name}</TableCell>
+                      <TableRow key={org.id} className="hover:bg-gray-50 transition-colors">
+                        <TableCell className="font-medium">{org.name}</TableCell>
                         <TableCell>{org.license_count}</TableCell>
                         <TableCell>
                           {org.license_start_date 
@@ -262,7 +269,7 @@ export default function Dashboard() {
                             : 'N/A'}
                         </TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             org.status === 'active' 
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-red-100 text-red-800'
