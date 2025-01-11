@@ -3,10 +3,34 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 // Fetch functions
+const fetchUserProfile = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (error) throw error;
+  return profile;
+};
+
+const fetchOrganizations = async () => {
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*');
+  
+  if (error) throw error;
+  return data;
+};
+
 const fetchCampaignCount = async () => {
   const { count, error } = await supabase
     .from('phishing_campaigns')
@@ -64,6 +88,17 @@ export default function Dashboard() {
     compliance: 0,
   });
 
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: fetchUserProfile,
+  });
+
+  const { data: organizations = [], isLoading: isLoadingOrgs } = useQuery({
+    queryKey: ['organizations'],
+    queryFn: fetchOrganizations,
+    enabled: profile?.role === 'super_admin',
+  });
+
   const { data: activeCampaigns = 0, isLoading: isLoadingCampaigns } = useQuery({
     queryKey: ['activeCampaigns'],
     queryFn: fetchCampaignCount,
@@ -108,50 +143,140 @@ export default function Dashboard() {
     };
   }, [toast, queryClient]);
 
+  if (isLoadingProfile) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <DashboardLayout>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoadingCampaigns ? "Loading..." : activeCampaigns}
+      {profile?.role === 'super_admin' ? (
+        <>
+          <h2 className="text-2xl font-bold mb-6">Organizations Overview</h2>
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Organizations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isLoadingOrgs ? "Loading..." : organizations.length}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Licenses</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isLoadingOrgs ? "Loading..." : organizations.reduce((acc, org) => acc + (org.license_count || 0), 0)}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Organizations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isLoadingOrgs ? "Loading..." : organizations.filter(org => org.status === 'active').length}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Course Completion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoadingCourses ? "Loading..." : `${courseCompletion}%`}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Risk Score</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {courseCompletion >= 75 ? "Low" : courseCompletion >= 50 ? "Medium" : "High"}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoadingCompliance ? "Loading..." : `${complianceStatus}%`}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Organizations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Organization Name</TableHead>
+                      <TableHead>License Count</TableHead>
+                      <TableHead>License Start</TableHead>
+                      <TableHead>License End</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {organizations.map((org) => (
+                      <TableRow key={org.id}>
+                        <TableCell>{org.name}</TableCell>
+                        <TableCell>{org.license_count}</TableCell>
+                        <TableCell>
+                          {org.license_start_date 
+                            ? new Date(org.license_start_date).toLocaleDateString() 
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          {org.license_end_date 
+                            ? new Date(org.license_end_date).toLocaleDateString() 
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            org.status === 'active' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {org.status}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoadingCampaigns ? "Loading..." : activeCampaigns}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Course Completion</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoadingCourses ? "Loading..." : `${courseCompletion}%`}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Risk Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {courseCompletion >= 75 ? "Low" : courseCompletion >= 50 ? "Medium" : "High"}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Compliance Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {isLoadingCompliance ? "Loading..." : `${complianceStatus}%`}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
       <div className="mt-4">
         <Card className="col-span-4">
           <CardHeader>

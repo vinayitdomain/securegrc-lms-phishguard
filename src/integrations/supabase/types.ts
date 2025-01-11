@@ -171,19 +171,31 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          license_count: number | null
+          license_end_date: string | null
+          license_start_date: string | null
           name: string
+          status: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
+          license_count?: number | null
+          license_end_date?: string | null
+          license_start_date?: string | null
           name: string
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
+          license_count?: number | null
+          license_end_date?: string | null
+          license_start_date?: string | null
           name?: string
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: []
