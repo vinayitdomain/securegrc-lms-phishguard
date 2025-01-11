@@ -44,13 +44,21 @@ export default function AuthPage() {
   }, [navigate]);
 
   const getErrorMessage = (error: AuthError) => {
+    console.error("Auth error details:", error);
+    
     if (error instanceof AuthApiError) {
+      // Check for specific error codes in the response body
+      const errorBody = error.message && typeof error.message === 'string' 
+        ? JSON.parse(error.message)
+        : null;
+      
+      if (errorBody?.code === 'invalid_credentials') {
+        return 'Invalid email or password. Please check your credentials and try again.';
+      }
+
       switch (error.status) {
         case 400:
-          if (error.message.includes("Invalid login credentials")) {
-            return 'Invalid email or password. Please check your credentials and try again.';
-          }
-          return 'Invalid email or password format. Please check your input.';
+          return 'Invalid email or password. Please check your credentials and try again.';
         case 422:
           return 'Invalid email format. Please enter a valid email address.';
         case 429:
@@ -92,6 +100,8 @@ export default function AuthPage() {
     setErrorMessage("");
 
     try {
+      console.log("Attempting login with:", { email: email.trim().toLowerCase() });
+      
       const trimmedEmail = email.trim().toLowerCase();
       const trimmedPassword = password.trim();
 
