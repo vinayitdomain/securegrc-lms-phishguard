@@ -43,19 +43,11 @@ export default function AuthPage() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const getErrorMessage = (error: AuthError) => {
+  const getErrorMessage = (error: AuthError | Error) => {
     console.error("Auth error details:", error);
     
     if (error instanceof AuthApiError) {
-      // Check for specific error codes in the response body
-      const errorBody = error.message && typeof error.message === 'string' 
-        ? JSON.parse(error.message)
-        : null;
-      
-      if (errorBody?.code === 'invalid_credentials') {
-        return 'Invalid email or password. Please check your credentials and try again.';
-      }
-
+      // Handle specific API error codes
       switch (error.status) {
         case 400:
           return 'Invalid email or password. Please check your credentials and try again.';
@@ -64,10 +56,10 @@ export default function AuthPage() {
         case 429:
           return 'Too many attempts. Please try again later.';
         default:
-          return `Authentication error: ${error.message}`;
+          return error.message || 'An authentication error occurred';
       }
     }
-    return error.message || 'An error occurred during authentication';
+    return error.message || 'An unexpected error occurred';
   };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -99,19 +91,19 @@ export default function AuthPage() {
     setIsSubmitting(true);
     setErrorMessage("");
 
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      setErrorMessage("Please enter both email and password");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      console.log("Attempting login with:", { email: email.trim().toLowerCase() });
+      console.log("Attempting login with:", { email: trimmedEmail });
       
-      const trimmedEmail = email.trim().toLowerCase();
-      const trimmedPassword = password.trim();
-
-      if (!trimmedEmail || !trimmedPassword) {
-        setErrorMessage("Please enter both email and password");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
         password: trimmedPassword,
       });
@@ -119,6 +111,8 @@ export default function AuthPage() {
       if (error) {
         console.error("Authentication error:", error);
         setErrorMessage(getErrorMessage(error));
+      } else if (data?.user) {
+        console.log("Login successful:", data.user);
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
