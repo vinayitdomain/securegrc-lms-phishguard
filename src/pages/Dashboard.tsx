@@ -1,33 +1,46 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 // Fetch functions
 const fetchUserProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  console.log("Fetching profile for user:", user.id);
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', user.id)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error("Profile fetch error:", error);
+    throw error;
+  }
+  
+  console.log("User profile:", profile);
   return profile;
 };
 
 const fetchOrganizations = async () => {
+  console.log("Fetching organizations...");
   const { data, error } = await supabase
     .from('organizations')
     .select('*');
   
-  if (error) throw error;
+  if (error) {
+    console.error("Organizations fetch error:", error);
+    throw error;
+  }
+
+  console.log("Organizations data:", data);
   return data;
 };
 
@@ -81,70 +94,66 @@ const fetchCampaignMetrics = async () => {
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [realtimeData, setRealtimeData] = useState({
-    campaigns: 0,
-    courses: 0,
-    compliance: 0,
-  });
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+  const { 
+    data: profile, 
+    isLoading: isLoadingProfile,
+    error: profileError 
+  } = useQuery({
     queryKey: ['userProfile'],
     queryFn: fetchUserProfile,
   });
 
-  const { data: organizations = [], isLoading: isLoadingOrgs } = useQuery({
+  const { 
+    data: organizations = [], 
+    isLoading: isLoadingOrgs,
+    error: orgsError
+  } = useQuery({
     queryKey: ['organizations'],
     queryFn: fetchOrganizations,
     enabled: profile?.role === 'super_admin',
   });
 
-  const { data: activeCampaigns = 0, isLoading: isLoadingCampaigns } = useQuery({
-    queryKey: ['activeCampaigns'],
-    queryFn: fetchCampaignCount,
-  });
-
-  const { data: courseCompletion = 0, isLoading: isLoadingCourses } = useQuery({
-    queryKey: ['courseCompletion'],
-    queryFn: fetchCourses,
-  });
-
-  const { data: complianceStatus = 0, isLoading: isLoadingCompliance } = useQuery({
-    queryKey: ['complianceStatus'],
-    queryFn: fetchComplianceStatus,
-  });
-
-  const { data: campaignMetrics = [], isLoading: isLoadingMetrics } = useQuery({
-    queryKey: ['campaignMetrics'],
-    queryFn: fetchCampaignMetrics,
-  });
-
   useEffect(() => {
-    const channel = supabase
-      .channel('dashboard-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public' },
-        (payload) => {
-          console.log('Change received!', payload);
-          toast({
-            title: "Dashboard Updated",
-            description: `${payload.table} has been updated.`,
-          });
-          
-          // Refresh queries
-          queryClient.invalidateQueries();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [toast, queryClient]);
+    if (profileError) {
+      console.error("Profile error:", profileError);
+      setError("Error loading profile");
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive",
+      });
+    }
+    if (orgsError) {
+      console.error("Organizations error:", orgsError);
+      setError("Error loading organizations");
+      toast({
+        title: "Error",
+        description: "Failed to load organization data",
+        variant: "destructive",
+      });
+    }
+  }, [profileError, orgsError, toast]);
 
   if (isLoadingProfile) {
-    return <div>Loading...</div>;
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="p-4 text-red-500">
+          {error}
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (
