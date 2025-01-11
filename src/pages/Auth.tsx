@@ -44,22 +44,24 @@ export default function AuthPage() {
   }, [navigate]);
 
   const getErrorMessage = (error: AuthError | Error) => {
-    console.error("Auth error details:", error);
-    
     if (error instanceof AuthApiError) {
       // Handle specific API error codes
+      if (error.message.includes("Invalid login credentials")) {
+        return "Invalid email or password. Please check your credentials and try again.";
+      }
+      
       switch (error.status) {
         case 400:
-          return 'Invalid email or password. Please check your credentials and try again.';
+          return "Invalid email or password. Please check your credentials and try again.";
         case 422:
-          return 'Invalid email format. Please enter a valid email address.';
+          return "Invalid email format. Please enter a valid email address.";
         case 429:
-          return 'Too many attempts. Please try again later.';
+          return "Too many attempts. Please try again later.";
         default:
-          return error.message || 'An authentication error occurred';
+          return error.message;
       }
     }
-    return error.message || 'An unexpected error occurred';
+    return "An unexpected error occurred. Please try again.";
   };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -113,6 +115,7 @@ export default function AuthPage() {
         setErrorMessage(getErrorMessage(error));
       } else if (data?.user) {
         console.log("Login successful:", data.user);
+        // The navigation will be handled by the onAuthStateChange listener
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
