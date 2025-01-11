@@ -48,7 +48,7 @@ export default function AuthPage() {
     
     if (error instanceof AuthApiError) {
       if (error.message.includes("Invalid login credentials")) {
-        return "Invalid email or password. Please check your credentials and try again. Note: Test accounts use the format: orgname.xxxx.role@example.com with password: Password123!";
+        return "Invalid email or password. Please check your credentials and try again.\n\nTest accounts format: orgname.xxxx.role@example.com\nPassword: Password123!";
       }
       
       switch (error.status) {
@@ -144,16 +144,17 @@ export default function AuthPage() {
         <p className="mt-2 text-center text-sm text-gray-600">
           {isResetMode ? "Reset your password" : "Sign in with your organization credentials"}
         </p>
-        <p className="mt-1 text-center text-xs text-gray-500">
-          Test accounts use format: orgname.xxxx.role@example.com
-        </p>
+        <div className="mt-1 text-center text-xs space-y-1 text-gray-500">
+          <p>Test accounts format: orgname.xxxx.role@example.com</p>
+          <p>Password: Password123!</p>
+        </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {errorMessage && (
             <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertDescription className="whitespace-pre-line">{errorMessage}</AlertDescription>
             </Alert>
           )}
 
