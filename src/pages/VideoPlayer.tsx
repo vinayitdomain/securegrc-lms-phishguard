@@ -31,11 +31,7 @@ export default function VideoPlayer() {
         .maybeSingle();
 
       if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load video",
-          variant: "destructive",
-        });
+        console.error('Error fetching video:', error);
         throw error;
       }
 
@@ -43,7 +39,15 @@ export default function VideoPlayer() {
         throw new Error('Video not found');
       }
 
-      return data;
+      // Get the public URL for the video
+      const { data: publicUrlData } = supabase.storage
+        .from('training_videos')
+        .getPublicUrl(data.video_url);
+
+      return {
+        ...data,
+        publicUrl: publicUrlData.publicUrl
+      };
     },
     enabled: !!id,
     retry: false,
@@ -127,13 +131,21 @@ export default function VideoPlayer() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
           
-          {video.video_url && (
+          {video.publicUrl && (
             <div className="aspect-video mb-4">
               <video
                 ref={videoRef}
                 controls
                 className="w-full h-full rounded"
-                src={supabase.storage.from('training_videos').getPublicUrl(video.video_url).data.publicUrl}
+                src={video.publicUrl}
+                onError={(e) => {
+                  console.error('Video playback error:', e);
+                  toast({
+                    title: "Error",
+                    description: "Failed to play video. Please try again later.",
+                    variant: "destructive",
+                  });
+                }}
               >
                 Your browser does not support the video tag.
               </video>
