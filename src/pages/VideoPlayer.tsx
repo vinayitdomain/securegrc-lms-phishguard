@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef } from "react";
 
 export default function VideoPlayer() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -16,6 +16,8 @@ export default function VideoPlayer() {
   const { data: video, isLoading } = useQuery({
     queryKey: ['video', id],
     queryFn: async () => {
+      if (!id) throw new Error('No video ID provided');
+      
       const { data, error } = await supabase
         .from('training_videos')
         .select('*')
@@ -33,6 +35,7 @@ export default function VideoPlayer() {
 
       return data;
     },
+    enabled: !!id
   });
 
   useEffect(() => {
@@ -68,6 +71,26 @@ export default function VideoPlayer() {
     );
   }
 
+  if (!video) {
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/training/videos')}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Library
+          </Button>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <p>Video not found</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
@@ -81,9 +104,9 @@ export default function VideoPlayer() {
         </Button>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-4">{video?.title}</h1>
+          <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
           
-          {video?.video_url && (
+          {video.video_url && (
             <div className="aspect-video mb-4">
               <video
                 ref={videoRef}
@@ -96,7 +119,7 @@ export default function VideoPlayer() {
             </div>
           )}
 
-          {video?.description && (
+          {video.description && (
             <div className="prose max-w-none">
               <h2 className="text-xl font-semibold mb-2">Description</h2>
               <p>{video.description}</p>
