@@ -6,6 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  question: string;
+  options: string[];
+  correct_answer: string;
+  order_number: number;
+}
 
 export default function QuizAttempt() {
   const { id } = useParams();
@@ -37,7 +47,7 @@ export default function QuizAttempt() {
         .order('order_number');
       
       if (error) throw error;
-      return data;
+      return data as QuizQuestion[];
     }
   });
 
@@ -109,29 +119,26 @@ export default function QuizAttempt() {
                 <p className="font-medium mb-4">
                   {index + 1}. {question.question}
                 </p>
-                <div className="space-y-2">
-                  {question.options.map((option: string) => (
-                    <div key={option} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`${question.id}-${option}`}
-                        name={question.id}
-                        value={option}
-                        checked={answers[question.id] === option}
-                        onChange={(e) => 
-                          setAnswers(prev => ({
-                            ...prev,
-                            [question.id]: e.target.value
-                          }))
-                        }
-                        className="mr-2"
-                      />
-                      <label htmlFor={`${question.id}-${option}`}>
-                        {option}
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                <RadioGroup
+                  value={answers[question.id]}
+                  onValueChange={(value) => 
+                    setAnswers(prev => ({
+                      ...prev,
+                      [question.id]: value
+                    }))
+                  }
+                >
+                  <div className="space-y-2">
+                    {question.options.map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={`${question.id}-${option}`} />
+                        <label htmlFor={`${question.id}-${option}`}>
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </RadioGroup>
               </CardContent>
             </Card>
           ))}
