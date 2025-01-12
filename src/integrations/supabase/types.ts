@@ -282,6 +282,142 @@ export type Database = {
           },
         ]
       }
+      quiz_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string | null
+          id: string
+          options: Json
+          order_number: number
+          question: string
+          quiz_id: string | null
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string | null
+          id?: string
+          options: Json
+          order_number: number
+          question: string
+          quiz_id?: string | null
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string | null
+          id?: string
+          options?: Json
+          order_number?: number
+          question?: string
+          quiz_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          organization_id: string | null
+          passing_score: number | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string | null
+          passing_score?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string | null
+          passing_score?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quizzes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "training_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_videos: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          organization_id: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_videos_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_metrics: {
         Row: {
           courses_completed: number | null
@@ -322,6 +458,88 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_quiz_attempts: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          passed: boolean | null
+          quiz_id: string | null
+          score: number
+          user_id: string | null
+        }
+        Insert: {
+          answers: Json
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          quiz_id?: string | null
+          score: number
+          user_id?: string | null
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          passed?: boolean | null
+          quiz_id?: string | null
+          score?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_video_progress: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          id: string
+          last_watched_at: string | null
+          progress_percentage: number | null
+          updated_at: string | null
+          user_id: string | null
+          video_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          id?: string
+          last_watched_at?: string | null
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          id?: string
+          last_watched_at?: string | null
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_video_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "training_videos"
             referencedColumns: ["id"]
           },
         ]

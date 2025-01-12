@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
 import AuthPage from "./pages/Auth";
+import Training from "./pages/Training";
+import VideoLibrary from "./pages/VideoLibrary";
+import QuizManager from "./pages/QuizManager";
+import VideoPlayer from "./pages/VideoPlayer";
+import QuizAttempt from "./pages/QuizAttempt";
 
 const queryClient = new QueryClient();
 
@@ -41,10 +46,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/"
-            element={<Navigate to="/dashboard" replace />}
-          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route
             path="/dashboard"
             element={
@@ -58,6 +60,46 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Campaigns />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/training"
+            element={
+              <ProtectedRoute>
+                <Training />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/training/videos"
+            element={
+              <ProtectedRoute>
+                <VideoLibrary />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/training/quizzes"
+            element={
+              <ProtectedRoute>
+                <QuizManager />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/training/video/:id"
+            element={
+              <ProtectedRoute>
+                <VideoPlayer />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/training/quiz/:id"
+            element={
+              <ProtectedRoute>
+                <QuizAttempt />
               </ProtectedRoute>
             }
           />
