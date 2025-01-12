@@ -40,13 +40,18 @@ export default function VideoPlayer() {
       }
 
       // Get the public URL for the video
-      const { data: publicUrlData } = supabase.storage
+      const { data: publicUrlData } = await supabase.storage
         .from('training_videos')
-        .getPublicUrl(data.video_url);
+        .createSignedUrl(data.video_url, 3600); // 1 hour signed URL
+
+      if (!publicUrlData?.signedUrl) {
+        console.error('Failed to get signed URL for video');
+        throw new Error('Failed to get video URL');
+      }
 
       return {
         ...data,
-        publicUrl: publicUrlData.publicUrl
+        publicUrl: publicUrlData.signedUrl
       };
     },
     enabled: !!id,
