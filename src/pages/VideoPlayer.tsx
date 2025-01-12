@@ -22,7 +22,7 @@ export default function VideoPlayer() {
         .from('training_videos')
         .select()
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         toast({
@@ -33,9 +33,14 @@ export default function VideoPlayer() {
         throw error;
       }
 
+      if (!data) {
+        throw new Error('Video not found');
+      }
+
       return data;
     },
-    enabled: !!id
+    enabled: !!id,
+    retry: false
   });
 
   useEffect(() => {
