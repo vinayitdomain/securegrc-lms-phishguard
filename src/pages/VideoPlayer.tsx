@@ -18,6 +18,12 @@ export default function VideoPlayer() {
     queryFn: async () => {
       if (!id) throw new Error('No video ID provided');
       
+      // Validate UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        throw new Error('Invalid video ID format');
+      }
+
       const { data, error } = await supabase
         .from('training_videos')
         .select()
@@ -40,7 +46,15 @@ export default function VideoPlayer() {
       return data;
     },
     enabled: !!id,
-    retry: false
+    retry: false,
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to load video",
+        variant: "destructive",
+      });
+      navigate('/training/videos');
+    }
   });
 
   useEffect(() => {
