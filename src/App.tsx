@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import Dashboard from "./pages/Dashboard";
 import Campaigns from "./pages/Campaigns";
 import AuthPage from "./pages/Auth";
-import Training from "./pages/Training";
 import VideoLibrary from "./pages/VideoLibrary";
 import QuizManager from "./pages/QuizManager";
 import VideoPlayer from "./pages/VideoPlayer";
@@ -64,15 +63,7 @@ const App = () => (
             }
           />
           <Route
-            path="/training"
-            element={
-              <ProtectedRoute>
-                <Training />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/training/videos"
+            path="/learning/videos"
             element={
               <ProtectedRoute>
                 <VideoLibrary />
@@ -80,7 +71,7 @@ const App = () => (
             }
           />
           <Route
-            path="/training/quizzes"
+            path="/learning/quizzes"
             element={
               <ProtectedRoute>
                 <QuizManager />
@@ -88,7 +79,7 @@ const App = () => (
             }
           />
           <Route
-            path="/training/video/:id"
+            path="/learning/video/:id"
             element={
               <ProtectedRoute>
                 <VideoPlayer />
@@ -96,7 +87,7 @@ const App = () => (
             }
           />
           <Route
-            path="/training/quiz/:id"
+            path="/learning/quiz/:id"
             element={
               <ProtectedRoute>
                 <QuizAttempt />

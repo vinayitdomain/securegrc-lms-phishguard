@@ -45,12 +45,19 @@ export function Navbar() {
           >
             Phishing Campaigns
           </Button>
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/learning")}
-          >
-            Learning
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">Learning</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => navigate("/learning/videos")}>
+                Videos
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/learning/quizzes")}>
+                Quizzes
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="ghost"
             onClick={() => navigate("/compliance")}
