@@ -20,7 +20,7 @@ export default function VideoPlayer() {
       
       const { data, error } = await supabase
         .from('training_videos')
-        .select('*')
+        .select()
         .eq('id', id)
         .single();
 
