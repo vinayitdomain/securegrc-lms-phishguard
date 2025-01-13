@@ -371,6 +371,47 @@ export type Database = {
           },
         ]
       }
+      report_configurations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          filters: Json | null
+          id: string
+          name: string
+          organization_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          filters?: Json | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          filters?: Json | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_configurations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_content: {
         Row: {
           content_type: string
@@ -558,7 +599,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_course_progress_report: {
+        Args: {
+          org_id: string
+        }
+        Returns: {
+          user_id: string
+          full_name: string
+          content_title: string
+          progress_percentage: number
+          completed: boolean
+          last_watched_at: string
+        }[]
+      }
+      get_quiz_performance_report: {
+        Args: {
+          org_id: string
+        }
+        Returns: {
+          user_id: string
+          full_name: string
+          quiz_title: string
+          score: number
+          passed: boolean
+          completed_at: string
+        }[]
+      }
     }
     Enums: {
       notification_type: "info" | "warning" | "success" | "error"

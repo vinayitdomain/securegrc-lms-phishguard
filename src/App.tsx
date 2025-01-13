@@ -8,6 +8,7 @@ import QuizAttempt from "./pages/QuizAttempt";
 import Campaigns from "./pages/Campaigns";
 import Training from "./pages/Training";
 import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/campaigns" element={<Campaigns />} />
         <Route path="/training" element={<Training />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/reports" element={<Reports />} />
       </Routes>
     </Router>
   );
