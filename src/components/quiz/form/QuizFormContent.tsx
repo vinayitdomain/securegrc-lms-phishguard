@@ -10,24 +10,29 @@ interface QuizFormContentProps {
 }
 
 export function QuizFormContent({ control }: QuizFormContentProps) {
-  const { data: trainingContent, isLoading } = useQuery({
+  const { data: trainingContent, isLoading, error } = useQuery({
     queryKey: ['training-content'],
     queryFn: async () => {
+      console.log('Fetching training content...');
       const { data, error } = await supabase
         .from('training_content')
         .select('*')
         .eq('status', 'published')
-        .eq('requires_quiz', true)
-        .not('id', 'is', null);
+        .eq('requires_quiz', true);
       
       if (error) {
         console.error('Error fetching training content:', error);
         throw error;
       }
       
+      console.log('Training content fetched:', data);
       return data;
     }
   });
+
+  if (error) {
+    console.error('Error in training content query:', error);
+  }
 
   return (
     <FormField
@@ -48,14 +53,12 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
             </FormControl>
             <SelectContent>
               {trainingContent?.map((content) => (
-                content.id && (
-                  <SelectItem 
-                    key={content.id} 
-                    value={content.id.toString()}
-                  >
-                    {content.title || `Content ${content.id}`}
-                  </SelectItem>
-                )
+                <SelectItem 
+                  key={content.id} 
+                  value={content.id.toString()}
+                >
+                  {content.title || `Content ${content.id}`}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
