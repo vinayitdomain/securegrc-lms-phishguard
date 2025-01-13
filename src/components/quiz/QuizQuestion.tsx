@@ -142,8 +142,8 @@ export function QuizQuestion({
               </FormControl>
               <SelectContent>
                 {question.options.map((option, index) => (
-                  <SelectItem key={index} value={option || `Option ${index + 1}`}>
-                    {option || `Option ${index + 1}`}
+                  <SelectItem key={index} value={option}>
+                    {option}
                   </SelectItem>
                 ))}
               </SelectContent>
