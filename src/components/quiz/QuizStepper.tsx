@@ -41,9 +41,9 @@ export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
-  // Parse options from Json type to string array
+  // Parse options from Json type to string array and ensure they are strings
   const questionOptions = Array.isArray(currentQuestion.options) 
-    ? currentQuestion.options 
+    ? currentQuestion.options.map(option => String(option))
     : [];
 
   return (
@@ -61,12 +61,12 @@ export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
             <div className="space-y-3">
               {questionOptions.map((option) => (
                 <Button
-                  key={option}
+                  key={String(option)}
                   variant={answers[currentQuestion.id] === option ? "default" : "outline"}
                   className="w-full justify-start text-left"
                   onClick={() => handleAnswer(currentQuestion.id, option)}
                 >
-                  {option}
+                  {String(option)}
                 </Button>
               ))}
             </div>
