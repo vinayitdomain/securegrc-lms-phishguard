@@ -10,7 +10,7 @@ interface QuizFormContentProps {
 }
 
 export function QuizFormContent({ control }: QuizFormContentProps) {
-  const { data: trainingContent } = useQuery({
+  const { data: trainingContent, isLoading } = useQuery({
     queryKey: ['training-content'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -19,7 +19,11 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
         .eq('status', 'published')
         .eq('requires_quiz', true);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching training content:', error);
+        throw error;
+      }
+      
       return data;
     }
   });
@@ -34,7 +38,7 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
           <Select onValueChange={field.onChange} value={field.value || undefined}>
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Select training content" />
+                <SelectValue placeholder={isLoading ? "Loading..." : "Select training content"} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
