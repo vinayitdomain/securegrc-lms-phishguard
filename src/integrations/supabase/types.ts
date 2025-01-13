@@ -290,6 +290,7 @@ export type Database = {
           options: Json
           order_number: number
           question: string
+          question_type: string
           quiz_id: string | null
         }
         Insert: {
@@ -299,6 +300,7 @@ export type Database = {
           options: Json
           order_number: number
           question: string
+          question_type?: string
           quiz_id?: string | null
         }
         Update: {
@@ -308,6 +310,7 @@ export type Database = {
           options?: Json
           order_number?: number
           question?: string
+          question_type?: string
           quiz_id?: string | null
         }
         Relationships: [
@@ -328,6 +331,7 @@ export type Database = {
           id: string
           organization_id: string | null
           passing_score: number | null
+          preview_enabled: boolean
           status: string | null
           title: string
           updated_at: string | null
@@ -339,6 +343,7 @@ export type Database = {
           id?: string
           organization_id?: string | null
           passing_score?: number | null
+          preview_enabled?: boolean
           status?: string | null
           title: string
           updated_at?: string | null
@@ -350,6 +355,7 @@ export type Database = {
           id?: string
           organization_id?: string | null
           passing_score?: number | null
+          preview_enabled?: boolean
           status?: string | null
           title?: string
           updated_at?: string | null

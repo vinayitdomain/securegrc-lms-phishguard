@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { QuizForm } from "@/components/quiz/QuizForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -32,26 +33,36 @@ export default function QuizManager() {
           <Button onClick={() => navigate('/training')}>Back to Training</Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quizzes?.map((quiz) => (
-            <Card key={quiz.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>{quiz.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">{quiz.description}</p>
-                <p className="text-sm text-gray-500 mb-4">
-                  Passing Score: {quiz.passing_score}%
-                </p>
-                <Button 
-                  onClick={() => navigate(`/training/quiz/${quiz.id}`)}
-                  className="w-full"
-                >
-                  Take Quiz
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Create New Quiz</h2>
+            <QuizForm />
+          </div>
+
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Existing Quizzes</h2>
+            <div className="space-y-4">
+              {quizzes?.map((quiz) => (
+                <Card key={quiz.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>{quiz.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600 mb-4">{quiz.description}</p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Passing Score: {quiz.passing_score}%
+                    </p>
+                    <Button 
+                      onClick={() => navigate(`/training/quiz/${quiz.id}`)}
+                      className="w-full"
+                    >
+                      View Quiz
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

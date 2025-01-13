@@ -133,8 +133,8 @@ export default function QuizAttempt() {
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{quiz.title}</h1>
-          <Button variant="outline" onClick={() => navigate('/learning/quizzes')}>
+          <h1 className="text-3xl font-bold">{quiz?.title}</h1>
+          <Button variant="outline" onClick={() => navigate('/training/quizzes')}>
             Exit Quiz
           </Button>
         </div>
@@ -148,7 +148,7 @@ export default function QuizAttempt() {
         </div>
 
         <div className="space-y-6">
-          {questions.map((question, index) => (
+          {questions?.map((question, index) => (
             <Card key={question.id}>
               <CardContent className="pt-6">
                 <p className="font-medium mb-4">
@@ -181,7 +181,7 @@ export default function QuizAttempt() {
           <div className="flex justify-end mt-6">
             <Button 
               onClick={handleSubmit}
-              disabled={Object.keys(answers).length !== questions.length}
+              disabled={Object.keys(answers).length !== questions?.length}
             >
               Submit Quiz
             </Button>
