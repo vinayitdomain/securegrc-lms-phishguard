@@ -17,7 +17,8 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
         .from('training_content')
         .select('*')
         .eq('status', 'published')
-        .eq('requires_quiz', true);
+        .eq('requires_quiz', true)
+        .not('id', 'is', null);
       
       if (error) {
         console.error('Error fetching training content:', error);
@@ -38,6 +39,7 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
           <Select 
             onValueChange={field.onChange} 
             value={field.value?.toString() || undefined}
+            disabled={isLoading}
           >
             <FormControl>
               <SelectTrigger>
@@ -45,7 +47,7 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {trainingContent?.filter(content => content.id != null).map((content) => (
+              {trainingContent?.map((content) => (
                 <SelectItem 
                   key={content.id} 
                   value={content.id.toString()}

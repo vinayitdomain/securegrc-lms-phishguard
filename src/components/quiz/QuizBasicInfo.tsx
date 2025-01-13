@@ -10,14 +10,15 @@ interface QuizBasicInfoProps {
 }
 
 export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
-  const { data: trainingContent } = useQuery({
+  const { data: trainingContent, isLoading } = useQuery({
     queryKey: ['training-content'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('training_content')
         .select('*')
         .eq('status', 'published')
-        .eq('requires_quiz', true);
+        .eq('requires_quiz', true)
+        .not('id', 'is', null);
       
       if (error) throw error;
       return data;
@@ -61,14 +62,15 @@ export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
             <Select 
               onValueChange={field.onChange} 
               value={field.value?.toString() || undefined}
+              disabled={isLoading}
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select training content" />
+                  <SelectValue placeholder={isLoading ? "Loading..." : "Select training content"} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {trainingContent?.filter(content => content.id != null).map((content) => (
+                {trainingContent?.map((content) => (
                   <SelectItem 
                     key={content.id} 
                     value={content.id.toString()}
