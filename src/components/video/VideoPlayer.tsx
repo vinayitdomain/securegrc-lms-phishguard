@@ -10,7 +10,7 @@ import { useVideoProgress } from "@/hooks/video/useVideoProgress";
 import { useQuizAttempt } from "@/hooks/quiz/useQuizAttempt";
 import { useNavigate } from "react-router-dom";
 
-export default function VideoPlayer() {
+const VideoPlayer = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -99,4 +99,6 @@ export default function VideoPlayer() {
       </div>
     </DashboardLayout>
   );
-}
+};
+
+export default VideoPlayer;
