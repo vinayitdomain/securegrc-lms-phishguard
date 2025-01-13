@@ -19,7 +19,7 @@ interface QuizQuestion {
 }
 
 export default function QuizAttempt() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -27,6 +27,8 @@ export default function QuizAttempt() {
   const { data: quiz, isLoading: quizLoading } = useQuery({
     queryKey: ['quiz', id],
     queryFn: async () => {
+      if (!id) throw new Error('Quiz ID is required');
+      
       const { data, error } = await supabase
         .from('quizzes')
         .select('*, training_content(*)')
@@ -35,12 +37,15 @@ export default function QuizAttempt() {
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !!id
   });
 
   const { data: questions, isLoading: questionsLoading } = useQuery({
     queryKey: ['quiz-questions', id],
     queryFn: async () => {
+      if (!id) throw new Error('Quiz ID is required');
+      
       const { data, error } = await supabase
         .from('quiz_questions')
         .select('*')
@@ -49,7 +54,8 @@ export default function QuizAttempt() {
       
       if (error) throw error;
       return data as QuizQuestion[];
-    }
+    },
+    enabled: !!id
   });
 
   const handleSubmit = async () => {
@@ -120,11 +126,27 @@ export default function QuizAttempt() {
   };
 
   if (quizLoading || questionsLoading) {
-    return <div>Loading...</div>;
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg">Loading quiz...</div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   if (!quiz || !questions) {
-    return <div>Quiz not found</div>;
+    return (
+      <DashboardLayout>
+        <div className="container mx-auto py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg">Quiz not found</div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   const progress = (Object.keys(answers).length / questions.length) * 100;
@@ -134,7 +156,7 @@ export default function QuizAttempt() {
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{quiz?.title}</h1>
-          <Button variant="outline" onClick={() => navigate('/training/quizzes')}>
+          <Button variant="outline" onClick={() => navigate('/learning/quizzes')}>
             Exit Quiz
           </Button>
         </div>
