@@ -19,7 +19,7 @@ export function QuestionAnswer({ control, questionIndex, options }: QuestionAnsw
           <FormLabel>Correct Answer</FormLabel>
           <Select 
             onValueChange={field.onChange} 
-            value={field.value || options[0]}
+            value={field.value || undefined}
           >
             <FormControl>
               <SelectTrigger>
@@ -27,7 +27,7 @@ export function QuestionAnswer({ control, questionIndex, options }: QuestionAnsw
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {options.map((option, index) => (
+              {options.filter(option => option && option.trim() !== '').map((option, index) => (
                 <SelectItem key={index} value={option}>
                   {option}
                 </SelectItem>
