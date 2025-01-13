@@ -68,7 +68,7 @@ export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {trainingContent?.map((content) => (
+                {trainingContent?.filter(content => content.id != null).map((content) => (
                   <SelectItem 
                     key={content.id} 
                     value={content.id.toString()}

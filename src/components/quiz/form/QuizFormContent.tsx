@@ -45,7 +45,7 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {trainingContent?.map((content) => (
+              {trainingContent?.filter(content => content.id != null).map((content) => (
                 <SelectItem 
                   key={content.id} 
                   value={content.id.toString()}
