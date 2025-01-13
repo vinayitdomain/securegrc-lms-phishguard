@@ -26,7 +26,7 @@ interface ContentData {
   status: string | null;
   created_at: string | null;
   updated_at: string | null;
-  quiz?: Quiz;
+  quiz?: Quiz | null;
   publicUrl?: string;
 }
 
@@ -67,7 +67,7 @@ export const useVideoData = (contentId: string | undefined) => {
 
       const transformedData: ContentData = {
         ...content,
-        quiz: content.quiz?.[0],
+        quiz: content.quiz?.[0] || null,
         publicUrl
       };
 
