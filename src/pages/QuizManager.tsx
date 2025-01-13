@@ -14,10 +14,14 @@ export default function QuizManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quizzes')
-        .select('*');
+        .select('*, training_content(title)')
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      // Remove duplicates based on quiz id
+      return data.filter((quiz, index, self) => 
+        index === self.findIndex((q) => q.id === quiz.id)
+      );
     }
   });
 
@@ -49,6 +53,11 @@ export default function QuizManager() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-600 mb-4">{quiz.description}</p>
+                    {quiz.training_content && (
+                      <p className="text-sm text-gray-500 mb-2">
+                        Associated Content: {quiz.training_content.title}
+                      </p>
+                    )}
                     <p className="text-sm text-gray-500 mb-4">
                       Passing Score: {quiz.passing_score}%
                     </p>
