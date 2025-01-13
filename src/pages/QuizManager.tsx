@@ -21,7 +21,7 @@ export default function QuizManager() {
           passing_score,
           status,
           content_id,
-          training_content!left (
+          training_content:training_content (
             id,
             title
           )
@@ -45,22 +45,24 @@ export default function QuizManager() {
           <Button onClick={() => navigate('/training')}>Back to Training</Button>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Create New Quiz</h2>
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold">Create New Quiz</h2>
             <QuizForm />
           </div>
 
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Existing Quizzes</h2>
-            <div className="space-y-4">
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold">Existing Quizzes</h2>
+            <div className="grid gap-4">
               {quizzes?.map((quiz) => (
                 <Card key={quiz.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{quiz.title}</CardTitle>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">{quiz.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600 mb-4">{quiz.description}</p>
+                    {quiz.description && (
+                      <p className="text-sm text-gray-600 mb-3">{quiz.description}</p>
+                    )}
                     {quiz.training_content && (
                       <p className="text-sm text-gray-500 mb-2">
                         Associated Content: {quiz.training_content.title}
@@ -70,7 +72,7 @@ export default function QuizManager() {
                       Passing Score: {quiz.passing_score}%
                     </p>
                     <Button 
-                      onClick={() => navigate(`/training/quiz/${quiz.id}`)}
+                      onClick={() => navigate(`/quiz/${quiz.id}`)}
                       className="w-full"
                     >
                       View Quiz

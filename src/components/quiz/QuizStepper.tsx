@@ -1,0 +1,88 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+
+interface QuizStepperProps {
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    question_type: string;
+  }[];
+  onSubmit: (answers: Record<string, string>) => void;
+}
+
+export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+
+  const handleAnswer = (questionId: string, answer: string) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < questions.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const handleSubmit = () => {
+    onSubmit(answers);
+  };
+
+  const currentQuestion = questions[currentStep];
+  const progress = ((currentStep + 1) / questions.length) * 100;
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <Progress value={progress} className="mb-6" />
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Question {currentStep + 1} of {questions.length}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <p className="text-lg">{currentQuestion.question}</p>
+            
+            <div className="space-y-3">
+              {currentQuestion.options.map((option) => (
+                <Button
+                  key={option}
+                  variant={answers[currentQuestion.id] === option ? "default" : "outline"}
+                  className="w-full justify-start text-left"
+                  onClick={() => handleAnswer(currentQuestion.id, option)}
+                >
+                  {option}
+                </Button>
+              ))}
+            </div>
+
+            <div className="flex justify-between pt-4">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 0}
+              >
+                Previous
+              </Button>
+              
+              {currentStep === questions.length - 1 ? (
+                <Button onClick={handleSubmit}>Submit Quiz</Button>
+              ) : (
+                <Button onClick={handleNext}>Next Question</Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
