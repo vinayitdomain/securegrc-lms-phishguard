@@ -6,18 +6,20 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef, useState } from "react";
-import { Progress } from "@/components/ui/progress";
+import { VideoProgress } from "@/components/video/VideoProgress";
+import { QuizButton } from "@/components/video/QuizButton";
+import { VideoDescription } from "@/components/video/VideoDescription";
 
 interface Quiz {
   id: string;
   title: string;
   description: string | null;
-  organization_id: string | null;
-  passing_score: number | null;
-  status: string | null;
-  created_at: string | null;
-  updated_at: string | null;
-  video_id: string | null;
+  organization_id: string;
+  passing_score: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  video_id: string;
 }
 
 interface VideoData {
@@ -31,7 +33,7 @@ interface VideoData {
   status: string | null;
   created_at: string | null;
   updated_at: string | null;
-  quiz?: Quiz; // Changed from quizzes? to quiz? since we expect a single quiz
+  quiz?: Quiz;
   publicUrl?: string;
 }
 
@@ -43,7 +45,6 @@ export default function VideoPlayer() {
   const [progress, setProgress] = useState(0);
   const [hasCompleted, setHasCompleted] = useState(false);
 
-  // Fetch video details and user's progress
   const { data: videoData, isLoading: isLoadingVideo } = useQuery({
     queryKey: ['video', id],
     queryFn: async () => {
@@ -69,10 +70,9 @@ export default function VideoPlayer() {
         throw new Error('Failed to get video URL');
       }
 
-      // Transform the response to match our VideoData interface
       const transformedData: VideoData = {
         ...video,
-        quiz: video.quiz?.[0] || null, // Take the first quiz if it exists
+        quiz: video.quiz?.[0] || null,
         publicUrl: signedUrlData.signedUrl
       };
 
@@ -98,7 +98,6 @@ export default function VideoPlayer() {
     }
   });
 
-  // Check if user has passed the associated quiz
   const { data: quizAttempt } = useQuery({
     queryKey: ['quiz-attempt', videoData?.quiz?.id],
     queryFn: async () => {
@@ -130,7 +129,6 @@ export default function VideoPlayer() {
         const currentProgress = (video.currentTime / video.duration) * 100;
         setProgress(Math.round(currentProgress));
         
-        // Mark as completed when reaching 95% of the video
         if (currentProgress >= 95 && !hasCompleted) {
           setHasCompleted(true);
           updateProgress(true);
@@ -234,30 +232,18 @@ export default function VideoPlayer() {
                 </video>
               </div>
               
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Progress</span>
-                  <span>{progress}%</span>
-                </div>
-                <Progress value={progress} className="w-full" />
-              </div>
+              <VideoProgress progress={progress} />
 
               {showQuizButton && videoData?.quiz && (
-                <div className="flex justify-end mt-4">
-                  <Button onClick={handleQuizStart}>
-                    {quizAttempt?.passed ? 'Retake Quiz' : 'Take Quiz'}
-                  </Button>
-                </div>
+                <QuizButton 
+                  onQuizStart={handleQuizStart}
+                  hasPassed={!!quizAttempt?.passed}
+                />
               )}
             </div>
           )}
 
-          {videoData?.description && (
-            <div className="prose max-w-none mt-6">
-              <h2 className="text-xl font-semibold mb-2">Description</h2>
-              <p>{videoData.description}</p>
-            </div>
-          )}
+          <VideoDescription description={videoData?.description} />
         </div>
       </div>
     </DashboardLayout>

@@ -79,7 +79,7 @@ const App = () => (
             }
           />
           <Route
-            path="/learning/video/:id"
+            path="/training/video/:id"
             element={
               <ProtectedRoute>
                 <VideoPlayer />
