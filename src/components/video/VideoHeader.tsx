@@ -14,7 +14,7 @@ export const VideoHeader = ({ title, needsToRewatch }: VideoHeaderProps) => {
     <>
       <Button
         variant="outline"
-        onClick={() => navigate('/learning/videos')}
+        onClick={() => navigate('/training/videos')}
         className="mb-6"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

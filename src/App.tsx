@@ -17,15 +17,14 @@ function App() {
         <Route path="/" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/video-library" element={<VideoLibrary />} />
-        <Route path="/video/:id" element={<VideoPlayer />} />
-        <Route path="/quiz-manager" element={<QuizManager />} />
-        <Route path="/quiz/:id" element={<QuizAttempt />} />
-        <Route path="/campaigns" element={<Campaigns />} />
         <Route path="/training" element={<Training />} />
         <Route path="/training/videos" element={<VideoLibrary />} />
         <Route path="/training/quizzes" element={<QuizManager />} />
+        <Route path="/video/:id" element={<VideoPlayer />} />
         <Route path="/learning/video/:id" element={<VideoPlayer />} />
+        <Route path="/quiz/:id" element={<QuizAttempt />} />
         <Route path="/learning/quiz/:id" element={<QuizAttempt />} />
+        <Route path="/campaigns" element={<Campaigns />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/reports" element={<Reports />} />
       </Routes>

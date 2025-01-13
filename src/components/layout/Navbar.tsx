@@ -34,7 +34,7 @@ export function Navbar() {
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
-            <Link to="/video-library" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/training/videos" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
               <Play className="h-4 w-4" />
               Videos
             </Link>
