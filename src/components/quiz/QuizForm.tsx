@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { QuizBasicInfo } from "./QuizBasicInfo";
+import { QuizQuestion } from "./QuizQuestion";
 
 const questionSchema = z.object({
   question: z.string().min(1, "Question is required"),
@@ -32,19 +31,6 @@ type QuizFormValues = z.infer<typeof quizFormSchema>;
 
 export function QuizForm() {
   const { toast } = useToast();
-
-  const { data: trainingContent } = useQuery({
-    queryKey: ['training-content'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('training_content')
-        .select('*')
-        .eq('status', 'published');
-      
-      if (error) throw error;
-      return data;
-    }
-  });
 
   const form = useForm<QuizFormValues>({
     resolver: zodResolver(quizFormSchema),
@@ -121,8 +107,8 @@ export function QuizForm() {
       {
         question: "",
         question_type: "multiple_choice",
-        options: ["Option 1", "Option 2"], // Initialize with non-empty values
-        correct_answer: "Option 1", // Initialize with first option
+        options: ["Option 1", "Option 2"],
+        correct_answer: "Option 1",
         order_number: questions.length,
       },
     ]);
@@ -163,74 +149,7 @@ export function QuizForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Card>
           <CardContent className="pt-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quiz Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="content_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Attach to Training Content</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || undefined}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select training content" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {trainingContent?.map((content) => (
-                        <SelectItem key={content.id} value={content.id}>
-                          {content.title || 'Untitled Content'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="passing_score"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Passing Score (%)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      min="0" 
-                      max="100" 
-                      {...field} 
-                      onChange={e => field.onChange(parseInt(e.target.value))}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <QuizBasicInfo control={form.control} />
           </CardContent>
         </Card>
 
@@ -238,127 +157,13 @@ export function QuizForm() {
           {form.watch("questions").map((question, questionIndex) => (
             <Card key={questionIndex}>
               <CardContent className="pt-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Question {questionIndex + 1}</h3>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeQuestion(questionIndex)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <FormField
+                <QuizQuestion
                   control={form.control}
-                  name={`questions.${questionIndex}.question`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question Text</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name={`questions.${questionIndex}.question_type`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question Type</FormLabel>
-                      <Select
-                        onValueChange={(value: "multiple_choice" | "true_false") => {
-                          field.onChange(value);
-                          if (value === "true_false") {
-                            form.setValue(`questions.${questionIndex}.options`, ["True", "False"]);
-                            form.setValue(`questions.${questionIndex}.correct_answer`, "True");
-                          }
-                        }}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
-                          <SelectItem value="true_false">True/False</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-
-                {question.question_type === "multiple_choice" && (
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <FormLabel>Options</FormLabel>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addOption(questionIndex)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Option
-                      </Button>
-                    </div>
-                    {question.options.map((option, optionIndex) => (
-                      <div key={optionIndex} className="flex gap-2">
-                        <FormField
-                          control={form.control}
-                          name={`questions.${questionIndex}.options.${optionIndex}`}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormControl>
-                                <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => removeOption(questionIndex, optionIndex)}
-                          disabled={question.options.length <= 2}
-                        >
-                          <Trash className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <FormField
-                  control={form.control}
-                  name={`questions.${questionIndex}.correct_answer`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Correct Answer</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value || question.options[0]}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select correct answer" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {question.options.map((option, index) => (
-                            <SelectItem key={index} value={option || `Option ${index + 1}`}>
-                              {option || `Option ${index + 1}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
+                  questionIndex={questionIndex}
+                  onRemoveQuestion={removeQuestion}
+                  onAddOption={addOption}
+                  onRemoveOption={removeOption}
+                  question={question}
                 />
               </CardContent>
             </Card>
