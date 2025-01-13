@@ -40,7 +40,7 @@ export const useVideoData = (contentId: string | undefined) => {
         .from('training_content')
         .select(`
           *,
-          quiz:quizzes!quizzes_content_id_fkey (*)
+          quiz:quizzes(*)
         `)
         .eq('id', contentId)
         .maybeSingle();
