@@ -10,6 +10,9 @@ interface QuestionAnswerProps {
 }
 
 export function QuestionAnswer({ control, questionIndex, options }: QuestionAnswerProps) {
+  // Filter out empty or whitespace-only options
+  const validOptions = options.filter(option => option && option.trim() !== '');
+
   return (
     <FormField
       control={control}
@@ -27,8 +30,11 @@ export function QuestionAnswer({ control, questionIndex, options }: QuestionAnsw
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {options.filter(option => option && option.trim() !== '').map((option, index) => (
-                <SelectItem key={index} value={option}>
+              {validOptions.map((option, index) => (
+                <SelectItem 
+                  key={`${option}-${index}`} 
+                  value={option}
+                >
                   {option}
                 </SelectItem>
               ))}
