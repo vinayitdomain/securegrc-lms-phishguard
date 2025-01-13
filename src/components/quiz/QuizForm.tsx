@@ -9,41 +9,15 @@ import { QuizFormHeader } from "./form/QuizFormHeader";
 import { QuizFormContent } from "./form/QuizFormContent";
 import { QuizFormScore } from "./form/QuizFormScore";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuizData } from "@/hooks/quiz/useQuizData";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { QuizFormData } from "@/types/quiz";
 
 export function QuizForm() {
   const { id } = useParams();
   const { form, onSubmit, addQuestion, removeQuestion, addOption, removeOption } = useQuizForm();
+  const { data: quizData, isLoading } = useQuizData(id);
 
-  // Fetch quiz data if we have an ID
-  const { data: quizData, isLoading } = useQuery({
-    queryKey: ['quiz', id],
-    queryFn: async () => {
-      if (!id) return null;
-      
-      console.log('Fetching quiz data for ID:', id);
-      const { data: quiz, error: quizError } = await supabase
-        .from('quizzes')
-        .select(`
-          *,
-          quiz_questions (*)
-        `)
-        .eq('id', id)
-        .single();
-
-      if (quizError) {
-        console.error('Error fetching quiz:', quizError);
-        throw quizError;
-      }
-
-      console.log('Quiz data fetched:', quiz);
-      return quiz;
-    },
-    enabled: !!id
-  });
-
-  // Set form values when quiz data is loaded
   React.useEffect(() => {
     if (quizData && !isLoading) {
       form.reset({
@@ -64,12 +38,16 @@ export function QuizForm() {
   }, [quizData, isLoading, form]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
+
+  const handleSubmit = async (data: QuizFormData) => {
+    await onSubmit(data);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <Card>
           <CardContent className="pt-6">
             <QuizFormHeader control={form.control} />

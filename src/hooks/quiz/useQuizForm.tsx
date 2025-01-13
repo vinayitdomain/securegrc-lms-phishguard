@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { QuizFormData, Question } from "@/types/quiz";
+import { QuizFormData } from "@/types/quiz";
 
 const questionSchema = z.object({
   question: z.string().min(1, "Question is required"),
@@ -35,7 +35,7 @@ export const useQuizForm = () => {
       questions: [
         {
           question: "",
-          question_type: "multiple_choice" as const,
+          question_type: "multiple_choice",
           options: ["Option 1", "Option 2"],
           correct_answer: "Option 1",
           order_number: 0,
@@ -46,7 +46,6 @@ export const useQuizForm = () => {
 
   const onSubmit = async (values: QuizFormData) => {
     try {
-      // First, create the quiz and get its ID
       const { data: quiz, error: quizError } = await supabase
         .from('quizzes')
         .insert({
@@ -55,7 +54,7 @@ export const useQuizForm = () => {
           content_id: values.content_id,
           passing_score: values.passing_score,
           preview_enabled: values.preview_enabled,
-          status: 'draft' // Set initial status
+          status: 'draft'
         })
         .select('id')
         .single();
@@ -63,7 +62,6 @@ export const useQuizForm = () => {
       if (quizError) throw quizError;
       if (!quiz?.id) throw new Error('Quiz creation failed - no quiz ID returned');
 
-      // Then, prepare and insert the questions with the quiz ID
       const questionsData = values.questions.map((q, index) => ({
         quiz_id: quiz.id,
         question: q.question,
@@ -101,7 +99,7 @@ export const useQuizForm = () => {
       ...questions,
       {
         question: "",
-        question_type: "multiple_choice" as const,
+        question_type: "multiple_choice",
         options: ["Option 1", "Option 2"],
         correct_answer: "Option 1",
         order_number: questions.length,
