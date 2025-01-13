@@ -70,7 +70,8 @@ export default function VideoLibrary() {
         .insert({
           title: file.name.split('.')[0],
           content_type: contentType,
-          [contentType === 'video' ? 'video_url' : 'pdf_url']: filePath,
+          video_url: contentType === 'video' ? filePath : null,
+          pdf_url: contentType === 'pdf' ? filePath : null,
           status: 'active',
           requires_quiz: true
         });
@@ -140,3 +141,4 @@ export default function VideoLibrary() {
     </DashboardLayout>
   );
 }
+};

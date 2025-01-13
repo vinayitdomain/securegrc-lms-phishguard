@@ -10,7 +10,7 @@ interface Quiz {
   status: string;
   created_at: string;
   updated_at: string;
-  content_id: string;
+  content_id: string | null;
 }
 
 interface ContentData {
