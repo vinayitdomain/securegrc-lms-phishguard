@@ -10,14 +10,16 @@ interface Quiz {
   status: string;
   created_at: string;
   updated_at: string;
-  video_id: string;
+  content_id: string;
 }
 
-interface VideoData {
+interface ContentData {
   id: string;
   title: string;
   description: string | null;
-  video_url: string;
+  video_url: string | null;
+  pdf_url: string | null;
+  content_type: 'video' | 'pdf';
   duration: number | null;
   organization_id: string | null;
   created_by: string | null;
@@ -28,40 +30,49 @@ interface VideoData {
   publicUrl?: string;
 }
 
-export const useVideoData = (videoId: string | undefined) => {
+export const useVideoData = (contentId: string | undefined) => {
   return useQuery({
-    queryKey: ['video', videoId],
+    queryKey: ['content', contentId],
     queryFn: async () => {
-      if (!videoId) throw new Error('No video ID provided');
+      if (!contentId) throw new Error('No content ID provided');
       
-      const { data: video, error } = await supabase
-        .from('training_videos')
+      const { data: content, error } = await supabase
+        .from('training_content')
         .select(`
           *,
-          quiz:quizzes!quizzes_video_id_fkey (*)
+          quiz:quizzes!quizzes_content_id_fkey (*)
         `)
-        .eq('id', videoId)
+        .eq('id', contentId)
         .maybeSingle();
 
       if (error) throw error;
-      if (!video) throw new Error('Video not found');
+      if (!content) throw new Error('Content not found');
 
-      const { data: signedUrlData } = await supabase.storage
-        .from('training_videos')
-        .createSignedUrl(video.video_url, 3600);
-
-      if (!signedUrlData?.signedUrl) {
-        throw new Error('Failed to get video URL');
+      let publicUrl = null;
+      if (content.content_type === 'video' && content.video_url) {
+        const { data: signedUrlData } = await supabase.storage
+          .from('training_videos')
+          .createSignedUrl(content.video_url, 3600);
+        publicUrl = signedUrlData?.signedUrl;
+      } else if (content.content_type === 'pdf' && content.pdf_url) {
+        const { data: signedUrlData } = await supabase.storage
+          .from('training_videos')
+          .createSignedUrl(content.pdf_url, 3600);
+        publicUrl = signedUrlData?.signedUrl;
       }
 
-      const transformedData: VideoData = {
-        ...video,
-        quiz: video.quiz?.[0],
-        publicUrl: signedUrlData.signedUrl
+      if (!publicUrl) {
+        throw new Error('Failed to get content URL');
+      }
+
+      const transformedData: ContentData = {
+        ...content,
+        quiz: content.quiz?.[0],
+        publicUrl
       };
 
       return transformedData;
     },
-    enabled: !!videoId
+    enabled: !!contentId
   });
 };

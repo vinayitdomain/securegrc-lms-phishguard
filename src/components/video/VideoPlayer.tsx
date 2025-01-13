@@ -15,24 +15,24 @@ export default function VideoPlayer() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { data: videoData, isLoading: isLoadingVideo } = useVideoData(id);
+  const { data: contentData, isLoading: isLoadingContent } = useVideoData(id);
   const { videoRef, progress, hasCompleted } = useVideoProgress(id);
-  const { data: quizAttempt } = useQuizAttempt(videoData?.quiz?.id);
+  const { data: quizAttempt } = useQuizAttempt(contentData?.quiz?.id);
 
   const handleQuizStart = () => {
-    if (!videoData?.quiz?.id) {
+    if (!contentData?.quiz?.id) {
       toast({
         title: "No Quiz Available",
-        description: "This video doesn't have an associated quiz.",
+        description: "This content doesn't have an associated quiz.",
         variant: "destructive",
       });
       return;
     }
     
-    navigate(`/learning/quiz/${videoData.quiz.id}`);
+    navigate(`/learning/quiz/${contentData.quiz.id}`);
   };
 
-  if (isLoadingVideo) {
+  if (isLoadingContent) {
     return (
       <DashboardLayout>
         <div>Loading...</div>
@@ -40,26 +40,26 @@ export default function VideoPlayer() {
     );
   }
 
-  const showQuizButton = hasCompleted && videoData?.quiz;
+  const showQuizButton = hasCompleted && contentData?.quiz;
   const needsToRewatch = quizAttempt && !quizAttempt.passed;
 
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <VideoHeader 
-          title={videoData?.title || ''} 
+          title={contentData?.title || ''} 
           needsToRewatch={needsToRewatch} 
         />
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          {videoData?.publicUrl && (
+          {contentData?.publicUrl && contentData.content_type === 'video' && (
             <div className="space-y-4">
               <div className="aspect-video mb-4">
                 <video
                   ref={videoRef}
                   controls
                   className="w-full h-full rounded"
-                  src={videoData.publicUrl}
+                  src={contentData.publicUrl}
                   onError={(e) => {
                     console.error('Video playback error:', e);
                     toast({
@@ -74,17 +74,27 @@ export default function VideoPlayer() {
               </div>
               
               <VideoProgress progress={progress} />
-
-              {showQuizButton && (
-                <QuizButton 
-                  onQuizStart={handleQuizStart}
-                  hasPassed={!!quizAttempt?.passed}
-                />
-              )}
             </div>
           )}
 
-          <VideoDescription description={videoData?.description} />
+          {contentData?.publicUrl && contentData.content_type === 'pdf' && (
+            <div className="space-y-4">
+              <iframe
+                src={contentData.publicUrl}
+                className="w-full h-[600px] rounded"
+                title={contentData.title}
+              />
+              <VideoProgress progress={100} />
+            </div>
+          )}
+
+          <QuizButton 
+            onQuizStart={handleQuizStart}
+            hasPassed={!!quizAttempt?.passed}
+            isVisible={showQuizButton}
+          />
+
+          <VideoDescription description={contentData?.description} />
         </div>
       </div>
     </DashboardLayout>

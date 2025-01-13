@@ -322,6 +322,7 @@ export type Database = {
       }
       quizzes: {
         Row: {
+          content_id: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -330,9 +331,9 @@ export type Database = {
           status: string | null
           title: string
           updated_at: string | null
-          video_id: string | null
         }
         Insert: {
+          content_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -341,9 +342,9 @@ export type Database = {
           status?: string | null
           title: string
           updated_at?: string | null
-          video_id?: string | null
         }
         Update: {
+          content_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -352,7 +353,6 @@ export type Database = {
           status?: string | null
           title?: string
           updated_at?: string | null
-          video_id?: string | null
         }
         Relationships: [
           {
@@ -364,45 +364,54 @@ export type Database = {
           },
           {
             foreignKeyName: "quizzes_video_id_fkey"
-            columns: ["video_id"]
+            columns: ["content_id"]
             isOneToOne: false
-            referencedRelation: "training_videos"
+            referencedRelation: "training_content"
             referencedColumns: ["id"]
           },
         ]
       }
-      training_videos: {
+      training_content: {
         Row: {
+          content_type: string
           created_at: string | null
           created_by: string | null
           description: string | null
           duration: number | null
           id: string
           organization_id: string | null
+          pdf_url: string | null
+          requires_quiz: boolean
           status: string | null
           title: string
           updated_at: string | null
           video_url: string
         }
         Insert: {
+          content_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           duration?: number | null
           id?: string
           organization_id?: string | null
+          pdf_url?: string | null
+          requires_quiz?: boolean
           status?: string | null
           title: string
           updated_at?: string | null
           video_url: string
         }
         Update: {
+          content_type?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           duration?: number | null
           id?: string
           organization_id?: string | null
+          pdf_url?: string | null
+          requires_quiz?: boolean
           status?: string | null
           title?: string
           updated_at?: string | null
@@ -414,6 +423,47 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_content_progress: {
+        Row: {
+          completed: boolean | null
+          content_id: string | null
+          created_at: string | null
+          id: string
+          last_watched_at: string | null
+          progress_percentage: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          content_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_watched_at?: string | null
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          content_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_watched_at?: string | null
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_video_progress_video_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "training_content"
             referencedColumns: ["id"]
           },
         ]
@@ -499,47 +549,6 @@ export type Database = {
             columns: ["quiz_id"]
             isOneToOne: false
             referencedRelation: "quizzes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_video_progress: {
-        Row: {
-          completed: boolean | null
-          created_at: string | null
-          id: string
-          last_watched_at: string | null
-          progress_percentage: number | null
-          updated_at: string | null
-          user_id: string | null
-          video_id: string | null
-        }
-        Insert: {
-          completed?: boolean | null
-          created_at?: string | null
-          id?: string
-          last_watched_at?: string | null
-          progress_percentage?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-          video_id?: string | null
-        }
-        Update: {
-          completed?: boolean | null
-          created_at?: string | null
-          id?: string
-          last_watched_at?: string | null
-          progress_percentage?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-          video_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_video_progress_video_id_fkey"
-            columns: ["video_id"]
-            isOneToOne: false
-            referencedRelation: "training_videos"
             referencedColumns: ["id"]
           },
         ]

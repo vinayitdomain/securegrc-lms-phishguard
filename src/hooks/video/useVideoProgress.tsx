@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export const useVideoProgress = (videoId: string | undefined) => {
+export const useVideoProgress = (contentId: string | undefined) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   const [hasCompleted, setHasCompleted] = useState(false);
@@ -11,15 +11,15 @@ export const useVideoProgress = (videoId: string | undefined) => {
   // Fetch initial progress
   useEffect(() => {
     const fetchProgress = async () => {
-      if (!videoId) return;
+      if (!contentId) return;
       
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data } = await supabase
-        .from('user_video_progress')
+        .from('user_content_progress')
         .select('*')
-        .eq('video_id', videoId)
+        .eq('content_id', contentId)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -30,17 +30,17 @@ export const useVideoProgress = (videoId: string | undefined) => {
     };
 
     fetchProgress();
-  }, [videoId]);
+  }, [contentId]);
 
   const updateProgress = async (completed: boolean) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || !videoId) return;
+    if (!user || !contentId) return;
 
     const { error } = await supabase
-      .from('user_video_progress')
+      .from('user_content_progress')
       .upsert({
         user_id: user.id,
-        video_id: videoId,
+        content_id: contentId,
         progress_percentage: progress,
         completed,
         last_watched_at: new Date().toISOString()
@@ -76,7 +76,7 @@ export const useVideoProgress = (videoId: string | undefined) => {
       video.addEventListener('timeupdate', handleTimeUpdate);
       return () => video.removeEventListener('timeupdate', handleTimeUpdate);
     }
-  }, [hasCompleted, videoId]);
+  }, [hasCompleted, contentId]);
 
   return {
     videoRef,
