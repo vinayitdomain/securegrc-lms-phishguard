@@ -14,14 +14,22 @@ export default function QuizManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quizzes')
-        .select('*, training_content(title)')
+        .select(`
+          id,
+          title,
+          description,
+          passing_score,
+          status,
+          content_id,
+          training_content (
+            id,
+            title
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      // Remove duplicates based on quiz id
-      return data.filter((quiz, index, self) => 
-        index === self.findIndex((q) => q.id === quiz.id)
-      );
+      return data;
     }
   });
 

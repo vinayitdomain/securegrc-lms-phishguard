@@ -24,6 +24,7 @@ function App() {
         <Route path="/learning/video/:id" element={<VideoPlayer />} />
         <Route path="/quiz/:id" element={<QuizAttempt />} />
         <Route path="/learning/quiz/:id" element={<QuizAttempt />} />
+        <Route path="/training/quiz/:id" element={<QuizAttempt />} />
         <Route path="/campaigns" element={<Campaigns />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/reports" element={<Reports />} />
