@@ -140,7 +140,7 @@ export const useQuizForm = () => {
 
   return {
     form,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit,
     addQuestion,
     removeQuestion,
     addOption,
