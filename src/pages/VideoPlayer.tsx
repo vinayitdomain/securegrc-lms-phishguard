@@ -31,7 +31,7 @@ interface VideoData {
   status: string | null;
   created_at: string | null;
   updated_at: string | null;
-  quizzes?: Quiz;
+  quiz?: Quiz; // Changed from quizzes? to quiz? since we expect a single quiz
   publicUrl?: string;
 }
 
@@ -51,7 +51,10 @@ export default function VideoPlayer() {
       
       const { data: video, error } = await supabase
         .from('training_videos')
-        .select('*, quizzes!quizzes_video_id_fkey(*)')
+        .select(`
+          *,
+          quiz:quizzes!quizzes_video_id_fkey (*)
+        `)
         .eq('id', id)
         .maybeSingle();
 
@@ -66,10 +69,14 @@ export default function VideoPlayer() {
         throw new Error('Failed to get video URL');
       }
 
-      return {
+      // Transform the response to match our VideoData interface
+      const transformedData: VideoData = {
         ...video,
+        quiz: video.quiz?.[0] || null, // Take the first quiz if it exists
         publicUrl: signedUrlData.signedUrl
-      } as VideoData;
+      };
+
+      return transformedData;
     }
   });
 
@@ -93,9 +100,9 @@ export default function VideoPlayer() {
 
   // Check if user has passed the associated quiz
   const { data: quizAttempt } = useQuery({
-    queryKey: ['quiz-attempt', videoData?.quizzes?.id],
+    queryKey: ['quiz-attempt', videoData?.quiz?.id],
     queryFn: async () => {
-      if (!videoData?.quizzes?.id) return null;
+      if (!videoData?.quiz?.id) return null;
       
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -103,7 +110,7 @@ export default function VideoPlayer() {
       const { data, error } = await supabase
         .from('user_quiz_attempts')
         .select('*')
-        .eq('quiz_id', videoData.quizzes.id)
+        .eq('quiz_id', videoData.quiz.id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -112,7 +119,7 @@ export default function VideoPlayer() {
       if (error) throw error;
       return data;
     },
-    enabled: !!videoData?.quizzes?.id
+    enabled: !!videoData?.quiz?.id
   });
 
   useEffect(() => {
@@ -160,7 +167,7 @@ export default function VideoPlayer() {
   };
 
   const handleQuizStart = () => {
-    if (!videoData?.quizzes?.id) {
+    if (!videoData?.quiz?.id) {
       toast({
         title: "No Quiz Available",
         description: "This video doesn't have an associated quiz.",
@@ -169,7 +176,7 @@ export default function VideoPlayer() {
       return;
     }
     
-    navigate(`/learning/quiz/${videoData.quizzes.id}`);
+    navigate(`/learning/quiz/${videoData.quiz.id}`);
   };
 
   if (isLoadingVideo) {
@@ -235,7 +242,7 @@ export default function VideoPlayer() {
                 <Progress value={progress} className="w-full" />
               </div>
 
-              {showQuizButton && videoData?.quizzes && (
+              {showQuizButton && videoData?.quiz && (
                 <div className="flex justify-end mt-4">
                   <Button onClick={handleQuizStart}>
                     {quizAttempt?.passed ? 'Retake Quiz' : 'Take Quiz'}
