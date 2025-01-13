@@ -1,88 +1,45 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { BarChart2, BookOpen, Mail, Play, Home } from "lucide-react";
 
 export function Navbar() {
-  const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserEmail(session?.user?.email || null);
-    });
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   return (
-    <nav className="border-b bg-white">
-      <div className="flex h-16 items-center px-4">
-        <div className="flex items-center space-x-4">
-          <span className="text-2xl font-bold text-primary">SecureGRC</span>
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link to="/dashboard" className="mr-6 flex items-center space-x-2">
+            <span className="hidden font-bold sm:inline-block">
+              SecurityEd
+            </span>
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            <Link to="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Dashboard
+            </Link>
+            <Link to="/video-library" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+              <Play className="h-4 w-4" />
+              Videos
+            </Link>
+            <Link to="/training" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Training
+            </Link>
+            <Link to="/campaigns" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Campaigns
+            </Link>
+            <Link to="/analytics" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+              <BarChart2 className="h-4 w-4" />
+              Analytics
+            </Link>
+          </nav>
         </div>
-        <div className="ml-auto flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/campaigns")}
-          >
-            Phishing Campaigns
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">Learning</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => navigate("/learning/videos")}>
-                Videos
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/learning/quizzes")}>
-                Quizzes
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/compliance")}
-          >
-            Compliance
-          </Button>
-          {userEmail && (
-            <>
-              <NotificationBell />
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar>
-                    <AvatarFallback>
-                      {userEmail.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          )}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+          </div>
+          <NotificationBell />
         </div>
       </div>
     </nav>

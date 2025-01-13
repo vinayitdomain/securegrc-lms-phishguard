@@ -1,103 +1,30 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import Campaigns from "./pages/Campaigns";
-import AuthPage from "./pages/Auth";
 import VideoLibrary from "./pages/VideoLibrary";
-import QuizManager from "./pages/QuizManager";
 import VideoPlayer from "./pages/VideoPlayer";
+import QuizManager from "./pages/QuizManager";
 import QuizAttempt from "./pages/QuizAttempt";
+import Campaigns from "./pages/Campaigns";
+import Training from "./pages/Training";
+import Analytics from "./pages/Analytics";
 
-const queryClient = new QueryClient();
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>;
-  }
-
-  return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />;
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/campaigns"
-            element={
-              <ProtectedRoute>
-                <Campaigns />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learning/videos"
-            element={
-              <ProtectedRoute>
-                <VideoLibrary />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learning/quizzes"
-            element={
-              <ProtectedRoute>
-                <QuizManager />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/training/video/:id"
-            element={
-              <ProtectedRoute>
-                <VideoPlayer />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/learning/quiz/:id"
-            element={
-              <ProtectedRoute>
-                <QuizAttempt />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/video-library" element={<VideoLibrary />} />
+        <Route path="/video/:id" element={<VideoPlayer />} />
+        <Route path="/quiz-manager" element={<QuizManager />} />
+        <Route path="/quiz/:id" element={<QuizAttempt />} />
+        <Route path="/campaigns" element={<Campaigns />} />
+        <Route path="/training" element={<Training />} />
+        <Route path="/analytics" element={<Analytics />} />
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;
