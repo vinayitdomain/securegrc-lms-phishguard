@@ -29,18 +29,18 @@ export default function VideoLibrary() {
     checkRole();
   }, []);
 
-  const { data: videos, isLoading } = useQuery({
-    queryKey: ['training-videos'],
+  const { data: content, isLoading } = useQuery({
+    queryKey: ['training-content'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('training_videos')
+        .from('training_content')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
         toast({
           title: "Error",
-          description: "Failed to load videos",
+          description: "Failed to load content",
           variant: "destructive",
         });
         throw error;
@@ -57,6 +57,7 @@ export default function VideoLibrary() {
     try {
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
+      const contentType = file.type.startsWith('video/') ? 'video' : 'pdf';
 
       const { error: uploadError } = await supabase.storage
         .from('training_videos')
@@ -64,15 +65,12 @@ export default function VideoLibrary() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('training_videos')
-        .getPublicUrl(filePath);
-
       const { error: dbError } = await supabase
-        .from('training_videos')
+        .from('training_content')
         .insert({
           title: file.name.split('.')[0],
-          video_url: filePath,
+          content_type: contentType,
+          [contentType === 'video' ? 'video_url' : 'pdf_url']: filePath,
           status: 'active',
         });
 
@@ -80,13 +78,13 @@ export default function VideoLibrary() {
 
       toast({
         title: "Success",
-        description: "Video uploaded successfully",
+        description: "Content uploaded successfully",
       });
 
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to upload video",
+        description: "Failed to upload content",
         variant: "destructive",
       });
     }
@@ -96,16 +94,16 @@ export default function VideoLibrary() {
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Video Library</h1>
+          <h1 className="text-3xl font-bold">Content Library</h1>
           {isAdmin && (
             <Button>
               <Upload className="mr-2 h-4 w-4" />
               <label className="cursor-pointer">
-                Upload Video
+                Upload Content
                 <input
                   type="file"
                   className="hidden"
-                  accept="video/*"
+                  accept="video/*,application/pdf"
                   onChange={handleUpload}
                 />
               </label>
@@ -117,20 +115,20 @@ export default function VideoLibrary() {
           <div>Loading...</div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos?.map((video) => (
-              <Card key={video.id} className="hover:shadow-lg transition-shadow">
+            {content?.map((item) => (
+              <Card key={item.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Play className="h-5 w-5" />
-                    {video.title}
+                    {item.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="mb-4 text-gray-600 line-clamp-2">
-                    {video.description || 'No description available'}
+                    {item.description || 'No description available'}
                   </p>
-                  <Button onClick={() => navigate(`/training/video/${video.id}`)}>
-                    Watch Video
+                  <Button onClick={() => navigate(`/learning/video/${item.id}`)}>
+                    View Content
                   </Button>
                 </CardContent>
               </Card>
