@@ -21,7 +21,7 @@ export default function QuizManager() {
           passing_score,
           status,
           content_id,
-          training_content (
+          training_content!left (
             id,
             title
           )

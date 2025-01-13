@@ -20,6 +20,7 @@ function App() {
         <Route path="/training" element={<Training />} />
         <Route path="/training/videos" element={<VideoLibrary />} />
         <Route path="/training/quizzes" element={<QuizManager />} />
+        <Route path="/learning/quizzes" element={<QuizManager />} />
         <Route path="/video/:id" element={<VideoPlayer />} />
         <Route path="/learning/video/:id" element={<VideoPlayer />} />
         <Route path="/quiz/:id" element={<QuizAttempt />} />
