@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Plus } from "lucide-react";
-import { QuizBasicInfo } from "./QuizBasicInfo";
 import { QuizQuestion } from "./QuizQuestion";
 import { useQuizForm } from "@/hooks/quiz/useQuizForm";
+import { QuizFormHeader } from "./form/QuizFormHeader";
+import { QuizFormContent } from "./form/QuizFormContent";
+import { QuizFormScore } from "./form/QuizFormScore";
 
 export function QuizForm() {
   const { form, onSubmit, addQuestion, removeQuestion, addOption, removeOption } = useQuizForm();
@@ -14,7 +16,9 @@ export function QuizForm() {
       <form onSubmit={onSubmit} className="space-y-6">
         <Card>
           <CardContent className="pt-6">
-            <QuizBasicInfo control={form.control} />
+            <QuizFormHeader control={form.control} />
+            <QuizFormContent control={form.control} />
+            <QuizFormScore control={form.control} />
           </CardContent>
         </Card>
 

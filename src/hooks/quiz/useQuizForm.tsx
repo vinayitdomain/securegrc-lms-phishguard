@@ -35,7 +35,7 @@ export const useQuizForm = () => {
       questions: [
         {
           question: "",
-          question_type: "multiple_choice",
+          question_type: "multiple_choice" as const,
           options: ["Option 1", "Option 2"],
           correct_answer: "Option 1",
           order_number: 0,
@@ -97,7 +97,7 @@ export const useQuizForm = () => {
       ...questions,
       {
         question: "",
-        question_type: "multiple_choice",
+        question_type: "multiple_choice" as const,
         options: ["Option 1", "Option 2"],
         correct_answer: "Option 1",
         order_number: questions.length,
