@@ -46,6 +46,7 @@ export const useQuizForm = () => {
 
   const onSubmit = async (values: QuizFormData) => {
     try {
+      // First, create the quiz
       const { data: quiz, error: quizError } = await supabase
         .from('quizzes')
         .insert({
@@ -58,22 +59,33 @@ export const useQuizForm = () => {
         .select()
         .single();
 
-      if (quizError) throw quizError;
+      if (quizError) {
+        console.error('Error creating quiz:', quizError);
+        throw quizError;
+      }
+
+      if (!quiz) {
+        throw new Error('Quiz creation failed - no quiz returned');
+      }
+
+      // Then, create the questions using the quiz ID
+      const questionsData = values.questions.map((q, index) => ({
+        quiz_id: quiz.id,
+        question: q.question,
+        question_type: q.question_type,
+        options: q.options,
+        correct_answer: q.correct_answer,
+        order_number: index + 1,
+      }));
 
       const { error: questionsError } = await supabase
         .from('quiz_questions')
-        .insert(
-          values.questions.map((q, index) => ({
-            quiz_id: quiz.id,
-            question: q.question,
-            question_type: q.question_type,
-            options: q.options,
-            correct_answer: q.correct_answer,
-            order_number: index + 1,
-          }))
-        );
+        .insert(questionsData);
 
-      if (questionsError) throw questionsError;
+      if (questionsError) {
+        console.error('Error creating quiz questions:', questionsError);
+        throw questionsError;
+      }
 
       toast({
         title: "Success",
