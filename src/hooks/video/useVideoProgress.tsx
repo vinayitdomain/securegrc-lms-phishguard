@@ -8,6 +8,30 @@ export const useVideoProgress = (videoId: string | undefined) => {
   const [hasCompleted, setHasCompleted] = useState(false);
   const { toast } = useToast();
 
+  // Fetch initial progress
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!videoId) return;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('user_video_progress')
+        .select('*')
+        .eq('video_id', videoId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        setProgress(data.progress_percentage || 0);
+        setHasCompleted(data.completed || false);
+      }
+    };
+
+    fetchProgress();
+  }, [videoId]);
+
   const updateProgress = async (completed: boolean) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !videoId) return;
@@ -37,12 +61,15 @@ export const useVideoProgress = (videoId: string | undefined) => {
       const video = videoRef.current;
       
       const handleTimeUpdate = () => {
-        const currentProgress = (video.currentTime / video.duration) * 100;
-        setProgress(Math.round(currentProgress));
-        
-        if (currentProgress >= 95 && !hasCompleted) {
-          setHasCompleted(true);
-          updateProgress(true);
+        if (video.duration) {
+          const currentProgress = (video.currentTime / video.duration) * 100;
+          const roundedProgress = Math.round(currentProgress);
+          setProgress(roundedProgress);
+          
+          if (currentProgress >= 95 && !hasCompleted) {
+            setHasCompleted(true);
+            updateProgress(true);
+          }
         }
       };
 

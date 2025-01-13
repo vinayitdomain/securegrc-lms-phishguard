@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { VideoProgress } from "@/components/video/VideoProgress";
 import { QuizButton } from "@/components/video/QuizButton";
@@ -8,6 +8,7 @@ import { VideoHeader } from "@/components/video/VideoHeader";
 import { useVideoData } from "@/hooks/video/useVideoData";
 import { useVideoProgress } from "@/hooks/video/useVideoProgress";
 import { useQuizAttempt } from "@/hooks/quiz/useQuizAttempt";
+import { useNavigate } from "react-router-dom";
 
 export default function VideoPlayer() {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +40,7 @@ export default function VideoPlayer() {
     );
   }
 
-  const showQuizButton = hasCompleted;
+  const showQuizButton = hasCompleted && videoData?.quiz;
   const needsToRewatch = quizAttempt && !quizAttempt.passed;
 
   return (
@@ -74,7 +75,7 @@ export default function VideoPlayer() {
               
               <VideoProgress progress={progress} />
 
-              {showQuizButton && videoData?.quiz && (
+              {showQuizButton && (
                 <QuizButton 
                   onQuizStart={handleQuizStart}
                   hasPassed={!!quizAttempt?.passed}
