@@ -8,6 +8,33 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useRef, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 
+interface Quiz {
+  id: string;
+  title: string;
+  description: string | null;
+  organization_id: string | null;
+  passing_score: number | null;
+  status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  video_id: string | null;
+}
+
+interface VideoData {
+  id: string;
+  title: string;
+  description: string | null;
+  video_url: string;
+  duration: number | null;
+  organization_id: string | null;
+  created_by: string | null;
+  status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  quizzes?: Quiz;
+  publicUrl?: string;
+}
+
 export default function VideoPlayer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -24,7 +51,7 @@ export default function VideoPlayer() {
       
       const { data: video, error } = await supabase
         .from('training_videos')
-        .select('*, quizzes(*)')
+        .select('*, quizzes!quizzes_video_id_fkey(*)')
         .eq('id', id)
         .maybeSingle();
 
@@ -42,7 +69,7 @@ export default function VideoPlayer() {
       return {
         ...video,
         publicUrl: signedUrlData.signedUrl
-      };
+      } as VideoData;
     }
   });
 
