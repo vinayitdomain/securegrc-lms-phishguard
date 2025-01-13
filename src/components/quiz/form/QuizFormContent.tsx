@@ -48,12 +48,14 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
             </FormControl>
             <SelectContent>
               {trainingContent?.map((content) => (
-                <SelectItem 
-                  key={content.id} 
-                  value={content.id.toString()}
-                >
-                  {content.title || `Content ${content.id}`}
-                </SelectItem>
+                content.id && (
+                  <SelectItem 
+                    key={content.id} 
+                    value={content.id.toString()}
+                  >
+                    {content.title || `Content ${content.id}`}
+                  </SelectItem>
+                )
               ))}
             </SelectContent>
           </Select>
