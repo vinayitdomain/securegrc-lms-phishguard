@@ -72,6 +72,7 @@ export default function VideoLibrary() {
           content_type: contentType,
           [contentType === 'video' ? 'video_url' : 'pdf_url']: filePath,
           status: 'active',
+          requires_quiz: true
         });
 
       if (dbError) throw dbError;

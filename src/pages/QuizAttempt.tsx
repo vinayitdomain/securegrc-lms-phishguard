@@ -29,7 +29,7 @@ export default function QuizAttempt() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quizzes')
-        .select('*, training_videos(*)')
+        .select('*, training_content(*)')
         .eq('id', id)
         .single();
       
@@ -65,7 +65,7 @@ export default function QuizAttempt() {
     });
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
-    const passed = score >= 80; // Enforcing 80% passing requirement
+    const passed = score >= (quiz.passing_score || 80);
 
     try {
       const { error } = await supabase
@@ -88,27 +88,27 @@ export default function QuizAttempt() {
         toast({
           variant: "destructive",
           title: "Quiz Failed",
-          description: `You scored ${score}%. You need 80% to pass. Please watch the video again and retry.`,
+          description: `You scored ${score}%. You need ${quiz.passing_score || 80}% to pass. Please review the content again and retry.`,
         });
 
-        // Reset video progress to force rewatching
-        if (quiz.video_id) {
+        // Reset content progress to force rewatching/reviewing
+        if (quiz.content_id) {
           const { error: progressError } = await supabase
-            .from('user_video_progress')
+            .from('user_content_progress')
             .update({
               completed: false,
               progress_percentage: 0
             })
-            .eq('video_id', quiz.video_id);
+            .eq('content_id', quiz.content_id);
 
           if (progressError) {
-            console.error('Error resetting video progress:', progressError);
+            console.error('Error resetting content progress:', progressError);
           }
         }
       }
 
-      // Navigate back to video if failed, or to quiz list if passed
-      navigate(passed ? '/learning/quizzes' : `/learning/video/${quiz.video_id}`);
+      // Navigate back to content if failed, or to quiz list if passed
+      navigate(passed ? '/learning/quizzes' : `/learning/video/${quiz.content_id}`);
     } catch (error) {
       console.error('Error submitting quiz:', error);
       toast({
