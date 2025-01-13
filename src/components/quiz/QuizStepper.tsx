@@ -38,6 +38,17 @@ export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
     onSubmit(answers);
   };
 
+  // Add check for empty questions array
+  if (!questions || questions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p>No questions available.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
