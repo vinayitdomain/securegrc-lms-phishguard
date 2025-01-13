@@ -141,4 +141,3 @@ export default function VideoLibrary() {
     </DashboardLayout>
   );
 }
-};
