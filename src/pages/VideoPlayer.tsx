@@ -1,250 +1,205 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect, useRef, useState } from "react";
+import { VideoPlayer as VideoPlayerComponent } from "@/components/video/VideoPlayer";
+import { VideoDescription } from "@/components/video/VideoDescription";
+import { VideoHeader } from "@/components/video/VideoHeader";
 import { VideoProgress } from "@/components/video/VideoProgress";
 import { QuizButton } from "@/components/video/QuizButton";
-import { VideoDescription } from "@/components/video/VideoDescription";
+import { useVideoData } from "@/hooks/video/useVideoData";
+import { useVideoProgress } from "@/hooks/video/useVideoProgress";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface Quiz {
   id: string;
   title: string;
   description: string | null;
-  organization_id: string;
+  content_id: string;
+  organization_id: string | null;
   passing_score: number;
   status: string;
   created_at: string;
   updated_at: string;
-  video_id: string;
-}
-
-interface VideoData {
-  id: string;
-  title: string;
-  description: string | null;
-  video_url: string;
-  duration: number | null;
-  organization_id: string | null;
-  created_by: string | null;
-  status: string | null;
-  created_at: string | null;
-  updated_at: string | null;
-  quiz?: Quiz;
-  publicUrl?: string;
 }
 
 export default function VideoPlayer() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [hasCompleted, setHasCompleted] = useState(false);
+  const [isQuizStarted, setIsQuizStarted] = useState(false);
 
-  const { data: videoData, isLoading: isLoadingVideo } = useQuery({
-    queryKey: ['video', id],
+  const { data: video, isLoading: isLoadingVideo } = useQuery({
+    queryKey: ['training_content', id],
     queryFn: async () => {
-      if (!id) throw new Error('No video ID provided');
-      
-      const { data: video, error } = await supabase
-        .from('training_videos')
-        .select(`
-          *,
-          quiz:quizzes!quizzes_video_id_fkey (*)
-        `)
+      const { data, error } = await supabase
+        .from('training_content')
+        .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
-      if (!video) throw new Error('Video not found');
-
-      const { data: signedUrlData } = await supabase.storage
-        .from('training_videos')
-        .createSignedUrl(video.video_url, 3600);
-
-      if (!signedUrlData?.signedUrl) {
-        throw new Error('Failed to get video URL');
+      if (error) {
+        toast({
+          title: "Error loading video",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
       }
 
-      const transformedData: VideoData = {
-        ...video,
-        quiz: video.quiz?.[0] || null,
-        publicUrl: signedUrlData.signedUrl
-      };
-
-      return transformedData;
-    }
+      return data;
+    },
   });
 
-  const { data: progress_data } = useQuery({
-    queryKey: ['video-progress', id],
+  const { data: quiz, isLoading: isLoadingQuiz } = useQuery({
+    queryKey: ['quizzes', video?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quizzes')
+        .select('*')
+        .eq('content_id', video?.id)
+        .single();
+
+      if (error) {
+        if (error.code !== 'PGRST116') { // No rows returned
+          toast({
+            title: "Error loading quiz",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return null;
+      }
+
+      return data as Quiz;
+    },
+    enabled: !!video?.id,
+  });
+
+  const { data: progress, isLoading: isLoadingProgress } = useQuery({
+    queryKey: ['user_content_progress', video?.id],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
-        .from('user_video_progress')
+        .from('user_content_progress')
         .select('*')
-        .eq('video_id', id)
+        .eq('content_id', video?.id)
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code !== 'PGRST116') { // No rows returned
+          toast({
+            title: "Error loading progress",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return null;
+      }
+
       return data;
-    }
+    },
+    enabled: !!video?.id,
   });
 
-  const { data: quizAttempt } = useQuery({
-    queryKey: ['quiz-attempt', videoData?.quiz?.id],
+  const { data: quizAttempt, isLoading: isLoadingQuizAttempt } = useQuery({
+    queryKey: ['user_quiz_attempts', quiz?.id],
     queryFn: async () => {
-      if (!videoData?.quiz?.id) return null;
-      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
         .from('user_quiz_attempts')
         .select('*')
-        .eq('quiz_id', videoData.quiz.id)
+        .eq('quiz_id', quiz?.id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code !== 'PGRST116') { // No rows returned
+          toast({
+            title: "Error loading quiz attempt",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return null;
+      }
+
       return data;
     },
-    enabled: !!videoData?.quiz?.id
+    enabled: !!quiz?.id,
   });
 
-  useEffect(() => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      
-      const handleTimeUpdate = () => {
-        const currentProgress = (video.currentTime / video.duration) * 100;
-        setProgress(Math.round(currentProgress));
-        
-        if (currentProgress >= 95 && !hasCompleted) {
-          setHasCompleted(true);
-          updateProgress(true);
-        }
-      };
-
-      video.addEventListener('timeupdate', handleTimeUpdate);
-      return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-    }
-  }, [hasCompleted]);
-
-  const updateProgress = async (completed: boolean) => {
+  const updateProgress = async (progressPercentage: number) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || !id) return;
+    if (!user) return;
 
+    const isComplete = progressPercentage >= 100;
     const { error } = await supabase
-      .from('user_video_progress')
+      .from('user_content_progress')
       .upsert({
         user_id: user.id,
-        video_id: id,
-        progress_percentage: progress,
-        completed,
-        last_watched_at: new Date().toISOString()
+        content_id: video?.id,
+        progress_percentage: progressPercentage,
+        completed: isComplete,
+        last_watched_at: new Date().toISOString(),
       });
 
     if (error) {
-      console.error('Error updating progress:', error);
       toast({
-        title: "Error",
-        description: "Failed to update progress",
+        title: "Error updating progress",
+        description: error.message,
         variant: "destructive",
       });
     }
   };
 
-  const handleQuizStart = () => {
-    if (!videoData?.quiz?.id) {
-      toast({
-        title: "No Quiz Available",
-        description: "This video doesn't have an associated quiz.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    navigate(`/learning/quiz/${videoData.quiz.id}`);
-  };
-
-  if (isLoadingVideo) {
+  if (isLoadingVideo || isLoadingProgress || isLoadingQuiz || isLoadingQuizAttempt) {
     return (
       <DashboardLayout>
-        <div>Loading...</div>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary" />
+        </div>
       </DashboardLayout>
     );
   }
 
-  const showQuizButton = hasCompleted || progress_data?.completed;
-  const needsToRewatch = quizAttempt && !quizAttempt.passed && progress_data?.completed;
+  if (!video) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-gray-900">Video not found</h2>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/learning/videos')}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Library
-        </Button>
-
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-4">{videoData?.title}</h1>
-          
-          {needsToRewatch && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
-              <p className="text-yellow-700">
-                You need to watch the video again before retaking the quiz.
-              </p>
-            </div>
-          )}
-
-          {videoData?.publicUrl && (
-            <div className="space-y-4">
-              <div className="aspect-video mb-4">
-                <video
-                  ref={videoRef}
-                  controls
-                  className="w-full h-full rounded"
-                  src={videoData.publicUrl}
-                  onError={(e) => {
-                    console.error('Video playback error:', e);
-                    toast({
-                      title: "Error",
-                      description: "Failed to play video. Please try again later.",
-                      variant: "destructive",
-                    });
-                  }}
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              
-              <VideoProgress progress={progress} />
-
-              {showQuizButton && videoData?.quiz && (
-                <QuizButton 
-                  onQuizStart={handleQuizStart}
-                  hasPassed={!!quizAttempt?.passed}
-                />
-              )}
-            </div>
-          )}
-
-          <VideoDescription description={videoData?.description} />
+      <div className="space-y-8">
+        <VideoHeader title={video.title} />
+        <div className="aspect-video">
+          <VideoPlayerComponent
+            url={video.video_url}
+            onProgress={updateProgress}
+            initialProgress={progress?.progress_percentage || 0}
+          />
         </div>
+        <VideoProgress progress={progress?.progress_percentage || 0} />
+        <VideoDescription description={video.description || ''} />
+        {quiz && (
+          <QuizButton
+            onQuizStart={() => setIsQuizStarted(true)}
+            hasPassed={!!quizAttempt?.passed}
+            isVisible={!isQuizStarted && progress?.completed}
+          />
+        )}
       </div>
     </DashboardLayout>
   );
