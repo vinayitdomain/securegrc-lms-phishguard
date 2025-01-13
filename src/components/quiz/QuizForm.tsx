@@ -57,8 +57,8 @@ export function QuizForm() {
         {
           question: "",
           question_type: "multiple_choice",
-          options: ["", ""],
-          correct_answer: "",
+          options: ["Option 1", "Option 2"], // Initialize with non-empty values
+          correct_answer: "Option 1", // Initialize with first option
           order_number: 0,
         },
       ],
@@ -121,8 +121,8 @@ export function QuizForm() {
       {
         question: "",
         question_type: "multiple_choice",
-        options: ["", ""],
-        correct_answer: "",
+        options: ["Option 1", "Option 2"], // Initialize with non-empty values
+        correct_answer: "Option 1", // Initialize with first option
         order_number: questions.length,
       },
     ]);
@@ -139,16 +139,23 @@ export function QuizForm() {
   const addOption = (questionIndex: number) => {
     const questions = form.getValues("questions");
     const question = questions[questionIndex];
-    form.setValue(`questions.${questionIndex}.options`, [...question.options, ""]);
+    const newOptionNumber = question.options.length + 1;
+    form.setValue(
+      `questions.${questionIndex}.options`, 
+      [...question.options, `Option ${newOptionNumber}`]
+    );
   };
 
   const removeOption = (questionIndex: number, optionIndex: number) => {
     const questions = form.getValues("questions");
     const question = questions[questionIndex];
-    form.setValue(
-      `questions.${questionIndex}.options`,
-      question.options.filter((_, i) => i !== optionIndex)
-    );
+    const newOptions = question.options.filter((_, i) => i !== optionIndex);
+    form.setValue(`questions.${questionIndex}.options`, newOptions);
+    
+    // If the removed option was the correct answer, update it to the first available option
+    if (question.correct_answer === question.options[optionIndex] && newOptions.length > 0) {
+      form.setValue(`questions.${questionIndex}.correct_answer`, newOptions[0]);
+    }
   };
 
   return (
@@ -267,6 +274,7 @@ export function QuizForm() {
                           field.onChange(value);
                           if (value === "true_false") {
                             form.setValue(`questions.${questionIndex}.options`, ["True", "False"]);
+                            form.setValue(`questions.${questionIndex}.correct_answer`, "True");
                           }
                         }}
                         value={field.value}
@@ -299,7 +307,7 @@ export function QuizForm() {
                         Add Option
                       </Button>
                     </div>
-                    {question.options.map((_, optionIndex) => (
+                    {question.options.map((option, optionIndex) => (
                       <div key={optionIndex} className="flex gap-2">
                         <FormField
                           control={form.control}
@@ -317,6 +325,7 @@ export function QuizForm() {
                           variant="destructive"
                           size="sm"
                           onClick={() => removeOption(questionIndex, optionIndex)}
+                          disabled={question.options.length <= 2}
                         >
                           <Trash className="h-4 w-4" />
                         </Button>
