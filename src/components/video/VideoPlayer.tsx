@@ -40,7 +40,8 @@ const VideoPlayer = () => {
     );
   }
 
-  const showQuizButton = hasCompleted && contentData?.quiz;
+  // Only show quiz button if video is completed AND there is a quiz available
+  const showQuizButton = hasCompleted && !!contentData?.quiz;
   const needsToRewatch = quizAttempt && !quizAttempt.passed;
 
   return (
