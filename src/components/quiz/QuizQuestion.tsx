@@ -12,11 +12,11 @@ interface QuizQuestionProps {
   onAddOption: (questionIndex: number) => void;
   onRemoveOption: (questionIndex: number, optionIndex: number) => void;
   question: {
-    question?: string;
+    question: string;
     question_type: "multiple_choice" | "true_false";
     options: string[];
-    correct_answer?: string;
-    order_number?: number;
+    correct_answer: string;
+    order_number: number;
   };
 }
 
