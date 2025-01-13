@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Json } from "@/integrations/supabase/types";
 
 interface QuizStepperProps {
   questions: {
     id: string;
     question: string;
-    options: string[];
+    options: Json;
     question_type: string;
   }[];
   onSubmit: (answers: Record<string, string>) => void;
@@ -40,6 +41,11 @@ export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
+  // Parse options from Json type to string array
+  const questionOptions = Array.isArray(currentQuestion.options) 
+    ? currentQuestion.options 
+    : [];
+
   return (
     <div className="max-w-2xl mx-auto">
       <Progress value={progress} className="mb-6" />
@@ -53,7 +59,7 @@ export function QuizStepper({ questions, onSubmit }: QuizStepperProps) {
             <p className="text-lg">{currentQuestion.question}</p>
             
             <div className="space-y-3">
-              {currentQuestion.options.map((option) => (
+              {questionOptions.map((option) => (
                 <Button
                   key={option}
                   variant={answers[currentQuestion.id] === option ? "default" : "outline"}
