@@ -35,7 +35,10 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Attach to Training Content</FormLabel>
-          <Select onValueChange={field.onChange} value={field.value || undefined}>
+          <Select 
+            onValueChange={field.onChange} 
+            value={field.value?.toString() || undefined}
+          >
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder={isLoading ? "Loading..." : "Select training content"} />
@@ -43,7 +46,6 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
             </FormControl>
             <SelectContent>
               {trainingContent?.map((content) => (
-                // Ensure we always have a string value by using toString()
                 <SelectItem 
                   key={content.id} 
                   value={content.id.toString()}

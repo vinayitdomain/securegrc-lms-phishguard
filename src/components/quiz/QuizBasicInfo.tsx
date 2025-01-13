@@ -58,7 +58,10 @@ export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Attach to Training Content</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || undefined}>
+            <Select 
+              onValueChange={field.onChange} 
+              value={field.value?.toString() || undefined}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select training content" />
@@ -66,8 +69,11 @@ export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
               </FormControl>
               <SelectContent>
                 {trainingContent?.map((content) => (
-                  <SelectItem key={content.id} value={content.id}>
-                    {content.title || 'Untitled Content'}
+                  <SelectItem 
+                    key={content.id} 
+                    value={content.id.toString()}
+                  >
+                    {content.title || `Content ${content.id}`}
                   </SelectItem>
                 ))}
               </SelectContent>
