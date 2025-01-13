@@ -53,7 +53,6 @@ export function QuizForm() {
 
   const onSubmit = async (values: QuizFormValues) => {
     try {
-      // Insert quiz
       const { data: quiz, error: quizError } = await supabase
         .from('quizzes')
         .insert({
@@ -68,7 +67,6 @@ export function QuizForm() {
 
       if (quizError) throw quizError;
 
-      // Insert questions
       const { error: questionsError } = await supabase
         .from('quiz_questions')
         .insert(
@@ -138,7 +136,6 @@ export function QuizForm() {
     const newOptions = question.options.filter((_, i) => i !== optionIndex);
     form.setValue(`questions.${questionIndex}.options`, newOptions);
     
-    // If the removed option was the correct answer, update it to the first available option
     if (question.correct_answer === question.options[optionIndex] && newOptions.length > 0) {
       form.setValue(`questions.${questionIndex}.correct_answer`, newOptions[0]);
     }
