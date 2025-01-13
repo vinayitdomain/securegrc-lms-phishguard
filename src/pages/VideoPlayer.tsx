@@ -5,95 +5,147 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Progress } from "@/components/ui/progress";
 
 export default function VideoPlayer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
 
-  const { data: video, isLoading } = useQuery({
+  // Fetch video details and user's progress
+  const { data: videoData, isLoading: isLoadingVideo } = useQuery({
     queryKey: ['video', id],
     queryFn: async () => {
       if (!id) throw new Error('No video ID provided');
       
-      // Validate UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(id)) {
-        throw new Error('Invalid video ID format');
-      }
-
-      const { data, error } = await supabase
+      const { data: video, error } = await supabase
         .from('training_videos')
-        .select()
+        .select('*, quizzes(*)')
         .eq('id', id)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching video:', error);
-        throw error;
-      }
+      if (error) throw error;
+      if (!video) throw new Error('Video not found');
 
-      if (!data) {
-        throw new Error('Video not found');
-      }
-
-      // Get the public URL for the video
-      const { data: publicUrlData } = await supabase.storage
+      const { data: signedUrlData } = await supabase.storage
         .from('training_videos')
-        .createSignedUrl(data.video_url, 3600); // 1 hour signed URL
+        .createSignedUrl(video.video_url, 3600);
 
-      if (!publicUrlData?.signedUrl) {
-        console.error('Failed to get signed URL for video');
+      if (!signedUrlData?.signedUrl) {
         throw new Error('Failed to get video URL');
       }
 
       return {
-        ...data,
-        publicUrl: publicUrlData.signedUrl
+        ...video,
+        publicUrl: signedUrlData.signedUrl
       };
-    },
-    enabled: !!id,
-    retry: false,
-    meta: {
-      onError: (error: Error) => {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to load video",
-          variant: "destructive",
-        });
-        navigate('/training/videos');
-      }
     }
   });
 
+  const { data: progress_data } = useQuery({
+    queryKey: ['video-progress', id],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_video_progress')
+        .select('*')
+        .eq('video_id', id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Check if user has passed the associated quiz
+  const { data: quizAttempt } = useQuery({
+    queryKey: ['quiz-attempt', videoData?.quizzes?.id],
+    queryFn: async () => {
+      if (!videoData?.quizzes?.id) return null;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_quiz_attempts')
+        .select('*')
+        .eq('quiz_id', videoData.quizzes.id)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!videoData?.quizzes?.id
+  });
+
   useEffect(() => {
-    if (video?.video_url) {
-      const trackProgress = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { error } = await supabase
-          .from('user_video_progress')
-          .upsert({
-            user_id: user.id,
-            video_id: id,
-            progress_percentage: Math.round((videoRef.current?.currentTime || 0) / (videoRef.current?.duration || 1) * 100),
-            last_watched_at: new Date().toISOString(),
-          });
-
-        if (error) {
-          console.error('Error updating progress:', error);
+    if (videoRef.current) {
+      const video = videoRef.current;
+      
+      const handleTimeUpdate = () => {
+        const currentProgress = (video.currentTime / video.duration) * 100;
+        setProgress(Math.round(currentProgress));
+        
+        // Mark as completed when reaching 95% of the video
+        if (currentProgress >= 95 && !hasCompleted) {
+          setHasCompleted(true);
+          updateProgress(true);
         }
       };
 
-      const interval = setInterval(trackProgress, 10000); // Update every 10 seconds
-      return () => clearInterval(interval);
+      video.addEventListener('timeupdate', handleTimeUpdate);
+      return () => video.removeEventListener('timeupdate', handleTimeUpdate);
     }
-  }, [video, id]);
+  }, [hasCompleted]);
 
-  if (isLoading) {
+  const updateProgress = async (completed: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !id) return;
+
+    const { error } = await supabase
+      .from('user_video_progress')
+      .upsert({
+        user_id: user.id,
+        video_id: id,
+        progress_percentage: progress,
+        completed,
+        last_watched_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('Error updating progress:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update progress",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleQuizStart = () => {
+    if (!videoData?.quizzes?.id) {
+      toast({
+        title: "No Quiz Available",
+        description: "This video doesn't have an associated quiz.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    navigate(`/learning/quiz/${videoData.quizzes.id}`);
+  };
+
+  if (isLoadingVideo) {
     return (
       <DashboardLayout>
         <div>Loading...</div>
@@ -101,32 +153,15 @@ export default function VideoPlayer() {
     );
   }
 
-  if (!video) {
-    return (
-      <DashboardLayout>
-        <div className="container mx-auto py-6">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/training/videos')}
-            className="mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Library
-          </Button>
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <p>Video not found</p>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const showQuizButton = hasCompleted || progress_data?.completed;
+  const needsToRewatch = quizAttempt && !quizAttempt.passed && progress_data?.completed;
 
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <Button
           variant="outline"
-          onClick={() => navigate('/training/videos')}
+          onClick={() => navigate('/learning/videos')}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -134,33 +169,59 @@ export default function VideoPlayer() {
         </Button>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
+          <h1 className="text-2xl font-bold mb-4">{videoData?.title}</h1>
           
-          {video.publicUrl && (
-            <div className="aspect-video mb-4">
-              <video
-                ref={videoRef}
-                controls
-                className="w-full h-full rounded"
-                src={video.publicUrl}
-                onError={(e) => {
-                  console.error('Video playback error:', e);
-                  toast({
-                    title: "Error",
-                    description: "Failed to play video. Please try again later.",
-                    variant: "destructive",
-                  });
-                }}
-              >
-                Your browser does not support the video tag.
-              </video>
+          {needsToRewatch && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+              <p className="text-yellow-700">
+                You need to watch the video again before retaking the quiz.
+              </p>
             </div>
           )}
 
-          {video.description && (
-            <div className="prose max-w-none">
+          {videoData?.publicUrl && (
+            <div className="space-y-4">
+              <div className="aspect-video mb-4">
+                <video
+                  ref={videoRef}
+                  controls
+                  className="w-full h-full rounded"
+                  src={videoData.publicUrl}
+                  onError={(e) => {
+                    console.error('Video playback error:', e);
+                    toast({
+                      title: "Error",
+                      description: "Failed to play video. Please try again later.",
+                      variant: "destructive",
+                    });
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>Progress</span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="w-full" />
+              </div>
+
+              {showQuizButton && videoData?.quizzes && (
+                <div className="flex justify-end mt-4">
+                  <Button onClick={handleQuizStart}>
+                    {quizAttempt?.passed ? 'Retake Quiz' : 'Take Quiz'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {videoData?.description && (
+            <div className="prose max-w-none mt-6">
               <h2 className="text-xl font-semibold mb-2">Description</h2>
-              <p>{video.description}</p>
+              <p>{videoData.description}</p>
             </div>
           )}
         </div>

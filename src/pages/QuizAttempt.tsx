@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Progress } from "@/components/ui/progress";
 
 interface QuizQuestion {
   id: string;
@@ -28,7 +29,7 @@ export default function QuizAttempt() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('quizzes')
-        .select('*')
+        .select('*, training_videos(*)')
         .eq('id', id)
         .single();
       
@@ -64,7 +65,7 @@ export default function QuizAttempt() {
     });
 
     const score = Math.round((correctAnswers / totalQuestions) * 100);
-    const passed = score >= (quiz.passing_score || 70);
+    const passed = score >= 80; // Enforcing 80% passing requirement
 
     try {
       const { error } = await supabase
@@ -78,12 +79,36 @@ export default function QuizAttempt() {
 
       if (error) throw error;
 
-      toast({
-        title: passed ? "Congratulations!" : "Quiz Completed",
-        description: `You scored ${score}%. ${passed ? "You passed!" : "Try again to improve your score."}`,
-      });
+      if (passed) {
+        toast({
+          title: "Congratulations!",
+          description: `You passed with a score of ${score}%!`,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Quiz Failed",
+          description: `You scored ${score}%. You need 80% to pass. Please watch the video again and retry.`,
+        });
 
-      navigate('/training/quizzes');
+        // Reset video progress to force rewatching
+        if (quiz.video_id) {
+          const { error: progressError } = await supabase
+            .from('user_video_progress')
+            .update({
+              completed: false,
+              progress_percentage: 0
+            })
+            .eq('video_id', quiz.video_id);
+
+          if (progressError) {
+            console.error('Error resetting video progress:', progressError);
+          }
+        }
+      }
+
+      // Navigate back to video if failed, or to quiz list if passed
+      navigate(passed ? '/learning/quizzes' : `/learning/video/${quiz.video_id}`);
     } catch (error) {
       console.error('Error submitting quiz:', error);
       toast({
@@ -102,14 +127,24 @@ export default function QuizAttempt() {
     return <div>Quiz not found</div>;
   }
 
+  const progress = (Object.keys(answers).length / questions.length) * 100;
+
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{quiz.title}</h1>
-          <Button variant="outline" onClick={() => navigate('/training/quizzes')}>
+          <Button variant="outline" onClick={() => navigate('/learning/quizzes')}>
             Exit Quiz
           </Button>
+        </div>
+
+        <div className="mb-6">
+          <div className="flex justify-between text-sm text-gray-500 mb-2">
+            <span>Progress</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="w-full" />
         </div>
 
         <div className="space-y-6">
