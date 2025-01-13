@@ -16,7 +16,8 @@ export function QuizBasicInfo({ control }: QuizBasicInfoProps) {
       const { data, error } = await supabase
         .from('training_content')
         .select('*')
-        .eq('status', 'published');
+        .eq('status', 'published')
+        .eq('requires_quiz', true);
       
       if (error) throw error;
       return data;

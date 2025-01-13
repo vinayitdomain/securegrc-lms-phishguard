@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash, Plus } from "lucide-react";
 import { Control } from "react-hook-form";
+import { Question } from "@/types/quiz";
 
 interface QuizQuestionProps {
   control: Control<any>;
@@ -11,13 +12,7 @@ interface QuizQuestionProps {
   onRemoveQuestion: (index: number) => void;
   onAddOption: (questionIndex: number) => void;
   onRemoveOption: (questionIndex: number, optionIndex: number) => void;
-  question: {
-    question: string;
-    question_type: "multiple_choice" | "true_false";
-    options: string[];
-    correct_answer: string;
-    order_number: number;
-  };
+  question: Question;
 }
 
 export function QuizQuestion({
