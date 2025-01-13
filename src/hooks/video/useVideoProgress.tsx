@@ -8,7 +8,6 @@ export const useVideoProgress = (contentId: string | undefined) => {
   const [hasCompleted, setHasCompleted] = useState(false);
   const { toast } = useToast();
 
-  // Fetch initial progress
   useEffect(() => {
     const fetchProgress = async () => {
       if (!contentId) return;

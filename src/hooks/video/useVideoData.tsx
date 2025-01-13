@@ -5,11 +5,11 @@ interface Quiz {
   id: string;
   title: string;
   description: string | null;
-  organization_id: string;
-  passing_score: number;
-  status: string;
-  created_at: string;
-  updated_at: string;
+  organization_id: string | null;
+  passing_score: number | null;
+  status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   content_id: string | null;
 }
 
@@ -67,6 +67,7 @@ export const useVideoData = (contentId: string | undefined) => {
 
       const transformedData: ContentData = {
         ...content,
+        content_type: content.content_type as 'video' | 'pdf',
         quiz: content.quiz?.[0] || null,
         publicUrl
       };
