@@ -57,8 +57,8 @@ export function QuizForm() {
         {
           question: "",
           question_type: "multiple_choice",
-          options: ["Option 1", "Option 2"], // Initialize with non-empty values
-          correct_answer: "Option 1", // Initialize with first option
+          options: ["Option 1", "Option 2"],
+          correct_answer: "Option 1",
           order_number: 0,
         },
       ],
@@ -195,7 +195,7 @@ export function QuizForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Attach to Training Content</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || undefined}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select training content" />
@@ -204,7 +204,7 @@ export function QuizForm() {
                     <SelectContent>
                       {trainingContent?.map((content) => (
                         <SelectItem key={content.id} value={content.id}>
-                          {content.title}
+                          {content.title || 'Untitled Content'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -340,7 +340,10 @@ export function QuizForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Correct Answer</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value || question.options[0]}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select correct answer" />
@@ -348,8 +351,8 @@ export function QuizForm() {
                         </FormControl>
                         <SelectContent>
                           {question.options.map((option, index) => (
-                            <SelectItem key={index} value={option}>
-                              {option}
+                            <SelectItem key={index} value={option || `Option ${index + 1}`}>
+                              {option || `Option ${index + 1}`}
                             </SelectItem>
                           ))}
                         </SelectContent>
