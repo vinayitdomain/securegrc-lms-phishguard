@@ -46,7 +46,7 @@ export const useQuizForm = () => {
 
   const onSubmit = async (values: QuizFormData) => {
     try {
-      // First, create the quiz
+      // First, create the quiz and get its ID
       const { data: quiz, error: quizError } = await supabase
         .from('quizzes')
         .insert({
@@ -55,20 +55,15 @@ export const useQuizForm = () => {
           content_id: values.content_id,
           passing_score: values.passing_score,
           preview_enabled: values.preview_enabled,
+          status: 'draft' // Set initial status
         })
-        .select()
+        .select('id')
         .single();
 
-      if (quizError) {
-        console.error('Error creating quiz:', quizError);
-        throw quizError;
-      }
+      if (quizError) throw quizError;
+      if (!quiz?.id) throw new Error('Quiz creation failed - no quiz ID returned');
 
-      if (!quiz) {
-        throw new Error('Quiz creation failed - no quiz returned');
-      }
-
-      // Then, create the questions using the quiz ID
+      // Then, prepare and insert the questions with the quiz ID
       const questionsData = values.questions.map((q, index) => ({
         quiz_id: quiz.id,
         question: q.question,
@@ -82,10 +77,7 @@ export const useQuizForm = () => {
         .from('quiz_questions')
         .insert(questionsData);
 
-      if (questionsError) {
-        console.error('Error creating quiz questions:', questionsError);
-        throw questionsError;
-      }
+      if (questionsError) throw questionsError;
 
       toast({
         title: "Success",
@@ -93,12 +85,12 @@ export const useQuizForm = () => {
       });
 
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating quiz:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create quiz. Please try again.",
+        description: error.message || "Failed to create quiz. Please try again.",
       });
     }
   };
