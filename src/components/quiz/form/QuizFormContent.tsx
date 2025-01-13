@@ -43,8 +43,12 @@ export function QuizFormContent({ control }: QuizFormContentProps) {
             </FormControl>
             <SelectContent>
               {trainingContent?.map((content) => (
-                <SelectItem key={content.id} value={content.id}>
-                  {content.title || 'Untitled Content'}
+                // Ensure we always have a string value by using toString()
+                <SelectItem 
+                  key={content.id} 
+                  value={content.id.toString()}
+                >
+                  {content.title || `Content ${content.id}`}
                 </SelectItem>
               ))}
             </SelectContent>
