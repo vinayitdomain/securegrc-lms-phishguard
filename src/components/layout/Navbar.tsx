@@ -28,10 +28,10 @@ export function Navbar({ organization }: NavbarProps) {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link to="/dashboard" className="mr-6 flex items-center space-x-2">
+    <nav className="border-b bg-white shadow-sm">
+      <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-8">
+          <Link to="/dashboard" className="flex items-center gap-2">
             {organization?.brand_logo_url && (
               <img 
                 src={organization.brand_logo_url} 
@@ -39,68 +39,64 @@ export function Navbar({ organization }: NavbarProps) {
                 className="h-8 w-auto"
               />
             )}
-            <span className="hidden font-bold text-primary hover:text-primary/90 transition-colors sm:inline-block">
+            <span className="text-xl font-bold text-primary">
               {organization?.name || "SecureGRC"}
             </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-4 text-sm font-medium">
             <Link 
               to="/dashboard" 
-              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
             >
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
             <Link 
               to="/training/videos" 
-              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
             >
               <Play className="h-4 w-4" />
               Videos
             </Link>
             <Link 
               to="/training" 
-              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
             >
               <BookOpen className="h-4 w-4" />
               Training
             </Link>
             <Link 
               to="/campaigns" 
-              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
             >
               <Mail className="h-4 w-4" />
               Campaigns
             </Link>
             <Link 
               to="/analytics" 
-              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
             >
               <BarChart2 className="h-4 w-4" />
               Analytics
             </Link>
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-          </div>
-          <div className="flex items-center gap-4">
-            <NotificationBell />
-            <div className="flex items-center gap-4 bg-accent/40 px-4 py-1.5 rounded-full">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <User className="h-4 w-4" />
-                <span>John Doe</span>
-              </div>
-              <Button 
-                variant="destructive" 
-                size="sm"
-                onClick={handleSignOut}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2 shadow-sm transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
+        <div className="flex items-center gap-4">
+          <NotificationBell />
+          <div className="flex items-center gap-4 bg-gray-100 px-4 py-2 rounded-full">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <User className="h-4 w-4" />
+              <span>John Doe</span>
             </div>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={handleSignOut}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2 shadow-sm transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </div>

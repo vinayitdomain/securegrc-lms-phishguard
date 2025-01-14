@@ -8,33 +8,37 @@ interface OrganizationsTableProps {
 export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
   return (
     <Card className="border-t-4 border-t-primary shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
-        <CardTitle className="text-xl font-semibold text-primary">
+      <CardHeader className="bg-gray-50/80">
+        <CardTitle className="text-xl font-semibold text-gray-900">
           Organizations Directory
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
-          <TableHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
-            <TableRow>
-              <TableHead className="font-semibold text-primary">Organization Name</TableHead>
-              <TableHead className="font-semibold text-primary">License Count</TableHead>
-              <TableHead className="font-semibold text-primary">License Start</TableHead>
-              <TableHead className="font-semibold text-primary">License End</TableHead>
-              <TableHead className="font-semibold text-primary">Status</TableHead>
+          <TableHeader>
+            <TableRow className="bg-gray-50/50">
+              <TableHead className="font-semibold text-gray-700">Organization Name</TableHead>
+              <TableHead className="font-semibold text-gray-700">License Count</TableHead>
+              <TableHead className="font-semibold text-gray-700">License Start</TableHead>
+              <TableHead className="font-semibold text-gray-700">License End</TableHead>
+              <TableHead className="font-semibold text-gray-700">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {organizations.map((org) => (
               <TableRow key={org.id} className="hover:bg-gray-50/80 transition-colors group">
-                <TableCell className="font-medium group-hover:text-primary transition-colors">{org.name}</TableCell>
-                <TableCell className="group-hover:text-gray-900 transition-colors">{org.license_count}</TableCell>
-                <TableCell className="group-hover:text-gray-900 transition-colors">
+                <TableCell className="font-medium text-gray-900 group-hover:text-primary transition-colors">
+                  {org.name}
+                </TableCell>
+                <TableCell className="text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {org.license_count}
+                </TableCell>
+                <TableCell className="text-gray-700 group-hover:text-gray-900 transition-colors">
                   {org.license_start_date 
                     ? new Date(org.license_start_date).toLocaleDateString() 
                     : 'N/A'}
                 </TableCell>
-                <TableCell className="group-hover:text-gray-900 transition-colors">
+                <TableCell className="text-gray-700 group-hover:text-gray-900 transition-colors">
                   {org.license_end_date 
                     ? new Date(org.license_end_date).toLocaleDateString() 
                     : 'N/A'}

@@ -9,11 +9,11 @@ interface StatCardProps {
 export function StatCard({ title, value, className = "" }: StatCardProps) {
   return (
     <Card className={`transition-all duration-200 hover:scale-105 hover:shadow-lg ${className}`}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-accent/20">
-        <CardTitle className="text-sm font-medium text-foreground">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gray-50/80">
+        <CardTitle className="text-sm font-medium text-gray-700">{title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="text-2xl font-bold text-primary dark:text-white">{value}</div>
+        <div className="text-2xl font-bold text-gray-900">{value}</div>
       </CardContent>
     </Card>
   );
