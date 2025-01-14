@@ -24,7 +24,7 @@ export function EventForm() {
   const queryClient = useQueryClient();
   const form = useForm<EventFormData>();
 
-  const { data: profile } = useQuery({
+  const { data: profiles } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -33,26 +33,26 @@ export function EventForm() {
       const { data } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', user.id);
 
-      return data;
+      if (!data?.length) throw new Error('No profile found');
+      return data[0];
     }
   });
 
   const { data: trainingPaths } = useQuery({
     queryKey: ['training-paths'],
     queryFn: async () => {
-      if (!profile?.organization_id) return [];
+      if (!profiles?.organization_id) return [];
       
       const { data } = await supabase
         .from('training_paths')
         .select('id, title')
-        .eq('organization_id', profile.organization_id);
+        .eq('organization_id', profiles.organization_id);
 
       return data || [];
     },
-    enabled: !!profile?.organization_id
+    enabled: !!profiles?.organization_id
   });
 
   const onSubmit = async (data: EventFormData) => {
@@ -60,7 +60,7 @@ export function EventForm() {
       const { error } = await supabase
         .from('training_events')
         .insert({
-          organization_id: profile?.organization_id,
+          organization_id: profiles?.organization_id,
           title: data.title,
           description: data.description,
           start_time: data.startTime,

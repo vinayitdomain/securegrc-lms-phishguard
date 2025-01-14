@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 interface EventDetailsProps {
   date?: Date;
@@ -49,13 +50,19 @@ export function EventDetails({ date, events = [] }: EventDetailsProps) {
                   {format(new Date(event.start_time), 'p')} - {format(new Date(event.end_time), 'p')}
                 </p>
                 {event.training_paths && (
-                  <p className="text-primary">Training Path: {event.training_paths.title}</p>
+                  <Badge variant="outline" className="mt-2">
+                    Training Path: {event.training_paths.title}
+                  </Badge>
                 )}
                 {event.training_content && (
-                  <p className="text-primary">Content: {event.training_content.title}</p>
+                  <Badge variant="outline" className="mt-2 ml-2">
+                    Content: {event.training_content.title}
+                  </Badge>
                 )}
                 {event.quizzes && (
-                  <p className="text-primary">Quiz: {event.quizzes.title}</p>
+                  <Badge variant="outline" className="mt-2 ml-2">
+                    Quiz: {event.quizzes.title}
+                  </Badge>
                 )}
               </div>
             </div>
