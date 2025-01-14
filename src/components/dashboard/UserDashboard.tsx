@@ -3,6 +3,7 @@ import { DashboardCharts } from "./DashboardCharts";
 import { AchievementsGrid } from "./AchievementsGrid";
 import { Leaderboard } from "./Leaderboard";
 import { RecentIncidents } from "../incidents/RecentIncidents";
+import { RiskAssessmentOverview } from "../risk/RiskAssessmentOverview";
 
 interface UserDashboardProps {
   activeCampaigns: number;
@@ -44,6 +45,10 @@ export function UserDashboard({
 
       <div className="grid gap-4 md:grid-cols-2">
         <RecentIncidents />
+        <RiskAssessmentOverview />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <h2 className="text-2xl font-bold tracking-tight mb-4">Achievements</h2>
           <AchievementsGrid
@@ -51,11 +56,10 @@ export function UserDashboard({
             earnedAchievements={earnedAchievements}
           />
         </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Leaderboard</h2>
-        <Leaderboard entries={leaderboard} />
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Leaderboard</h2>
+          <Leaderboard entries={leaderboard} />
+        </div>
       </div>
     </div>
   );

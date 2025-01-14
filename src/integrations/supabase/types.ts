@@ -959,6 +959,124 @@ export type Database = {
           },
         ]
       }
+      risk_assessments: {
+        Row: {
+          assigned_to: string | null
+          category_id: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          impact_score: number | null
+          likelihood_score: number | null
+          mitigation_plan: string | null
+          organization_id: string
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category_id: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          impact_score?: number | null
+          likelihood_score?: number | null
+          mitigation_plan?: string | null
+          organization_id: string
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          impact_score?: number | null
+          likelihood_score?: number | null
+          mitigation_plan?: string | null
+          organization_id?: string
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "risk_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_content: {
         Row: {
           content_type: string
@@ -1504,6 +1622,7 @@ export type Database = {
         | "success"
         | "error"
         | "calendar_event"
+      risk_level: "low" | "medium" | "high" | "critical"
       user_role: "super_admin" | "org_admin" | "user"
     }
     CompositeTypes: {
