@@ -59,6 +59,7 @@ export function ComplianceOverview() {
         {frameworks?.map((framework) => (
           <ComplianceFrameworkCard
             key={framework.id}
+            id={framework.id}
             name={framework.name}
             description={framework.description}
             complianceScore={framework.compliance_score || 0}

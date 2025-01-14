@@ -643,6 +643,67 @@ export type Database = {
           },
         ]
       }
+      compliance_requirement_mappings: {
+        Row: {
+          created_at: string | null
+          framework_id: string
+          id: string
+          last_reviewed_at: string | null
+          notes: string | null
+          organization_id: string
+          policy_id: string
+          requirement_key: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          framework_id: string
+          id?: string
+          last_reviewed_at?: string | null
+          notes?: string | null
+          organization_id: string
+          policy_id: string
+          requirement_key: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          framework_id?: string
+          id?: string
+          last_reviewed_at?: string | null
+          notes?: string | null
+          organization_id?: string
+          policy_id?: string
+          requirement_key?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_requirement_mappings_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_frameworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_requirement_mappings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_requirement_mappings_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string | null
