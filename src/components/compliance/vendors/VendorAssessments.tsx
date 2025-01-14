@@ -13,6 +13,7 @@ interface Assessment {
   status: string;
   vendors: {
     name: string;
+    risk_level: string;
   };
 }
 
@@ -27,7 +28,8 @@ export function VendorAssessments() {
         .select(`
           *,
           vendors (
-            name
+            name,
+            risk_level
           )
         `)
         .order('assessment_date', { ascending: false });

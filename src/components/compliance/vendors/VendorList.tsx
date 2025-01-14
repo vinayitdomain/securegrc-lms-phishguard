@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { VendorForm } from "./VendorForm";
+import { VendorDetails } from "./VendorDetails";
 
 interface Vendor {
   id: string;
@@ -61,10 +62,7 @@ export function VendorList() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Third-Party Vendors</h2>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Vendor
-        </Button>
+        <VendorForm />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -94,9 +92,7 @@ export function VendorList() {
                 }`}>
                   {vendor.status}
                 </span>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
+                <VendorDetails vendorId={vendor.id} />
               </div>
             </CardContent>
           </Card>
