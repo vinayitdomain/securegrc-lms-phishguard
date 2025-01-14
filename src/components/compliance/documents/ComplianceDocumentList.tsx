@@ -27,7 +27,7 @@ export function ComplianceDocumentList() {
         .from('compliance_documents')
         .select(`
           *,
-          creator:created_by(full_name),
+          creator:profiles!compliance_documents_created_by_fkey(full_name),
           tags:compliance_document_tag_relations(
             tag:compliance_document_tags(*)
           )

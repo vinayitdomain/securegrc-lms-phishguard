@@ -1,5 +1,15 @@
 export type ComplianceDocumentStatus = 'draft' | 'published' | 'archived';
 
+interface Profile {
+  id: string;
+  user_id: string;
+  organization_id: string | null;
+  full_name: string | null;
+  role: 'super_admin' | 'org_admin' | 'user';
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ComplianceDocument {
   id: string;
   organization_id: string;
@@ -11,8 +21,8 @@ export interface ComplianceDocument {
   created_by: string;
   created_at: string;
   updated_at: string;
-  tags?: ComplianceDocumentTag[];
   creator?: Profile;
+  tags?: ComplianceDocumentTagRelation[];
 }
 
 export interface ComplianceDocumentTag {
@@ -20,6 +30,12 @@ export interface ComplianceDocumentTag {
   name: string;
   organization_id: string;
   created_at: string;
+}
+
+export interface ComplianceDocumentTagRelation {
+  document_id: string;
+  tag_id: string;
+  tag: ComplianceDocumentTag;
 }
 
 export interface ComplianceDocumentVersion {

@@ -40,16 +40,17 @@ export default function Dashboard() {
     enabled: !!profile?.organization_id,
   });
 
-  const activeCampaigns = metricsData?.active_campaigns || 0;
+  // Default values for metrics that don't exist in the database
+  const activeCampaigns = 0;
   const courseCompletion = metricsData?.courses_completed || 0;
   const complianceStatus = metricsData?.security_score || 0;
   const isLoadingCampaigns = isLoadingMetrics;
   const isLoadingCourses = isLoadingMetrics;
   const isLoadingCompliance = isLoadingMetrics;
-  const campaignMetrics = metricsData?.campaign_metrics || [];
-  const achievements = metricsData?.achievements || [];
-  const earnedAchievements = metricsData?.earned_achievements || [];
-  const leaderboard = metricsData?.leaderboard || [];
+  const campaignMetrics = [];
+  const achievements = [];
+  const earnedAchievements = [];
+  const leaderboard = [];
 
   return (
     <div className="space-y-8">
