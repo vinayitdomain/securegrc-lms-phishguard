@@ -260,8 +260,8 @@ export type Database = {
           id: string
           ip_address: string | null
           organization_id: string
+          profile_id: string | null
           user_agent: string | null
-          user_id: string | null
         }
         Insert: {
           action_type: Database["public"]["Enums"]["audit_log_type"]
@@ -272,8 +272,8 @@ export type Database = {
           id?: string
           ip_address?: string | null
           organization_id: string
+          profile_id?: string | null
           user_agent?: string | null
-          user_id?: string | null
         }
         Update: {
           action_type?: Database["public"]["Enums"]["audit_log_type"]
@@ -284,8 +284,8 @@ export type Database = {
           id?: string
           ip_address?: string | null
           organization_id?: string
+          profile_id?: string | null
           user_agent?: string | null
-          user_id?: string | null
         }
         Relationships: [
           {
@@ -300,6 +300,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

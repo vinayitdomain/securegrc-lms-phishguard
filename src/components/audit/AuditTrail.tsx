@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Database } from "@/integrations/supabase/types";
 
 type AuditLog = {
   id: string;
-  action_type: string;
+  action_type: Database["public"]["Enums"]["audit_log_type"];
   entity_type: string;
   created_at: string;
   profile?: {
