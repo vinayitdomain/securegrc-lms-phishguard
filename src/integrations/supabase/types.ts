@@ -39,6 +39,271 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_checklist_items: {
+        Row: {
+          assigned_to: string | null
+          checklist_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          description: string
+          due_date: string | null
+          evidence_required: boolean | null
+          id: string
+          requirement: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          checklist_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description: string
+          due_date?: string | null
+          evidence_required?: boolean | null
+          id?: string
+          requirement?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          checklist_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string
+          due_date?: string | null
+          evidence_required?: boolean | null
+          id?: string
+          requirement?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_checklist_items_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "audit_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_checklists: {
+        Row: {
+          audit_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          order_number: number
+          title: string
+        }
+        Insert: {
+          audit_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_number: number
+          title: string
+        }
+        Update: {
+          audit_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_number?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_checklists_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audit_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_evidence: {
+        Row: {
+          checklist_item_id: string | null
+          file_type: string | null
+          file_url: string
+          finding_id: string | null
+          id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          checklist_item_id?: string | null
+          file_type?: string | null
+          file_url: string
+          finding_id?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          checklist_item_id?: string | null
+          file_type?: string | null
+          file_url?: string
+          finding_id?: string | null
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_evidence_checklist_item_id_fkey"
+            columns: ["checklist_item_id"]
+            isOneToOne: false
+            referencedRelation: "audit_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_evidence_finding_id_fkey"
+            columns: ["finding_id"]
+            isOneToOne: false
+            referencedRelation: "audit_findings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_evidence_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_findings: {
+        Row: {
+          audit_id: string | null
+          checklist_item_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          remediation_plan: string | null
+          severity: string
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          audit_id?: string | null
+          checklist_item_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          remediation_plan?: string | null
+          severity: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          audit_id?: string | null
+          checklist_item_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          remediation_plan?: string | null
+          severity?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_findings_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audit_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_findings_checklist_item_id_fkey"
+            columns: ["checklist_item_id"]
+            isOneToOne: false
+            referencedRelation: "audit_checklist_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_findings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_programs: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          organization_id: string
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          organization_id: string
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          organization_id?: string
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_programs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_programs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_targets: {
         Row: {
           campaign_id: string
