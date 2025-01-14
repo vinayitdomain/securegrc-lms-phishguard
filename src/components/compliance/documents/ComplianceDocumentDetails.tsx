@@ -40,7 +40,7 @@ export function ComplianceDocumentDetails({ documentId }: ComplianceDocumentDeta
           created_by_user:profiles!created_by(full_name)
         `)
         .eq('id', documentId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data as ComplianceDocument;
