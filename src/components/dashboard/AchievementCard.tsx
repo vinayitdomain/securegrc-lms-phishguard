@@ -28,14 +28,26 @@ export function AchievementCard({ achievement, earned = false }: AchievementCard
   const Icon = iconMap[achievement.icon as keyof typeof iconMap];
 
   return (
-    <Card className={`transition-all duration-200 ${earned ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200' : 'opacity-50'}`}>
+    <Card className={`transition-all duration-200 ${
+      earned 
+        ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-lg' 
+        : 'opacity-50 hover:opacity-75'
+    }`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{achievement.name}</CardTitle>
-        {Icon && <Icon className={`h-5 w-5 ${earned ? 'text-yellow-600' : 'text-gray-400'}`} />}
+        <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {achievement.name}
+        </CardTitle>
+        {Icon && (
+          <Icon className={`h-5 w-5 ${
+            earned ? 'text-yellow-600' : 'text-gray-400'
+          }`} />
+        )}
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-600">{achievement.description}</p>
-        <div className="mt-2 text-sm font-semibold text-primary">{achievement.points} points</div>
+        <p className="text-sm text-gray-700 dark:text-gray-300">{achievement.description}</p>
+        <div className="mt-2 text-sm font-semibold text-primary dark:text-white">
+          {achievement.points} points
+        </div>
       </CardContent>
     </Card>
   );

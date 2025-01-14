@@ -28,7 +28,7 @@ export function Navbar({ organization }: NavbarProps) {
   };
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex">
           <Link to="/dashboard" className="mr-6 flex items-center space-x-2">
@@ -39,28 +39,28 @@ export function Navbar({ organization }: NavbarProps) {
                 className="h-8 w-auto"
               />
             )}
-            <span className="hidden font-bold sm:inline-block">
+            <span className="hidden font-bold text-primary sm:inline-block">
               {organization?.name || "SecureGRC"}
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link to="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/dashboard" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
-            <Link to="/training/videos" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/training/videos" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
               <Play className="h-4 w-4" />
               Videos
             </Link>
-            <Link to="/training" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/training" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               Training
             </Link>
-            <Link to="/campaigns" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/campaigns" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
               <Mail className="h-4 w-4" />
               Campaigns
             </Link>
-            <Link to="/analytics" className="transition-colors hover:text-foreground/80 text-foreground flex items-center gap-2">
+            <Link to="/analytics" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
               <BarChart2 className="h-4 w-4" />
               Analytics
             </Link>
@@ -72,12 +72,13 @@ export function Navbar({ organization }: NavbarProps) {
           <div className="flex items-center gap-4">
             <NotificationBell />
             <Button 
-              variant="ghost" 
-              size="icon"
+              variant="destructive" 
+              size="sm"
               onClick={handleSignOut}
-              className="text-foreground/80 hover:text-foreground"
+              className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4" />
+              Sign Out
             </Button>
           </div>
         </div>
