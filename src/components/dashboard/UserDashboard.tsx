@@ -1,13 +1,8 @@
+import { StatCard } from "./StatCard";
 import { MetricsChart } from "./MetricsChart";
 import { AchievementsGrid } from "./AchievementsGrid";
-import { UserStats } from "./UserStats";
 import { Leaderboard } from "./Leaderboard";
-import { UserSegments } from "./UserSegments";
-import { TrainingPaths } from "./TrainingPaths";
-import { CertificateGrid } from "../certificates/CertificateGrid";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { CertificateTemplateDesigner } from "../certificates/CertificateTemplateDesigner";
+import { ComplianceOverview } from "../compliance/ComplianceOverview";
 
 interface UserDashboardProps {
   activeCampaigns: number;
@@ -16,7 +11,7 @@ interface UserDashboardProps {
   isLoadingCampaigns: boolean;
   isLoadingCourses: boolean;
   isLoadingCompliance: boolean;
-  campaignMetrics: Array<{ name: string; value: number }>;
+  campaignMetrics: { name: string; value: number }[];
   achievements: any[];
   userAchievements: string[];
   leaderboard: any[];
@@ -34,61 +29,53 @@ export function UserDashboard({
   userAchievements,
   leaderboard,
 }: UserDashboardProps) {
-  const { data: userProfile } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const isAdmin = userProfile?.role === 'org_admin' || userProfile?.role === 'super_admin';
-
   return (
-    <>
-      <UserStats
-        activeCampaigns={activeCampaigns}
-        courseCompletion={courseCompletion}
-        complianceStatus={complianceStatus}
-        isLoadingCampaigns={isLoadingCampaigns}
-        isLoadingCourses={isLoadingCourses}
-        isLoadingCompliance={isLoadingCompliance}
-      />
-      
-      <div className="grid gap-6 mt-6">
-        <TrainingPaths />
-        
-        <AchievementsGrid 
-          achievements={achievements}
-          earnedAchievements={userAchievements}
+    <div className="space-y-8">
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          title="Active Campaigns"
+          value={activeCampaigns}
+          description="Current phishing campaigns"
+          isLoading={isLoadingCampaigns}
         />
+        <StatCard
+          title="Course Completion"
+          value={`${courseCompletion}%`}
+          description="Average completion rate"
+          isLoading={isLoadingCourses}
+        />
+        <StatCard
+          title="Compliance Status"
+          value={`${complianceStatus}%`}
+          description="Overall compliance score"
+          isLoading={isLoadingCompliance}
+        />
+      </div>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Certificates</h2>
-          {isAdmin && <CertificateTemplateDesigner />}
-          <CertificateGrid />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="col-span-4">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Compliance Frameworks</h2>
+          <ComplianceOverview />
         </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <MetricsChart data={campaignMetrics} />
-          </div>
-          <UserSegments />
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <Leaderboard entries={leaderboard} />
+        <div className="col-span-3">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Campaign Activity</h2>
+          <MetricsChart data={campaignMetrics} />
         </div>
       </div>
-    </>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Achievements</h2>
+          <AchievementsGrid
+            achievements={achievements}
+            userAchievements={userAchievements}
+          />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Leaderboard</h2>
+          <Leaderboard data={leaderboard} />
+        </div>
+      </div>
+    </div>
   );
 }

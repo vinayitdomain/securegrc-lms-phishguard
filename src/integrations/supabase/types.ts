@@ -123,35 +123,104 @@ export type Database = {
       }
       compliance_frameworks: {
         Row: {
+          compliance_score: number | null
           created_at: string | null
           description: string | null
           id: string
+          last_assessment_date: string | null
           name: string
+          next_assessment_date: string | null
           organization_id: string | null
+          requirements: Json | null
           status: string
           updated_at: string | null
         }
         Insert: {
+          compliance_score?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
+          last_assessment_date?: string | null
           name: string
+          next_assessment_date?: string | null
           organization_id?: string | null
+          requirements?: Json | null
           status?: string
           updated_at?: string | null
         }
         Update: {
+          compliance_score?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
+          last_assessment_date?: string | null
           name?: string
+          next_assessment_date?: string | null
           organization_id?: string | null
+          requirements?: Json | null
           status?: string
           updated_at?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "compliance_frameworks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_policies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          evidence_required: boolean | null
+          evidence_url: string | null
+          framework_id: string | null
+          id: string
+          last_reviewed_at: string | null
+          organization_id: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          evidence_required?: boolean | null
+          evidence_url?: string | null
+          framework_id?: string | null
+          id?: string
+          last_reviewed_at?: string | null
+          organization_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          evidence_required?: boolean | null
+          evidence_url?: string | null
+          framework_id?: string | null
+          id?: string
+          last_reviewed_at?: string | null
+          organization_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_policies_framework_id_fkey"
+            columns: ["framework_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_frameworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_policies_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
