@@ -20,8 +20,12 @@ export default function AuthPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session check error:", error);
+          // Clear any invalid session data
+          await supabase.auth.signOut();
+        } else if (session) {
           navigate("/dashboard");
         }
       } catch (error) {
@@ -33,9 +37,12 @@ export default function AuthPage() {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event);
       if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
+      } else if (event === 'SIGNED_OUT') {
+        setErrorMessage("");
       }
     });
 
