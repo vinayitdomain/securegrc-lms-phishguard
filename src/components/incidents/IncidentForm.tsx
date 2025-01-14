@@ -22,13 +22,23 @@ export function IncidentForm() {
     try {
       setIsSubmitting(true);
       
+      const user = (await supabase.auth.getUser()).data.user;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!profile?.organization_id) throw new Error('No organization found');
+      
       const { error } = await supabase
         .from('incidents')
-        .insert([{
+        .insert({
           ...data,
           status: 'open',
-          reported_by: (await supabase.auth.getUser()).data.user?.id,
-        }]);
+          reported_by: user?.id,
+          organization_id: profile.organization_id
+        });
 
       if (error) throw error;
 

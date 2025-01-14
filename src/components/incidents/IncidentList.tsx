@@ -8,19 +8,20 @@ export function IncidentList() {
   const { data: incidents = [], isLoading } = useQuery({
     queryKey: ['incidents'],
     queryFn: async () => {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
       const { data, error } = await supabase
         .from('incidents')
         .select(`
-          id,
-          title,
-          description,
-          priority,
-          status,
-          created_at,
-          reported_by,
-          assigned_to,
-          profiles!reported_by(full_name)
+          *,
+          reporter:profiles!incidents_reported_by_fkey(full_name),
+          assignee:profiles!incidents_assigned_to_fkey(full_name)
         `)
+        .eq('organization_id', userProfile?.organization_id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -72,7 +73,7 @@ export function IncidentList() {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
-              <span>{incident.profiles?.full_name || 'Unknown'}</span>
+              <span>{incident.reporter?.full_name || 'Unknown'}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />

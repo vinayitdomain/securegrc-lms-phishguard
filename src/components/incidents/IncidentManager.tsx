@@ -5,8 +5,10 @@ import { IncidentDetails } from "./IncidentDetails";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
+type ViewState = 'list' | 'new' | { type: 'details'; id: string };
+
 export function IncidentManager() {
-  const [view, setView] = useState<'list' | 'new' | { type: 'details', id: string }>('list');
+  const [view, setView] = useState<ViewState>('list');
 
   return (
     <div className="space-y-6">
@@ -32,7 +34,7 @@ export function IncidentManager() {
           <IncidentForm />
         </div>
       )}
-      {view.type === 'details' && (
+      {typeof view === 'object' && view.type === 'details' && (
         <div className="space-y-4">
           <Button 
             variant="outline" 

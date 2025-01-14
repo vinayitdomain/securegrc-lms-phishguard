@@ -23,8 +23,8 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .from('incidents')
         .select(`
           *,
-          profiles!reported_by(full_name),
-          assigned_profile:profiles!assigned_to(full_name)
+          reporter:profiles!incidents_reported_by_fkey(full_name),
+          assignee:profiles!incidents_assigned_to_fkey(full_name)
         `)
         .eq('id', incidentId)
         .single();
@@ -41,7 +41,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .from('incident_updates')
         .select(`
           *,
-          profiles!user_id(full_name)
+          author:profiles!incident_updates_user_id_fkey(full_name)
         `)
         .eq('incident_id', incidentId)
         .order('created_at', { ascending: false });
@@ -121,12 +121,12 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <User className="h-4 w-4" />
-            <span>Reported by: {incident.profiles?.full_name}</span>
+            <span>Reported by: {incident.reporter?.full_name}</span>
           </div>
-          {incident.assigned_profile && (
+          {incident.assignee && (
             <div className="flex items-center gap-1">
               <User className="h-4 w-4" />
-              <span>Assigned to: {incident.assigned_profile.full_name}</span>
+              <span>Assigned to: {incident.assignee.full_name}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
@@ -166,7 +166,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
                 <div key={update.id} className="border rounded-lg p-3 space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <MessageSquare className="h-4 w-4" />
-                    <span>{update.profiles?.full_name}</span>
+                    <span>{update.author?.full_name}</span>
                     <span>•</span>
                     <span>{formatDate(update.created_at)}</span>
                   </div>
