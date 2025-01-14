@@ -29,8 +29,8 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .from('incidents')
         .select(`
           *,
-          reporter:reported_by(full_name),
-          assignee:assigned_to(full_name)
+          reporter:profiles!incidents_reported_by_fkey(full_name),
+          assignee:profiles!incidents_assigned_to_fkey(full_name)
         `)
         .eq('id', incidentId)
         .eq('organization_id', userProfile?.organization_id)
@@ -48,7 +48,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .from('incident_updates')
         .select(`
           *,
-          author:user_id(full_name)
+          author:profiles!incident_updates_user_id_fkey(full_name)
         `)
         .eq('incident_id', incidentId)
         .order('created_at', { ascending: false });
