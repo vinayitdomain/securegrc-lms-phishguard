@@ -15,6 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Database } from "@/integrations/supabase/types";
+
+type RiskLevel = Database["public"]["Enums"]["risk_level"];
 
 export function CreateRiskForm() {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ export function CreateRiskForm() {
     category_id: "",
     impact_score: "",
     likelihood_score: "",
-    risk_level: "low",
+    risk_level: "low" as RiskLevel,
     mitigation_plan: "",
   });
 
@@ -59,15 +62,17 @@ export function CreateRiskForm() {
 
       const { data: risk, error } = await supabase
         .from('risk_assessments')
-        .insert([
-          {
-            ...data,
-            organization_id: userProfile.organization_id,
-            created_by: userProfile.id,
-            impact_score: parseInt(data.impact_score),
-            likelihood_score: parseInt(data.likelihood_score),
-          },
-        ])
+        .insert({
+          title: data.title,
+          description: data.description,
+          category_id: data.category_id,
+          organization_id: userProfile.organization_id,
+          created_by: userProfile.id,
+          impact_score: parseInt(data.impact_score),
+          likelihood_score: parseInt(data.likelihood_score),
+          risk_level: data.risk_level,
+          mitigation_plan: data.mitigation_plan,
+        })
         .select()
         .single();
 
@@ -96,7 +101,7 @@ export function CreateRiskForm() {
     createRiskMutation.mutate(formData);
   };
 
-  const calculateRiskLevel = (impact: string, likelihood: string) => {
+  const calculateRiskLevel = (impact: string, likelihood: string): RiskLevel => {
     const impactScore = parseInt(impact);
     const likelihoodScore = parseInt(likelihood);
     

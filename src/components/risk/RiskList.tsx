@@ -18,7 +18,7 @@ export function RiskList() {
         .select(`
           *,
           category:risk_categories(name),
-          assigned_to:profiles(full_name)
+          assigned_to:profiles!risk_assessments_assigned_to_fkey(full_name)
         `)
         .order('created_at', { ascending: false });
 
