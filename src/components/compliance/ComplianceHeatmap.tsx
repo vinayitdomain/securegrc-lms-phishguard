@@ -76,25 +76,12 @@ export function ComplianceHeatmap() {
           <ChartContainer config={{}}>
             <ResponsiveContainer width="100%" height="100%">
               <div className="recharts-wrapper">
-                <div className="relative w-full h-full pt-8 pl-20"> {/* Added padding for labels */}
+                <div className="relative w-full h-full pl-20"> {/* Removed top padding */}
                   {/* Department labels on the left */}
                   <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-around pr-4">
                     {DEPARTMENTS.map(dept => (
                       <div key={dept} className="text-sm font-medium">
                         {dept}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Category labels on top */}
-                  <div className="absolute top-0 left-20 right-0 flex justify-around mb-4">
-                    {CATEGORIES.map(cat => (
-                      <div 
-                        key={cat} 
-                        className="text-sm font-medium transform -rotate-45 origin-left whitespace-nowrap"
-                        style={{ marginLeft: '1rem' }}
-                      >
-                        {cat}
                       </div>
                     ))}
                   </div>
@@ -120,12 +107,24 @@ export function ComplianceHeatmap() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Category labels at bottom */}
+                  <div className="absolute bottom-[-40px] left-20 right-0 flex justify-around">
+                    {CATEGORIES.map(cat => (
+                      <div 
+                        key={cat} 
+                        className="text-sm font-medium transform -rotate-45 origin-top-left whitespace-nowrap"
+                      >
+                        {cat}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </ResponsiveContainer>
           </ChartContainer>
         </div>
-        <div className="mt-4 flex justify-center items-center gap-4">
+        <div className="mt-12 flex justify-center items-center gap-4"> {/* Increased top margin to accommodate rotated labels */}
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-500"></div>
             <span className="text-sm">Critical (&lt;40%)</span>
