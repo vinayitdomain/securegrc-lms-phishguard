@@ -623,7 +623,10 @@ export type Database = {
       }
       compliance_policies: {
         Row: {
+          approval_status: Database["public"]["Enums"]["policy_status"] | null
+          category_id: string | null
           created_at: string | null
+          current_version: number | null
           description: string | null
           evidence_required: boolean | null
           evidence_url: string | null
@@ -634,9 +637,13 @@ export type Database = {
           status: string | null
           title: string
           updated_at: string | null
+          workflow_template_id: string | null
         }
         Insert: {
+          approval_status?: Database["public"]["Enums"]["policy_status"] | null
+          category_id?: string | null
           created_at?: string | null
+          current_version?: number | null
           description?: string | null
           evidence_required?: boolean | null
           evidence_url?: string | null
@@ -647,9 +654,13 @@ export type Database = {
           status?: string | null
           title: string
           updated_at?: string | null
+          workflow_template_id?: string | null
         }
         Update: {
+          approval_status?: Database["public"]["Enums"]["policy_status"] | null
+          category_id?: string | null
           created_at?: string | null
+          current_version?: number | null
           description?: string | null
           evidence_required?: boolean | null
           evidence_url?: string | null
@@ -660,8 +671,16 @@ export type Database = {
           status?: string | null
           title?: string
           updated_at?: string | null
+          workflow_template_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "compliance_policies_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "policy_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "compliance_policies_framework_id_fkey"
             columns: ["framework_id"]
@@ -681,6 +700,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_policies_workflow_template_id_fkey"
+            columns: ["workflow_template_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -1198,6 +1224,93 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      policy_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "policy_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      policy_versions: {
+        Row: {
+          changes_summary: string | null
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          policy_id: string
+          version_number: number
+        }
+        Insert: {
+          changes_summary?: string | null
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          policy_id: string
+          version_number: number
+        }
+        Update: {
+          changes_summary?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          policy_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_versions_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_policies"
             referencedColumns: ["id"]
           },
         ]
@@ -2597,6 +2710,7 @@ export type Database = {
         | "success"
         | "error"
         | "calendar_event"
+      policy_status: "draft" | "pending_review" | "approved" | "archived"
       risk_level: "low" | "medium" | "high" | "critical"
       signature_type:
         | "document_signoff"
