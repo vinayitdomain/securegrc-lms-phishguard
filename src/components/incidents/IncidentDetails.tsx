@@ -12,25 +12,25 @@ interface IncidentDetailsProps {
 }
 
 interface Profile {
-  full_name: string;
+  full_name: string | null;
 }
 
 interface Incident {
   id: string;
   title: string;
-  description: string;
-  priority: string;
-  status: string;
+  description: string | null;
+  priority: "low" | "medium" | "high" | "critical";
+  status: "open" | "investigating" | "resolved" | "closed";
   created_at: string;
-  reporter: Profile;
-  assignee: Profile | null;
+  reporter: { full_name: string | null };
+  assignee: { full_name: string | null } | null;
 }
 
 interface IncidentUpdate {
   id: string;
   message: string;
   created_at: string;
-  author: Profile;
+  author: { full_name: string | null };
 }
 
 export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
@@ -59,7 +59,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .single();
 
       if (error) throw error;
-      return data as Incident;
+      return data as unknown as Incident;
     },
   });
 
@@ -76,7 +76,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as IncidentUpdate[];
+      return data as unknown as IncidentUpdate[];
     },
   });
 

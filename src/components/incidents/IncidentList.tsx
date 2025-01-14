@@ -5,18 +5,18 @@ import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 
 interface Profile {
-  full_name: string;
+  full_name: string | null;
 }
 
 interface Incident {
   id: string;
   title: string;
-  description: string;
-  priority: string;
-  status: string;
+  description: string | null;
+  priority: "low" | "medium" | "high" | "critical";
+  status: "open" | "investigating" | "resolved" | "closed";
   created_at: string;
-  reporter: Profile;
-  assignee: Profile | null;
+  reporter: { full_name: string | null };
+  assignee: { full_name: string | null } | null;
 }
 
 export function IncidentList() {
@@ -40,7 +40,7 @@ export function IncidentList() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Incident[];
+      return data as unknown as Incident[];
     },
   });
 
