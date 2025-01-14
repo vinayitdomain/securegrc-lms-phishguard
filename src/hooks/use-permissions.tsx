@@ -20,18 +20,38 @@ export function usePermissions() {
   const { data: permissions, isLoading } = useQuery({
     queryKey: ['permissions'],
     queryFn: async () => {
-      const { data: profile } = await supabase
+      // First check if we have an authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get user profile, using maybeSingle() to handle no profile case
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id, role')
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (!profile) throw new Error('No profile found');
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return [];
+      }
 
-      const { data: rolePermissions } = await supabase
+      if (!profile) {
+        console.warn('No profile found for user');
+        return [];
+      }
+
+      // Get role permissions
+      const { data: rolePermissions, error: permissionsError } = await supabase
         .from('role_permissions')
         .select('permission')
         .eq('organization_id', profile.organization_id)
         .eq('role', profile.role);
+
+      if (permissionsError) {
+        console.error('Error fetching permissions:', permissionsError);
+        return [];
+      }
 
       return rolePermissions?.map(p => p.permission) || [];
     },
