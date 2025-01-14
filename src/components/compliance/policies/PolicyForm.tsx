@@ -54,6 +54,14 @@ export function PolicyForm({ policyId }: { policyId?: string }) {
       const { data: profile } = await supabase.auth.getUser();
       if (!profile.user) throw new Error('Not authenticated');
 
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('id, organization_id')
+        .eq('user_id', profile.user.id)
+        .single();
+
+      if (!userProfile) throw new Error('Profile not found');
+
       // Start a transaction
       const { data: policy, error: policyError } = await supabase
         .from('compliance_policies')
@@ -63,6 +71,7 @@ export function PolicyForm({ policyId }: { policyId?: string }) {
           category_id: data.category_id,
           workflow_template_id: data.workflow_template_id,
           approval_status: 'draft',
+          organization_id: userProfile.organization_id,
         })
         .select()
         .single();
@@ -77,6 +86,7 @@ export function PolicyForm({ policyId }: { policyId?: string }) {
           content: data.content,
           version_number: 1,
           changes_summary: 'Initial version',
+          created_by: userProfile.id,
         });
 
       if (versionError) throw versionError;

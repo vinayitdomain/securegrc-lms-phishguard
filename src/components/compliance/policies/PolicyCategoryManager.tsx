@@ -27,11 +27,24 @@ export function PolicyCategoryManager() {
 
   const handleAddCategory = async () => {
     try {
+      // Get the user's profile to get the organization_id
+      const { data: profile } = await supabase.auth.getUser();
+      if (!profile.user) throw new Error('Not authenticated');
+
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', profile.user.id)
+        .single();
+
+      if (!userProfile?.organization_id) throw new Error('No organization found');
+
       const { error } = await supabase
         .from('policy_categories')
         .insert({
           name: newCategory.name,
           description: newCategory.description,
+          organization_id: userProfile.organization_id,
         });
 
       if (error) throw error;
