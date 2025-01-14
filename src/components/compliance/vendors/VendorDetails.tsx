@@ -116,7 +116,11 @@ export function VendorDetails({ vendorId }: VendorDetailsProps) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Assessments</CardTitle>
-              <AssessmentForm vendorId={vendorId} vendorName={vendor.name} />
+              <AssessmentForm 
+                vendorId={vendorId} 
+                vendorName={vendor.name} 
+                organizationId={vendor.organization_id}
+              />
             </CardHeader>
             <CardContent>
               {/* Assessment history will be added here */}

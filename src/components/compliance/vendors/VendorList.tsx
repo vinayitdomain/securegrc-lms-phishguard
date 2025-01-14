@@ -15,10 +15,28 @@ interface Vendor {
   status: string;
   risk_level: string;
   created_at: string;
+  organization_id: string;
 }
 
 export function VendorList() {
   const { toast } = useToast();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: vendors, isLoading } = useQuery({
     queryKey: ['vendors'],
@@ -58,11 +76,15 @@ export function VendorList() {
     return <div>Loading vendors...</div>;
   }
 
+  if (!profile?.organization_id) {
+    return <div>Organization not found</div>;
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Third-Party Vendors</h2>
-        <VendorForm />
+        <VendorForm organizationId={profile.organization_id} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
