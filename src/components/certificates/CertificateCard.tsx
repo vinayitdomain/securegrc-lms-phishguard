@@ -2,18 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Database } from "@/integrations/supabase/types";
+
+type CertificateData = {
+  title: string;
+  completion_date: string;
+  course_name?: string;
+  quiz_name?: string;
+};
+
+type IssuedCertificate = Database['public']['Tables']['issued_certificates']['Row'] & {
+  certificate_data: CertificateData;
+};
 
 interface CertificateCardProps {
-  certificate: {
-    id: string;
-    issued_at: string;
-    certificate_data: {
-      title: string;
-      completion_date: string;
-      course_name?: string;
-      quiz_name?: string;
-    };
-  };
+  certificate: IssuedCertificate;
 }
 
 export function CertificateCard({ certificate }: CertificateCardProps) {
@@ -31,7 +34,7 @@ export function CertificateCard({ certificate }: CertificateCardProps) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
-          Issued on {new Date(certificate.issued_at).toLocaleDateString()}
+          Issued on {new Date(certificate.issued_at || '').toLocaleDateString()}
         </p>
         <div className="flex gap-2">
           <Dialog>
