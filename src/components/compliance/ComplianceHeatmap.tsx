@@ -76,50 +76,50 @@ export function ComplianceHeatmap() {
           <ChartContainer config={{}}>
             <ResponsiveContainer width="100%" height="100%">
               <div className="recharts-wrapper">
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  {complianceData?.map((item, index) => {
-                    const cellWidth = 100 / CATEGORIES.length;
-                    const cellHeight = 100 / DEPARTMENTS.length;
-                    const x = (CATEGORIES.indexOf(item.category) * cellWidth) + '%';
-                    const y = (DEPARTMENTS.indexOf(item.department) * cellHeight) + '%';
+                <div className="relative w-full h-full pt-8 pl-20"> {/* Added padding for labels */}
+                  {/* Department labels on the left */}
+                  <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-around pr-4">
+                    {DEPARTMENTS.map(dept => (
+                      <div key={dept} className="text-sm font-medium">
+                        {dept}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Category labels on top */}
+                  <div className="absolute top-0 left-20 right-0 flex justify-around mb-4">
+                    {CATEGORIES.map(cat => (
+                      <div 
+                        key={cat} 
+                        className="text-sm font-medium transform -rotate-45 origin-left whitespace-nowrap"
+                        style={{ marginLeft: '1rem' }}
+                      >
+                        {cat}
+                      </div>
+                    ))}
+                  </div>
 
-                    return (
+                  {/* Heatmap grid */}
+                  <div className="grid h-full" 
+                       style={{ 
+                         gridTemplateColumns: `repeat(${CATEGORIES.length}, 1fr)`,
+                         gridTemplateRows: `repeat(${DEPARTMENTS.length}, 1fr)`,
+                         gap: '1px'
+                       }}>
+                    {complianceData?.map((item, index) => (
                       <div
                         key={`${item.department}-${item.category}`}
                         style={{
-                          position: 'absolute',
-                          left: x,
-                          top: y,
-                          width: cellWidth + '%',
-                          height: cellHeight + '%',
                           backgroundColor: colorScale(item.score),
-                          border: '1px solid white',
                           transition: 'background-color 0.2s',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: item.score > 60 ? 'black' : 'white',
-                          fontSize: '0.875rem',
-                          cursor: 'pointer',
                         }}
+                        className="flex items-center justify-center text-sm font-medium"
                         title={`${item.department} - ${item.category}: ${item.score}%`}
                       >
                         {item.score}%
                       </div>
-                    );
-                  })}
-                </div>
-                <div className="absolute left-0 top-0 flex flex-col h-full justify-around pr-2 font-medium">
-                  {DEPARTMENTS.map(dept => (
-                    <div key={dept} className="text-sm">{dept}</div>
-                  ))}
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 flex justify-around pt-2 font-medium">
-                  {CATEGORIES.map(cat => (
-                    <div key={cat} className="text-sm transform -rotate-45 origin-left">
-                      {cat}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </ResponsiveContainer>
