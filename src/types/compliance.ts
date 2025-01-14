@@ -1,15 +1,5 @@
 export type ComplianceDocumentStatus = 'draft' | 'published' | 'archived';
 
-interface Profile {
-  id: string;
-  user_id: string;
-  organization_id: string | null;
-  full_name: string | null;
-  role: 'super_admin' | 'org_admin' | 'user';
-  created_at: string;
-  updated_at: string;
-}
-
 export interface ComplianceDocument {
   id: string;
   organization_id: string;
@@ -21,7 +11,9 @@ export interface ComplianceDocument {
   created_by: string;
   created_at: string;
   updated_at: string;
-  creator?: Profile;
+  profiles?: {
+    full_name: string | null;
+  };
   tags?: ComplianceDocumentTagRelation[];
 }
 
@@ -46,5 +38,7 @@ export interface ComplianceDocumentVersion {
   changes_description: string | null;
   created_by: string;
   created_at: string;
-  creator?: Profile;
+  profiles?: {
+    full_name: string | null;
+  };
 }

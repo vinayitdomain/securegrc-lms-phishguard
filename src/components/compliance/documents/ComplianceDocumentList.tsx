@@ -27,8 +27,10 @@ export function ComplianceDocumentList() {
         .from('compliance_documents')
         .select(`
           *,
-          creator:profiles!compliance_documents_created_by_fkey(full_name),
-          tags:compliance_document_tag_relations(
+          profiles!compliance_documents_created_by_fkey (
+            full_name
+          ),
+          tags:compliance_document_tag_relations (
             tag:compliance_document_tags(*)
           )
         `)
@@ -94,7 +96,7 @@ export function ComplianceDocumentList() {
                   </Badge>
                 </TableCell>
                 <TableCell>v{doc.version}</TableCell>
-                <TableCell>{doc.creator?.full_name}</TableCell>
+                <TableCell>{doc.profiles?.full_name}</TableCell>
                 <TableCell>
                   {format(new Date(doc.created_at), 'MMM d, yyyy')}
                 </TableCell>
