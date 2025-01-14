@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SignaturePad } from "./SignaturePad";
-import { signature } from "lucide-react";
+import { Signature } from "lucide-react";
 
 interface SignatureDialogProps {
   open: boolean;
@@ -73,7 +73,7 @@ export function SignatureDialog({
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <signature className="h-5 w-5" />
+            <Signature className="h-5 w-5" />
             Sign {itemTitle}
           </DialogTitle>
         </DialogHeader>

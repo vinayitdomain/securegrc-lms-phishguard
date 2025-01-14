@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
-import { history } from "lucide-react";
+import { History } from "lucide-react";
 
 interface SignatureHistoryProps {
   type: "document_signoff" | "policy_acknowledgment" | "audit_approval";
@@ -41,7 +41,7 @@ export function SignatureHistory({ type, itemId }: SignatureHistoryProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <history className="h-5 w-5" />
+          <History className="h-5 w-5" />
           Signature History
         </CardTitle>
       </CardHeader>

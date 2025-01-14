@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignatureDialog } from "../signatures/SignatureDialog";
 import { SignatureHistory } from "../signatures/SignatureHistory";
-import { file, signature } from "lucide-react";
+import { FileText, Signature, History } from "lucide-react";
 import { format } from "date-fns";
 
 interface ComplianceDocumentDetailsProps {
@@ -40,14 +40,14 @@ export function ComplianceDocumentDetails({ documentId }: ComplianceDocumentDeta
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <file className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
               {document.title}
             </div>
             <Button
               onClick={() => setShowSignatureDialog(true)}
               className="flex items-center gap-2"
             >
-              <signature className="h-4 w-4" />
+              <Signature className="h-4 w-4" />
               Sign Document
             </Button>
           </CardTitle>
