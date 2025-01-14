@@ -49,16 +49,19 @@ export function CreateRiskForm() {
 
   const createRiskMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { data: profile } = await supabase.auth.getUser();
-      if (!profile.user) throw new Error('Not authenticated');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-      const { data: userProfile, error: profileError } = await supabase
+      // Get all profiles for the user and select the first one
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id, organization_id')
-        .eq('user_id', profile.user.id)
-        .single();
+        .eq('user_id', user.id);
 
       if (profileError) throw profileError;
+      if (!profiles || profiles.length === 0) throw new Error('No profile found');
+      
+      const profile = profiles[0]; // Take the first profile
 
       const { data: risk, error } = await supabase
         .from('risk_assessments')
@@ -66,8 +69,8 @@ export function CreateRiskForm() {
           title: data.title,
           description: data.description,
           category_id: data.category_id,
-          organization_id: userProfile.organization_id,
-          created_by: userProfile.id,
+          organization_id: profile.organization_id,
+          created_by: profile.id,
           impact_score: parseInt(data.impact_score),
           likelihood_score: parseInt(data.likelihood_score),
           risk_level: data.risk_level,
