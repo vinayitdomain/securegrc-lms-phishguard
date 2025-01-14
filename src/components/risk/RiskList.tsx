@@ -17,18 +17,18 @@ export function RiskList() {
       if (!user) throw new Error('Not authenticated');
 
       // First get the user's profile
-      const { data: profile, error: profileError } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id, organization_id')
-        .eq('user_id', user.id)
-        .limit(1)
-        .maybeSingle();
+        .eq('user_id', user.id);
 
       if (profileError) {
         console.error('Profile error:', profileError);
         throw new Error('Failed to fetch profile');
       }
-      if (!profile) throw new Error('No profile found');
+      
+      if (!profiles || profiles.length === 0) throw new Error('No profile found');
+      const profile = profiles[0]; // Take the first profile
       if (!profile.organization_id) throw new Error('No organization found');
 
       // Then get risk assessments for the organization
