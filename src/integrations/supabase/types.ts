@@ -1529,6 +1529,126 @@ export type Database = {
           },
         ]
       }
+      signature_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          metadata: Json
+          signature_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json
+          signature_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json
+          signature_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_logs_signature_id_fkey"
+            columns: ["signature_id"]
+            isOneToOne: false
+            referencedRelation: "signatures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signatures: {
+        Row: {
+          audit_id: string | null
+          created_at: string | null
+          document_id: string | null
+          id: string
+          ip_address: string | null
+          organization_id: string
+          policy_id: string | null
+          signature_data: Json
+          signature_type: Database["public"]["Enums"]["signature_type"]
+          signed_at: string | null
+          signer_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          audit_id?: string | null
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          ip_address?: string | null
+          organization_id: string
+          policy_id?: string | null
+          signature_data?: Json
+          signature_type: Database["public"]["Enums"]["signature_type"]
+          signed_at?: string | null
+          signer_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          audit_id?: string | null
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          ip_address?: string | null
+          organization_id?: string
+          policy_id?: string | null
+          signature_data?: Json
+          signature_type?: Database["public"]["Enums"]["signature_type"]
+          signed_at?: string | null
+          signer_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signatures_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audit_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signatures_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signatures_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "signatures_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signatures_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signatures_signer_id_fkey"
+            columns: ["signer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_content: {
         Row: {
           content_type: string
@@ -2478,6 +2598,10 @@ export type Database = {
         | "error"
         | "calendar_event"
       risk_level: "low" | "medium" | "high" | "critical"
+      signature_type:
+        | "document_signoff"
+        | "policy_acknowledgment"
+        | "audit_approval"
       user_role: "super_admin" | "org_admin" | "user"
     }
     CompositeTypes: {
