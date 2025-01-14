@@ -1822,6 +1822,161 @@ export type Database = {
           },
         ]
       }
+      vendor_assessments: {
+        Row: {
+          assessment_date: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          next_assessment_date: string | null
+          organization_id: string
+          overall_score: number | null
+          status: string | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          assessment_date: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          next_assessment_date?: string | null
+          organization_id: string
+          overall_score?: number | null
+          status?: string | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          assessment_date?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          next_assessment_date?: string | null
+          organization_id?: string
+          overall_score?: number | null
+          status?: string | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_assessments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_assessments_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_requirements: {
+        Row: {
+          category: string
+          created_at: string | null
+          due_date: string | null
+          evidence_required: boolean | null
+          evidence_url: string | null
+          id: string
+          requirement: string
+          status: string | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          due_date?: string | null
+          evidence_required?: boolean | null
+          evidence_url?: string | null
+          id?: string
+          requirement: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          due_date?: string | null
+          evidence_required?: boolean | null
+          evidence_url?: string | null
+          id?: string
+          requirement?: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_requirements_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          risk_level: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          risk_level?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          risk_level?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_assignments: {
         Row: {
           action_type: string
