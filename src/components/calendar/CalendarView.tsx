@@ -9,24 +9,37 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { EventForm } from "./EventForm";
 import { Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function CalendarView() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { toast } = useToast();
 
-  const { data: events, isLoading } = useQuery({
-    queryKey: ['training-events'],
+  // First fetch the user's profile
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['user-profile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get all profiles for the user and select the first one
-      const { data: profiles } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('organization_id')
-        .eq('user_id', user.id);
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      if (!profiles?.length) throw new Error('No organization found');
-      const profile = profiles[0];
+      if (error) throw error;
+      if (!data) throw new Error('No profile found');
+      
+      return data;
+    }
+  });
+
+  // Then fetch events only if we have a valid organization_id
+  const { data: events, isLoading: isLoadingEvents } = useQuery({
+    queryKey: ['training-events', profile?.organization_id],
+    queryFn: async () => {
+      if (!profile?.organization_id) throw new Error('No organization found');
 
       const { data, error } = await supabase
         .from('training_events')
@@ -40,10 +53,18 @@ export function CalendarView() {
 
       if (error) throw error;
       return data;
+    },
+    enabled: !!profile?.organization_id,
+    onError: (error) => {
+      toast({
+        title: "Error loading events",
+        description: error instanceof Error ? error.message : "Failed to load events",
+        variant: "destructive"
+      });
     }
   });
 
-  if (isLoading) {
+  if (isLoadingProfile || isLoadingEvents) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="h-8 w-8 animate-spin" />
