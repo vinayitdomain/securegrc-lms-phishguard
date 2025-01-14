@@ -19,8 +19,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type AuditLog = {
+  id: string;
+  action_type: string;
+  entity_type: string;
+  created_at: string;
+  profile?: {
+    full_name: string | null;
+  } | null;
+};
+
 export function AuditTrail() {
-  const { data: auditLogs, isLoading } = useQuery({
+  const { data: auditLogs, isLoading } = useQuery<AuditLog[]>({
     queryKey: ['audit-logs'],
     queryFn: async () => {
       const { data, error } = await supabase
