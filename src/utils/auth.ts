@@ -8,8 +8,15 @@ export const getErrorMessage = (error: AuthError | Error) => {
       return "Invalid email or password. Please check your credentials and try again.\n\nTest accounts:\nsuper.admin@example.com\norg1.admin@example.com\norg1.user@example.com\nPassword: Password123!";
     }
     
+    if (error.message.includes("refresh_token_not_found")) {
+      return "Your session has expired. Please sign in again.";
+    }
+    
     switch (error.status) {
       case 400:
+        if (error.message.includes("refresh_token")) {
+          return "Your session has expired. Please sign in again.";
+        }
         return "Invalid email or password. Please check your credentials and try again.";
       case 422:
         return "Invalid email format. Please enter a valid email address.";

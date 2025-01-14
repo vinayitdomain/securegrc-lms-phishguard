@@ -25,6 +25,7 @@ export default function AuthPage() {
           console.error("Session check error:", error);
           // Clear any invalid session data
           await supabase.auth.signOut();
+          setErrorMessage(getErrorMessage(error));
         } else if (session) {
           navigate("/dashboard");
         }
@@ -39,10 +40,15 @@ export default function AuthPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change:", event);
+      
       if (event === 'SIGNED_IN' && session) {
         navigate("/dashboard");
       } else if (event === 'SIGNED_OUT') {
         setErrorMessage("");
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log("Token refreshed successfully");
+      } else if (event === 'USER_UPDATED') {
+        console.log("User updated");
       }
     });
 
@@ -97,10 +103,17 @@ export default function AuthPage() {
 
       if (error) {
         console.error("Authentication error:", error);
-        setErrorMessage(getErrorMessage(error));
+        if (error.message.includes('refresh_token_not_found')) {
+          // Handle refresh token errors specifically
+          await supabase.auth.signOut();
+          setErrorMessage("Your session has expired. Please sign in again.");
+        } else {
+          setErrorMessage(getErrorMessage(error));
+        }
       } else if (data?.user) {
         console.log("Login successful:", data.user);
         toast.success("Login successful!");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
