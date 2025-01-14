@@ -121,6 +121,156 @@ export type Database = {
           },
         ]
       }
+      compliance_document_tag_relations: {
+        Row: {
+          document_id: string
+          tag_id: string
+        }
+        Insert: {
+          document_id: string
+          tag_id: string
+        }
+        Update: {
+          document_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_document_tag_relations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_document_tag_relations_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_document_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_document_tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          organization_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_document_tags_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_document_versions: {
+        Row: {
+          changes_description: string | null
+          created_at: string | null
+          created_by: string | null
+          document_id: string | null
+          file_url: string
+          id: string
+          version: number
+        }
+        Insert: {
+          changes_description?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string | null
+          file_url: string
+          id?: string
+          version: number
+        }
+        Update: {
+          changes_description?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string | null
+          file_url?: string
+          id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_documents: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          file_url: string | null
+          id: string
+          organization_id: string | null
+          status:
+            | Database["public"]["Enums"]["compliance_document_status"]
+            | null
+          title: string
+          updated_at: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          organization_id?: string | null
+          status?:
+            | Database["public"]["Enums"]["compliance_document_status"]
+            | null
+          title: string
+          updated_at?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          organization_id?: string | null
+          status?:
+            | Database["public"]["Enums"]["compliance_document_status"]
+            | null
+          title?: string
+          updated_at?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_frameworks: {
         Row: {
           compliance_score: number | null
@@ -1345,6 +1495,7 @@ export type Database = {
       }
     }
     Enums: {
+      compliance_document_status: "draft" | "published" | "archived"
       incident_priority: "low" | "medium" | "high" | "critical"
       incident_status: "open" | "investigating" | "resolved" | "closed"
       notification_type:
