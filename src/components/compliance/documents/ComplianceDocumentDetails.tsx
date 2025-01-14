@@ -12,6 +12,21 @@ interface ComplianceDocumentDetailsProps {
   documentId: string;
 }
 
+interface ComplianceDocument {
+  id: string;
+  organization_id: string;
+  title: string;
+  description: string | null;
+  version: number;
+  status: 'draft' | 'published' | 'archived';
+  file_url: string | null;
+  created_by: string;
+  created_at: string;
+  created_by_user: {
+    full_name: string | null;
+  } | null;
+}
+
 export function ComplianceDocumentDetails({ documentId }: ComplianceDocumentDetailsProps) {
   const [showSignatureDialog, setShowSignatureDialog] = useState(false);
 
@@ -28,7 +43,7 @@ export function ComplianceDocumentDetails({ documentId }: ComplianceDocumentDeta
         .single();
 
       if (error) throw error;
-      return data;
+      return data as ComplianceDocument;
     },
   });
 
