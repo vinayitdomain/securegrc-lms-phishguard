@@ -1,16 +1,13 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Building2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { OrganizationStats } from "@/components/dashboard/OrganizationStats";
 import { OrganizationsTable } from "@/components/dashboard/OrganizationsTable";
-import { UserStats } from "@/components/dashboard/UserStats";
-import { AchievementCard } from "@/components/dashboard/AchievementCard";
-import { Leaderboard } from "@/components/dashboard/Leaderboard";
 
 const fetchUserProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -253,12 +250,7 @@ export default function Dashboard() {
     <DashboardLayout>
       {profile?.role === 'super_admin' ? (
         <>
-          <div className="flex items-center gap-3 mb-8">
-            <Building2 className="h-8 w-8 text-primary animate-pulse" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Organizations Overview
-            </h1>
-          </div>
+          <DashboardHeader />
           <div className="space-y-6">
             <OrganizationStats 
               organizations={organizations} 
@@ -268,59 +260,18 @@ export default function Dashboard() {
           </div>
         </>
       ) : (
-        <>
-          <UserStats
-            activeCampaigns={activeCampaigns}
-            courseCompletion={courseCompletion}
-            complianceStatus={complianceStatus}
-            isLoadingCampaigns={isLoadingCampaigns}
-            isLoadingCourses={isLoadingCourses}
-            isLoadingCompliance={isLoadingCompliance}
-          />
-          
-          <div className="grid gap-6 mt-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              {achievements.map((achievement) => (
-                <AchievementCard
-                  key={achievement.id}
-                  achievement={achievement}
-                  earned={userAchievements.includes(achievement.id)}
-                />
-              ))}
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle className="text-xl font-semibold text-primary">
-                    Security Metrics Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={campaignMetrics}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line 
-                          type="monotone" 
-                          dataKey="value" 
-                          stroke="#1a365d"
-                          strokeWidth={2}
-                          dot={{ fill: '#1a365d' }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Leaderboard entries={leaderboard} />
-            </div>
-          </div>
-        </>
+        <UserDashboard
+          activeCampaigns={activeCampaigns}
+          courseCompletion={courseCompletion}
+          complianceStatus={complianceStatus}
+          isLoadingCampaigns={isLoadingCampaigns}
+          isLoadingCourses={isLoadingCourses}
+          isLoadingCompliance={isLoadingCompliance}
+          campaignMetrics={campaignMetrics}
+          achievements={achievements}
+          userAchievements={userAchievements}
+          leaderboard={leaderboard}
+        />
       )}
     </DashboardLayout>
   );
