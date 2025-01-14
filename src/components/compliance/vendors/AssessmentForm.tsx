@@ -8,13 +8,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 interface AssessmentFormProps {
   vendorId: string;
   vendorName: string;
+  organizationId: string;
 }
 
-export function AssessmentForm({ vendorId, vendorName }: AssessmentFormProps) {
+export function AssessmentForm({ vendorId, vendorName, organizationId }: AssessmentFormProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,13 +30,14 @@ export function AssessmentForm({ vendorId, vendorName }: AssessmentFormProps) {
 
     const { error } = await supabase
       .from('vendor_assessments')
-      .insert([{
+      .insert({
         vendor_id: vendorId,
+        organization_id: organizationId,
         assessment_date: assessmentDate?.toISOString(),
         next_assessment_date: nextAssessmentDate?.toISOString(),
         overall_score: parseInt(score),
         status: 'completed'
-      }]);
+      });
 
     setLoading(false);
 

@@ -7,7 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-export function VendorForm() {
+interface VendorFormProps {
+  organizationId: string;
+}
+
+export function VendorForm({ organizationId }: VendorFormProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +29,10 @@ export function VendorForm() {
 
     const { error } = await supabase
       .from('vendors')
-      .insert([formData]);
+      .insert({
+        ...formData,
+        organization_id: organizationId
+      });
 
     setLoading(false);
 
