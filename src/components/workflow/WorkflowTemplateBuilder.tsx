@@ -66,10 +66,13 @@ export function WorkflowTemplateBuilder() {
 
   const handleSubmit = async () => {
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
         .single();
+
+      if (profileError) throw profileError;
 
       const { error } = await supabase
         .from('workflow_templates')
@@ -79,7 +82,7 @@ export function WorkflowTemplateBuilder() {
           description: template.description,
           trigger_type: template.trigger_type,
           trigger_conditions: template.trigger_conditions,
-          actions: template.actions
+          actions: template.actions as unknown as Json // Type assertion to match Supabase's Json type
         });
 
       if (error) throw error;
@@ -88,7 +91,7 @@ export function WorkflowTemplateBuilder() {
         title: "Success",
         description: "Workflow template created successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "Failed to create workflow template",
