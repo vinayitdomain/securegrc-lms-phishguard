@@ -18,8 +18,8 @@ export function IncidentList() {
         .from('incidents')
         .select(`
           *,
-          reporter:profiles!incidents_reported_by_fkey(full_name),
-          assignee:profiles!incidents_assigned_to_fkey(full_name)
+          reporter:reported_by(full_name),
+          assignee:assigned_to(full_name)
         `)
         .eq('organization_id', userProfile?.organization_id)
         .order('created_at', { ascending: false });

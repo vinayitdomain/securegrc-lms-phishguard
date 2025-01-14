@@ -19,14 +19,21 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
   const { data: incident, isLoading: isLoadingIncident } = useQuery({
     queryKey: ['incident', incidentId],
     queryFn: async () => {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
       const { data, error } = await supabase
         .from('incidents')
         .select(`
           *,
-          reporter:profiles!incidents_reported_by_fkey(full_name),
-          assignee:profiles!incidents_assigned_to_fkey(full_name)
+          reporter:reported_by(full_name),
+          assignee:assigned_to(full_name)
         `)
         .eq('id', incidentId)
+        .eq('organization_id', userProfile?.organization_id)
         .single();
 
       if (error) throw error;
@@ -41,7 +48,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .from('incident_updates')
         .select(`
           *,
-          author:profiles!incident_updates_user_id_fkey(full_name)
+          author:user_id(full_name)
         `)
         .eq('incident_id', incidentId)
         .order('created_at', { ascending: false });
