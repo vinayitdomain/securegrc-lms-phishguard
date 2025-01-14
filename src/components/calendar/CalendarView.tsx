@@ -55,12 +55,14 @@ export function CalendarView() {
       return data;
     },
     enabled: !!profile?.organization_id,
-    onError: (error) => {
-      toast({
-        title: "Error loading events",
-        description: error instanceof Error ? error.message : "Failed to load events",
-        variant: "destructive"
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error loading events",
+          description: "Failed to load events",
+          variant: "destructive"
+        });
+      }
     }
   });
 
