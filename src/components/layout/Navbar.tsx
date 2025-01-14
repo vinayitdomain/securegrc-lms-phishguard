@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { BarChart2, BookOpen, Mail, Play, Home, LogOut } from "lucide-react";
+import { BarChart2, BookOpen, Mail, Play, Home, LogOut, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -44,23 +44,38 @@ export function Navbar({ organization }: NavbarProps) {
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link to="/dashboard" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
+            <Link 
+              to="/dashboard" 
+              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+            >
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
-            <Link to="/training/videos" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
+            <Link 
+              to="/training/videos" 
+              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+            >
               <Play className="h-4 w-4" />
               Videos
             </Link>
-            <Link to="/training" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
+            <Link 
+              to="/training" 
+              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+            >
               <BookOpen className="h-4 w-4" />
               Training
             </Link>
-            <Link to="/campaigns" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
+            <Link 
+              to="/campaigns" 
+              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+            >
               <Mail className="h-4 w-4" />
               Campaigns
             </Link>
-            <Link to="/analytics" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
+            <Link 
+              to="/analytics" 
+              className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-accent/50 px-3 py-2 rounded-md"
+            >
               <BarChart2 className="h-4 w-4" />
               Analytics
             </Link>
@@ -71,15 +86,21 @@ export function Navbar({ organization }: NavbarProps) {
           </div>
           <div className="flex items-center gap-4">
             <NotificationBell />
-            <Button 
-              variant="destructive" 
-              size="sm"
-              onClick={handleSignOut}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2 shadow-sm"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-4 bg-accent/40 px-4 py-1.5 rounded-full">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <User className="h-4 w-4" />
+                <span>John Doe</span>
+              </div>
+              <Button 
+                variant="destructive" 
+                size="sm"
+                onClick={handleSignOut}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2 shadow-sm transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </div>
       </div>

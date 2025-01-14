@@ -31,20 +31,20 @@ export function AchievementCard({ achievement, earned = false }: AchievementCard
     <Card className={`transition-all duration-200 ${
       earned 
         ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-lg' 
-        : 'opacity-50 hover:opacity-75'
+        : 'bg-accent/10 hover:bg-accent/20'
     }`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        <CardTitle className="text-sm font-medium text-foreground">
           {achievement.name}
         </CardTitle>
         {Icon && (
           <Icon className={`h-5 w-5 ${
-            earned ? 'text-yellow-600' : 'text-gray-400'
+            earned ? 'text-yellow-600' : 'text-muted-foreground'
           }`} />
         )}
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-700 dark:text-gray-300">{achievement.description}</p>
+        <p className="text-sm text-foreground/80">{achievement.description}</p>
         <div className="mt-2 text-sm font-semibold text-primary dark:text-white">
           {achievement.points} points
         </div>
