@@ -2,6 +2,7 @@ import { ComplianceOverview } from "@/components/compliance/ComplianceOverview";
 import { ComplianceDocumentList } from "@/components/compliance/documents/ComplianceDocumentList";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
+import { AuditTrail } from "@/components/audit/AuditTrail";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,6 +70,13 @@ export default function Dashboard() {
           earnedAchievements={earnedAchievements}
           leaderboard={leaderboard}
         />
+
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight">
+            Audit Trail
+          </h2>
+          <AuditTrail />
+        </div>
 
         <div className="space-y-6">
           <h2 className="text-2xl font-bold tracking-tight">

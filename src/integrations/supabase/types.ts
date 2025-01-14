@@ -250,6 +250,60 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action_type: Database["public"]["Enums"]["audit_log_type"]
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          organization_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["audit_log_type"]
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          organization_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["audit_log_type"]
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          organization_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "audit_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_programs: {
         Row: {
           created_at: string | null
@@ -2700,6 +2754,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      create_audit_log: {
+        Args: {
+          p_action_type: Database["public"]["Enums"]["audit_log_type"]
+          p_entity_type: string
+          p_entity_id: string
+          p_details?: Json
+        }
+        Returns: undefined
+      }
       get_course_progress_report: {
         Args: {
           org_id: string
@@ -2728,6 +2791,16 @@ export type Database = {
       }
     }
     Enums: {
+      audit_log_type:
+        | "policy_created"
+        | "policy_updated"
+        | "policy_deleted"
+        | "document_created"
+        | "document_updated"
+        | "document_deleted"
+        | "user_login"
+        | "user_logout"
+        | "permission_changed"
       compliance_document_status: "draft" | "published" | "archived"
       incident_priority: "low" | "medium" | "high" | "critical"
       incident_status: "open" | "investigating" | "resolved" | "closed"
