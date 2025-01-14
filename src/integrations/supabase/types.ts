@@ -693,6 +693,47 @@ export type Database = {
           },
         ]
       }
+      user_segments: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_calculated_at: string | null
+          organization_id: string | null
+          segment_score: number | null
+          segment_type: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          organization_id?: string | null
+          segment_score?: number | null
+          segment_type: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          organization_id?: string | null
+          segment_score?: number | null
+          segment_type?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_segments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       organization_leaderboard: {
@@ -715,6 +756,12 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_user_segments: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: undefined
+      }
       get_course_progress_report: {
         Args: {
           org_id: string

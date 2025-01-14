@@ -2,6 +2,7 @@ import { MetricsChart } from "./MetricsChart";
 import { AchievementsGrid } from "./AchievementsGrid";
 import { UserStats } from "./UserStats";
 import { Leaderboard } from "./Leaderboard";
+import { UserSegments } from "./UserSegments";
 
 interface UserDashboardProps {
   activeCampaigns: number;
@@ -45,8 +46,14 @@ export function UserDashboard({
           earnedAchievements={userAchievements}
         />
 
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <MetricsChart data={campaignMetrics} />
+          </div>
+          <UserSegments />
+        </div>
+
         <div className="grid md:grid-cols-2 gap-6">
-          <MetricsChart data={campaignMetrics} />
           <Leaderboard entries={leaderboard} />
         </div>
       </div>
