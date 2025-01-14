@@ -1703,6 +1703,45 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          permission: Database["public"]["Enums"]["permission_type"]
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          permission: Database["public"]["Enums"]["permission_type"]
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          permission?: Database["public"]["Enums"]["permission_type"]
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "role_permissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signature_logs: {
         Row: {
           action: string
@@ -2796,6 +2835,13 @@ export type Database = {
           completed_at: string
         }[]
       }
+      has_permission: {
+        Args: {
+          user_id: string
+          required_permission: Database["public"]["Enums"]["permission_type"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       audit_log_type:
@@ -2817,6 +2863,20 @@ export type Database = {
         | "success"
         | "error"
         | "calendar_event"
+      permission_type:
+        | "policy_view"
+        | "policy_create"
+        | "policy_edit"
+        | "policy_delete"
+        | "policy_approve"
+        | "document_view"
+        | "document_create"
+        | "document_edit"
+        | "document_delete"
+        | "document_approve"
+        | "audit_view"
+        | "audit_create"
+        | "audit_manage"
       policy_status: "draft" | "pending_review" | "approved" | "archived"
       risk_level: "low" | "medium" | "high" | "critical"
       signature_type:

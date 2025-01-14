@@ -4,9 +4,14 @@ import { ComplianceFrameworkCard } from "./ComplianceFrameworkCard";
 import { ComplianceHeatmap } from "./ComplianceHeatmap";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, ShieldCheck, ShieldAlert, TrendingUp } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, TrendingUp, Lock } from "lucide-react";
+import { usePermissions } from "@/hooks/use-permissions";
+import { useToast } from "@/hooks/use-toast";
 
 export function ComplianceOverview() {
+  const { hasPermission } = usePermissions();
+  const { toast } = useToast();
+
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
@@ -28,6 +33,14 @@ export function ComplianceOverview() {
     queryKey: ['compliance-overview', profile?.organization_id],
     queryFn: async () => {
       if (!profile?.organization_id) throw new Error('No organization found');
+      if (!hasPermission('policy_view')) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to view compliance data",
+          variant: "destructive",
+        });
+        throw new Error('Permission denied');
+      }
 
       const { data, error } = await supabase
         .from('organization_compliance_overview')
@@ -38,13 +51,16 @@ export function ComplianceOverview() {
       if (error) throw error;
       return data;
     },
-    enabled: !!profile?.organization_id,
+    enabled: !!profile?.organization_id && hasPermission('policy_view'),
   });
 
   const { data: frameworks, isLoading: isLoadingFrameworks } = useQuery({
     queryKey: ['compliance-frameworks', profile?.organization_id],
     queryFn: async () => {
       if (!profile?.organization_id) throw new Error('No organization found');
+      if (!hasPermission('policy_view')) {
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('compliance_frameworks')
@@ -54,8 +70,22 @@ export function ComplianceOverview() {
       if (error) throw error;
       return data;
     },
-    enabled: !!profile?.organization_id,
+    enabled: !!profile?.organization_id && hasPermission('policy_view'),
   });
+
+  if (!hasPermission('policy_view')) {
+    return (
+      <Card className="p-6">
+        <div className="flex flex-col items-center justify-center space-y-4 py-8">
+          <Lock className="h-12 w-12 text-muted-foreground" />
+          <h3 className="text-lg font-medium">Access Restricted</h3>
+          <p className="text-sm text-muted-foreground">
+            You don't have permission to view compliance data
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoadingProfile || isLoadingFrameworks || isLoadingOverview) {
     return (
