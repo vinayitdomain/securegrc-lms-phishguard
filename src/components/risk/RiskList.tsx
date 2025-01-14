@@ -13,6 +13,18 @@ export function RiskList() {
   const { data: riskAssessments, isLoading } = useQuery({
     queryKey: ['riskAssessments'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      if (!profile?.organization_id) throw new Error('No organization found');
+
       const { data, error } = await supabase
         .from('risk_assessments')
         .select(`
@@ -20,6 +32,7 @@ export function RiskList() {
           category:risk_categories(name),
           assigned_to:profiles!risk_assessments_assigned_to_fkey(full_name)
         `)
+        .eq('organization_id', profile.organization_id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
