@@ -11,6 +11,7 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Calendar from "./pages/Calendar";
 import AuditManagement from "./pages/AuditManagement";
+import RiskManagement from "./pages/RiskManagement";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/audits/*" element={<AuditManagement />} />
+        <Route path="/risks/*" element={<RiskManagement />} />
       </Routes>
     </Router>
   );
