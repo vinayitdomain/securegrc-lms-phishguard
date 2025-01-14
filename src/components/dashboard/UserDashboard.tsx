@@ -4,6 +4,10 @@ import { UserStats } from "./UserStats";
 import { Leaderboard } from "./Leaderboard";
 import { UserSegments } from "./UserSegments";
 import { TrainingPaths } from "./TrainingPaths";
+import { CertificateGrid } from "../certificates/CertificateGrid";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { CertificateTemplateDesigner } from "../certificates/CertificateTemplateDesigner";
 
 interface UserDashboardProps {
   activeCampaigns: number;
@@ -30,6 +34,25 @@ export function UserDashboard({
   userAchievements,
   leaderboard,
 }: UserDashboardProps) {
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const isAdmin = userProfile?.role === 'org_admin' || userProfile?.role === 'super_admin';
+
   return (
     <>
       <UserStats
@@ -48,6 +71,12 @@ export function UserDashboard({
           achievements={achievements}
           earnedAchievements={userAchievements}
         />
+
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Certificates</h2>
+          {isAdmin && <CertificateTemplateDesigner />}
+          <CertificateGrid />
+        </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
