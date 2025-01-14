@@ -45,10 +45,15 @@ export function ComplianceDocumentList() {
 
       if (creatorsError) throw creatorsError;
 
-      // Merge the data
+      // Merge and transform the data to match our types
       const docsWithCreators = docs?.map(doc => ({
         ...doc,
-        creator: creators?.find(c => c.id === doc.created_by)
+        creator: creators?.find(c => c.id === doc.created_by) || { full_name: null },
+        tags: doc.tags?.map(tagRel => ({
+          document_id: doc.id,
+          tag_id: tagRel.tag.id,
+          tag: tagRel.tag
+        })) || []
       }));
 
       return docsWithCreators as ComplianceDocument[];
