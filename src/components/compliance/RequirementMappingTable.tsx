@@ -73,7 +73,7 @@ export function RequirementMappingTable({ frameworkId }: RequirementMappingTable
                 <div className="flex items-center gap-2">
                   {getStatusIcon(mapping.status)}
                   <Badge variant={
-                    mapping.status === 'compliant' ? 'success' :
+                    mapping.status === 'compliant' ? 'secondary' :
                     mapping.status === 'non_compliant' ? 'destructive' :
                     'default'
                   }>
