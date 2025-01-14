@@ -18,11 +18,14 @@ export function RiskList() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('organization_id')
+        .select('id, organization_id')
         .eq('user_id', user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        throw new Error('Failed to fetch profile');
+      }
       if (!profile?.organization_id) throw new Error('No organization found');
 
       const { data, error } = await supabase
