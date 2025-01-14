@@ -13,10 +13,6 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ isResetMode }) => {
       <p className="mt-2 text-center text-sm text-gray-600">
         {isResetMode ? "Reset your password" : "Sign in with your organization credentials"}
       </p>
-      <div className="mt-1 text-center text-xs space-y-1 text-gray-500">
-        <p>Test accounts format: orgname.xxxx.role@example.com</p>
-        <p>Password: Password123!</p>
-      </div>
     </div>
   );
 };
