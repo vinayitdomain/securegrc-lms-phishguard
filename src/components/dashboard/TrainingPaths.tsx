@@ -34,7 +34,10 @@ export function TrainingPaths() {
           training_path_items (
             id,
             content_id,
-            quiz_id
+            quiz_id,
+            training_content (
+              is_global
+            )
           )
         `)
         .eq('target_role', profile.role)

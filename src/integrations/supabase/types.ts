@@ -303,6 +303,45 @@ export type Database = {
           },
         ]
       }
+      organization_content_access: {
+        Row: {
+          content_id: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          organization_id: string | null
+        }
+        Insert: {
+          content_id?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          organization_id?: string | null
+        }
+        Update: {
+          content_id?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_content_access_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "training_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_content_access_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           brand_accent_color: string | null
@@ -586,6 +625,7 @@ export type Database = {
           description: string | null
           duration: number | null
           id: string
+          is_global: boolean | null
           organization_id: string | null
           pdf_url: string | null
           requires_quiz: boolean
@@ -601,6 +641,7 @@ export type Database = {
           description?: string | null
           duration?: number | null
           id?: string
+          is_global?: boolean | null
           organization_id?: string | null
           pdf_url?: string | null
           requires_quiz?: boolean
@@ -616,6 +657,7 @@ export type Database = {
           description?: string | null
           duration?: number | null
           id?: string
+          is_global?: boolean | null
           organization_id?: string | null
           pdf_url?: string | null
           requires_quiz?: boolean
