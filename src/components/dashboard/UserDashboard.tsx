@@ -13,7 +13,7 @@ interface UserDashboardProps {
   isLoadingCompliance: boolean;
   campaignMetrics: { name: string; value: number }[];
   achievements: any[];
-  userAchievements: string[];
+  earnedAchievements: string[];
   leaderboard: any[];
 }
 
@@ -26,7 +26,7 @@ export function UserDashboard({
   isLoadingCompliance,
   campaignMetrics,
   achievements,
-  userAchievements,
+  earnedAchievements,
   leaderboard,
 }: UserDashboardProps) {
   return (
@@ -68,12 +68,12 @@ export function UserDashboard({
           <h2 className="text-2xl font-bold tracking-tight mb-4">Achievements</h2>
           <AchievementsGrid
             achievements={achievements}
-            userAchievements={userAchievements}
+            earnedAchievements={earnedAchievements}
           />
         </div>
         <div>
           <h2 className="text-2xl font-bold tracking-tight mb-4">Leaderboard</h2>
-          <Leaderboard data={leaderboard} />
+          <Leaderboard entries={leaderboard} />
         </div>
       </div>
     </div>

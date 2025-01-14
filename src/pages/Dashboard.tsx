@@ -269,7 +269,7 @@ export default function Dashboard() {
           isLoadingCompliance={isLoadingCompliance}
           campaignMetrics={campaignMetrics}
           achievements={achievements}
-          userAchievements={userAchievements}
+          earnedAchievements={userAchievements}
           leaderboard={leaderboard}
         />
       )}
