@@ -266,6 +266,129 @@ export type Database = {
           },
         ]
       }
+      incident_assignments: {
+        Row: {
+          assigned_by: string
+          assigned_to: string
+          created_at: string | null
+          id: string
+          incident_id: string
+          notes: string | null
+        }
+        Insert: {
+          assigned_by: string
+          assigned_to: string
+          created_at?: string | null
+          id?: string
+          incident_id: string
+          notes?: string | null
+        }
+        Update: {
+          assigned_by?: string
+          assigned_to?: string
+          created_at?: string | null
+          id?: string
+          incident_id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_assignments_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_updates: {
+        Row: {
+          created_at: string | null
+          id: string
+          incident_id: string
+          message: string
+          update_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          incident_id: string
+          message: string
+          update_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          incident_id?: string
+          message?: string
+          update_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_updates_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          organization_id: string
+          priority: Database["public"]["Enums"]["incident_priority"]
+          reported_by: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id: string
+          priority?: Database["public"]["Enums"]["incident_priority"]
+          reported_by: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string
+          priority?: Database["public"]["Enums"]["incident_priority"]
+          reported_by?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issued_certificates: {
         Row: {
           certificate_data: Json
@@ -1222,6 +1345,8 @@ export type Database = {
       }
     }
     Enums: {
+      incident_priority: "low" | "medium" | "high" | "critical"
+      incident_status: "open" | "investigating" | "resolved" | "closed"
       notification_type:
         | "info"
         | "warning"
