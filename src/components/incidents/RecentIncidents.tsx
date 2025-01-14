@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, AlertTriangle } from "lucide-react";
+import { Shield } from "lucide-react";
+import { IncidentBadge } from "./IncidentBadge";
 
 export function RecentIncidents() {
   const { data: recentIncidents = [], isLoading: isLoadingIncidents } = useQuery({
@@ -44,32 +45,13 @@ export function RecentIncidents() {
         ) : (
           <div className="space-y-4">
             {recentIncidents.map((incident) => (
-              <div
+              <IncidentBadge
                 key={incident.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <AlertTriangle className={`h-5 w-5 ${
-                    incident.priority === 'critical' ? 'text-destructive' :
-                    incident.priority === 'high' ? 'text-warning' :
-                    'text-muted-foreground'
-                  }`} />
-                  <div>
-                    <h4 className="font-medium">{incident.title}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(incident.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <span className={`text-sm px-2 py-1 rounded-full ${
-                  incident.status === 'open' ? 'bg-destructive/10 text-destructive' :
-                  incident.status === 'investigating' ? 'bg-warning/10 text-warning' :
-                  incident.status === 'resolved' ? 'bg-success/10 text-success' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}
-                </span>
-              </div>
+                priority={incident.priority}
+                status={incident.status}
+                title={incident.title}
+                date={incident.created_at}
+              />
             ))}
           </div>
         )}
