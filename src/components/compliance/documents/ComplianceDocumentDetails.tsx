@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignatureDialog } from "../signatures/SignatureDialog";
 import { SignatureHistory } from "../signatures/SignatureHistory";
-import { FileText, Signature, History } from "lucide-react";
+import { FileText, Signature } from "lucide-react";
 import { format } from "date-fns";
 
 interface ComplianceDocumentDetailsProps {
@@ -43,7 +43,14 @@ export function ComplianceDocumentDetails({ documentId }: ComplianceDocumentDeta
         .maybeSingle();
 
       if (error) throw error;
-      return data as ComplianceDocument;
+      
+      if (!data) return null;
+      
+      // Transform the data to match our interface
+      return {
+        ...data,
+        created_by_user: data.created_by_user?.[0] || null
+      } as ComplianceDocument;
     },
   });
 
