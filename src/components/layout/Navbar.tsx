@@ -5,7 +5,14 @@ import { BarChart2, BookOpen, Mail, Play, Home, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export function Navbar() {
+interface NavbarProps {
+  organization?: {
+    brand_logo_url?: string | null;
+    name: string;
+  } | null;
+}
+
+export function Navbar({ organization }: NavbarProps) {
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -25,8 +32,15 @@ export function Navbar() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex">
           <Link to="/dashboard" className="mr-6 flex items-center space-x-2">
+            {organization?.brand_logo_url && (
+              <img 
+                src={organization.brand_logo_url} 
+                alt={organization.name}
+                className="h-8 w-auto"
+              />
+            )}
             <span className="hidden font-bold sm:inline-block">
-              SecureGRC
+              {organization?.name || "SecureGRC"}
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">

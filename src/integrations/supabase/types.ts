@@ -199,7 +199,15 @@ export type Database = {
       }
       organizations: {
         Row: {
+          brand_accent_color: string | null
+          brand_background_color: string | null
+          brand_font_family: string | null
+          brand_logo_url: string | null
+          brand_primary_color: string | null
+          brand_secondary_color: string | null
+          brand_text_color: string | null
           created_at: string | null
+          dark_mode_enabled: boolean | null
           id: string
           license_count: number | null
           license_end_date: string | null
@@ -209,7 +217,15 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          brand_accent_color?: string | null
+          brand_background_color?: string | null
+          brand_font_family?: string | null
+          brand_logo_url?: string | null
+          brand_primary_color?: string | null
+          brand_secondary_color?: string | null
+          brand_text_color?: string | null
           created_at?: string | null
+          dark_mode_enabled?: boolean | null
           id?: string
           license_count?: number | null
           license_end_date?: string | null
@@ -219,7 +235,15 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          brand_accent_color?: string | null
+          brand_background_color?: string | null
+          brand_font_family?: string | null
+          brand_logo_url?: string | null
+          brand_primary_color?: string | null
+          brand_secondary_color?: string | null
+          brand_text_color?: string | null
           created_at?: string | null
+          dark_mode_enabled?: boolean | null
           id?: string
           license_count?: number | null
           license_end_date?: string | null
