@@ -17,17 +17,17 @@ export function OrganizationStats({ organizations, isLoading }: OrganizationStat
       <StatCard
         title="Total Organizations"
         value={totalOrgs}
-        className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200"
+        className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:from-blue-100 hover:to-blue-200"
       />
       <StatCard
         title="Active Licenses"
         value={totalLicenses}
-        className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200"
+        className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:from-purple-100 hover:to-purple-200"
       />
       <StatCard
         title="Active Organizations"
         value={activeOrgs}
-        className="bg-gradient-to-br from-green-50 to-green-100 border-green-200"
+        className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:from-green-100 hover:to-green-200"
       />
     </div>
   );

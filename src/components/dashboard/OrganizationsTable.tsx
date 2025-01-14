@@ -26,15 +26,15 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
           </TableHeader>
           <TableBody>
             {organizations.map((org) => (
-              <TableRow key={org.id} className="hover:bg-gray-50 transition-colors">
-                <TableCell className="font-medium">{org.name}</TableCell>
-                <TableCell>{org.license_count}</TableCell>
-                <TableCell>
+              <TableRow key={org.id} className="hover:bg-gray-50/80 transition-colors group">
+                <TableCell className="font-medium group-hover:text-primary transition-colors">{org.name}</TableCell>
+                <TableCell className="group-hover:text-gray-900 transition-colors">{org.license_count}</TableCell>
+                <TableCell className="group-hover:text-gray-900 transition-colors">
                   {org.license_start_date 
                     ? new Date(org.license_start_date).toLocaleDateString() 
                     : 'N/A'}
                 </TableCell>
-                <TableCell>
+                <TableCell className="group-hover:text-gray-900 transition-colors">
                   {org.license_end_date 
                     ? new Date(org.license_end_date).toLocaleDateString() 
                     : 'N/A'}
@@ -42,9 +42,9 @@ export function OrganizationsTable({ organizations }: OrganizationsTableProps) {
                 <TableCell>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     org.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                      ? 'bg-green-100 text-green-800 group-hover:bg-green-200' 
+                      : 'bg-red-100 text-red-800 group-hover:bg-red-200'
+                  } transition-colors`}>
                     {org.status}
                   </span>
                 </TableCell>

@@ -39,28 +39,28 @@ export function Navbar({ organization }: NavbarProps) {
                 className="h-8 w-auto"
               />
             )}
-            <span className="hidden font-bold text-primary sm:inline-block">
+            <span className="hidden font-bold text-primary hover:text-primary/90 transition-colors sm:inline-block">
               {organization?.name || "SecureGRC"}
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link to="/dashboard" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
+            <Link to="/dashboard" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
               <Home className="h-4 w-4" />
               Dashboard
             </Link>
-            <Link to="/training/videos" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
+            <Link to="/training/videos" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
               <Play className="h-4 w-4" />
               Videos
             </Link>
-            <Link to="/training" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
+            <Link to="/training" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
               <BookOpen className="h-4 w-4" />
               Training
             </Link>
-            <Link to="/campaigns" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
+            <Link to="/campaigns" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
               <Mail className="h-4 w-4" />
               Campaigns
             </Link>
-            <Link to="/analytics" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2">
+            <Link to="/analytics" className="transition-colors hover:text-primary text-foreground/80 flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md">
               <BarChart2 className="h-4 w-4" />
               Analytics
             </Link>
@@ -75,7 +75,7 @@ export function Navbar({ organization }: NavbarProps) {
               variant="destructive" 
               size="sm"
               onClick={handleSignOut}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white font-medium flex items-center gap-2 shadow-sm"
             >
               <LogOut className="h-4 w-4" />
               Sign Out
