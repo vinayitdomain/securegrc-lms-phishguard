@@ -5,6 +5,8 @@ interface Achievement {
   name: string;
   description: string;
   icon: string;
+  points: number;
+  type: string;
 }
 
 interface AchievementsGridProps {
