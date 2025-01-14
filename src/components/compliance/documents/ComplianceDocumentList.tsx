@@ -23,19 +23,35 @@ export function ComplianceDocumentList() {
   const { data: documents, isLoading } = useQuery({
     queryKey: ['compliance-documents'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get the documents
+      const { data: docs, error: docsError } = await supabase
         .from('compliance_documents')
         .select(`
           *,
-          creator:profiles!inner(full_name),
           tags:compliance_document_tag_relations(
             tag:compliance_document_tags(*)
           )
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data as ComplianceDocument[];
+      if (docsError) throw docsError;
+
+      // Then get the creator names
+      const creatorIds = docs?.map(doc => doc.created_by) || [];
+      const { data: creators, error: creatorsError } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', creatorIds);
+
+      if (creatorsError) throw creatorsError;
+
+      // Merge the data
+      const docsWithCreators = docs?.map(doc => ({
+        ...doc,
+        creator: creators?.find(c => c.id === doc.created_by)
+      }));
+
+      return docsWithCreators as ComplianceDocument[];
     },
   });
 
