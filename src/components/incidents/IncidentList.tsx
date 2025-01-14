@@ -4,6 +4,21 @@ import { AlertTriangle, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 
+interface Profile {
+  full_name: string;
+}
+
+interface Incident {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+  created_at: string;
+  reporter: Profile;
+  assignee: Profile | null;
+}
+
 export function IncidentList() {
   const { data: incidents = [], isLoading } = useQuery({
     queryKey: ['incidents'],
@@ -25,7 +40,7 @@ export function IncidentList() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Incident[];
     },
   });
 

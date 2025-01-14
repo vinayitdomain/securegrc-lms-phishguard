@@ -11,6 +11,28 @@ interface IncidentDetailsProps {
   incidentId: string;
 }
 
+interface Profile {
+  full_name: string;
+}
+
+interface Incident {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+  created_at: string;
+  reporter: Profile;
+  assignee: Profile | null;
+}
+
+interface IncidentUpdate {
+  id: string;
+  message: string;
+  created_at: string;
+  author: Profile;
+}
+
 export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
   const [updateMessage, setUpdateMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +59,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Incident;
     },
   });
 
@@ -54,7 +76,7 @@ export function IncidentDetails({ incidentId }: IncidentDetailsProps) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as IncidentUpdate[];
     },
   });
 
