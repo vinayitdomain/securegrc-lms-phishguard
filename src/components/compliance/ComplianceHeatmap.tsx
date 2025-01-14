@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { Rect, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { ResponsiveContainer } from "recharts";
 
 interface ComplianceData {
   category: string;
@@ -40,11 +40,10 @@ export function ComplianceHeatmap() {
       DEPARTMENTS.forEach(dept => {
         CATEGORIES.forEach(cat => {
           // Calculate score based on relevant frameworks
-          const relevantFrameworks = frameworks?.filter(f => 
-            f.requirements?.some((r: any) => 
-              r.department === dept && r.category === cat
-            )
-          );
+          const relevantFrameworks = frameworks?.filter(f => {
+            const reqs = f.requirements as Array<{ department: string; category: string; }>;
+            return reqs?.some(r => r.department === dept && r.category === cat);
+          });
           
           const score = relevantFrameworks?.length 
             ? Math.round(relevantFrameworks.reduce((acc, curr) => 
@@ -66,20 +65,6 @@ export function ComplianceHeatmap() {
   if (isLoading) {
     return <Skeleton className="w-full h-[400px]" />;
   }
-
-  const HeatmapCell = (props: any) => {
-    const { x, y, width, height, score } = props;
-    return (
-      <Rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={colorScale(score)}
-        className="transition-colors duration-200"
-      />
-    );
-  };
 
   return (
     <Card className="w-full">
