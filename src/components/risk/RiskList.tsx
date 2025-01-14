@@ -16,7 +16,7 @@ export function RiskList() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // First get the user's profile
+      // Get all profiles for the user and select the first one
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id, organization_id')
