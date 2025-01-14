@@ -80,6 +80,47 @@ export type Database = {
           },
         ]
       }
+      certificate_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          status: string | null
+          template_data: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          status?: string | null
+          template_data?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          status?: string | null
+          template_data?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_frameworks: {
         Row: {
           created_at: string | null
@@ -156,6 +197,71 @@ export type Database = {
           },
         ]
       }
+      issued_certificates: {
+        Row: {
+          certificate_data: Json
+          created_at: string | null
+          id: string
+          issued_at: string | null
+          organization_id: string | null
+          quiz_id: string | null
+          template_id: string | null
+          training_path_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          certificate_data: Json
+          created_at?: string | null
+          id?: string
+          issued_at?: string | null
+          organization_id?: string | null
+          quiz_id?: string | null
+          template_id?: string | null
+          training_path_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          certificate_data?: Json
+          created_at?: string | null
+          id?: string
+          issued_at?: string | null
+          organization_id?: string | null
+          quiz_id?: string | null
+          template_id?: string | null
+          training_path_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issued_certificates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issued_certificates_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issued_certificates_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issued_certificates_training_path_id_fkey"
+            columns: ["training_path_id"]
+            isOneToOne: false
+            referencedRelation: "training_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -174,7 +280,7 @@ export type Database = {
           organization_id: string
           read?: boolean
           title: string
-          type: Database["public"]["Enums"]["notification_type"]
+          type?: Database["public"]["Enums"]["notification_type"]
           user_id: string
         }
         Update: {
@@ -514,9 +620,9 @@ export type Database = {
           pdf_url?: string | null
           requires_quiz?: boolean
           status?: string | null
-          title: string
+          title?: string
           updated_at?: string | null
-          video_url: string
+          video_url?: string
         }
         Relationships: [
           {
@@ -640,8 +746,8 @@ export type Database = {
           achievement_id?: string
           earned_at?: string | null
           id?: string
-          organization_id: string
-          user_id: string
+          organization_id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -760,7 +866,7 @@ export type Database = {
           answers: Json
           completed_at?: string | null
           created_at?: string | null
-          id: string
+          id?: string
           passed?: boolean | null
           quiz_id?: string | null
           score: number
@@ -878,101 +984,6 @@ export type Database = {
           },
         ]
       }
-      issued_certificates: {
-        Row: {
-          id: string;
-          template_id: string;
-          user_id: string;
-          organization_id: string;
-          training_path_id: string | null;
-          quiz_id: string | null;
-          certificate_data: {
-            title: string;
-            completion_date: string;
-            course_name?: string;
-            quiz_name?: string;
-          };
-          issued_at: string;
-          created_at: string;
-        }
-        Insert: {
-          template_id: string;
-          user_id: string;
-          organization_id: string;
-          training_path_id?: string | null;
-          quiz_id?: string | null;
-          certificate_data: {
-            title: string;
-            completion_date: string;
-            course_name?: string;
-            quiz_name?: string;
-          };
-          issued_at?: string;
-          created_at?: string;
-        }
-        Update: {
-          template_id?: string;
-          user_id?: string;
-          organization_id?: string;
-          training_path_id?: string | null;
-          quiz_id?: string | null;
-          certificate_data?: {
-            title?: string;
-            completion_date?: string;
-            course_name?: string;
-            quiz_name?: string;
-          };
-          issued_at?: string;
-          created_at?: string;
-        }
-        Relationships: []
-      }
-      certificate_templates: {
-        Row: {
-          id: string;
-          organization_id: string;
-          name: string;
-          description: string | null;
-          template_data: {
-            title: string;
-            layout: string;
-            showLogo: boolean;
-            showDate: boolean;
-          };
-          status: string;
-          created_at: string;
-          updated_at: string;
-        }
-        Insert: {
-          organization_id: string;
-          name: string;
-          description?: string | null;
-          template_data: {
-            title: string;
-            layout: string;
-            showLogo: boolean;
-            showDate: boolean;
-          };
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        }
-        Update: {
-          organization_id?: string;
-          name?: string;
-          description?: string | null;
-          template_data?: {
-            title?: string;
-            layout?: string;
-            showLogo?: boolean;
-            showDate?: boolean;
-          };
-          status?: string;
-          created_at?: string;
-          updated_at?: string;
-        }
-        Relationships: []
-      }
     }
     Views: {
       organization_leaderboard: {
@@ -1047,7 +1058,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QuizStepper } from "@/components/quiz/QuizStepper";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function QuizAttempt() {
   const { id } = useParams();
@@ -37,11 +38,13 @@ export default function QuizAttempt() {
       const { error } = await supabase
         .from('user_quiz_attempts')
         .insert({
+          id: uuidv4(), // Generate UUID for the attempt
           user_id: user.user.id,
           quiz_id: id,
           score,
           passed,
-          answers
+          answers,
+          completed_at: new Date().toISOString()
         });
 
       if (error) throw error;
