@@ -11,7 +11,7 @@ export interface ComplianceDocument {
   created_by: string;
   created_at: string;
   updated_at: string;
-  profiles?: {
+  creator?: {
     full_name: string | null;
   };
   tags?: ComplianceDocumentTagRelation[];
@@ -38,7 +38,7 @@ export interface ComplianceDocumentVersion {
   changes_description: string | null;
   created_by: string;
   created_at: string;
-  profiles?: {
+  creator?: {
     full_name: string | null;
   };
 }
