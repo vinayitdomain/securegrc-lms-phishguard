@@ -27,7 +27,7 @@ export function AuditTrail() {
         .from('audit_logs')
         .select(`
           *,
-          user:profiles(full_name)
+          profile:profiles(full_name)
         `)
         .order('created_at', { ascending: false })
         .limit(10);
@@ -90,7 +90,7 @@ export function AuditTrail() {
                     {log.action_type.replace(/_/g, ' ')}
                   </Badge>
                 </TableCell>
-                <TableCell>{log.user?.full_name || 'System'}</TableCell>
+                <TableCell>{log.profile?.full_name || 'System'}</TableCell>
                 <TableCell className="capitalize">
                   {log.entity_type}
                 </TableCell>
