@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,11 +9,19 @@ import { Badge } from "@/components/ui/badge";
 
 export function AuditDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { data: audit, isLoading } = useQuery({
+  // Validate UUID format
+  const isValidUUID = id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+  const { data: audit, isLoading, error } = useQuery({
     queryKey: ['audit', id],
     queryFn: async () => {
+      if (!isValidUUID) {
+        throw new Error('Invalid audit ID');
+      }
+
       const { data, error } = await supabase
         .from('audit_programs')
         .select(`
@@ -34,15 +42,56 @@ export function AuditDetails() {
       if (error) throw error;
       return data;
     },
-    enabled: !!id,
+    enabled: !!isValidUUID,
   });
 
+  if (!isValidUUID) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold text-red-600">Invalid Audit ID</h2>
+        <p className="mt-2 text-gray-600">The requested audit could not be found.</p>
+        <Button 
+          className="mt-4"
+          onClick={() => navigate('/audits')}
+        >
+          Return to Audit List
+        </Button>
+      </div>
+    );
+  }
+
   if (isLoading) {
-    return <div>Loading audit details...</div>;
+    return <div className="p-6">Loading audit details...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold text-red-600">Error Loading Audit</h2>
+        <p className="mt-2 text-gray-600">{error.message}</p>
+        <Button 
+          className="mt-4"
+          onClick={() => navigate('/audits')}
+        >
+          Return to Audit List
+        </Button>
+      </div>
+    );
   }
 
   if (!audit) {
-    return <div>Audit not found</div>;
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold">Audit Not Found</h2>
+        <p className="mt-2 text-gray-600">The requested audit could not be found.</p>
+        <Button 
+          className="mt-4"
+          onClick={() => navigate('/audits')}
+        >
+          Return to Audit List
+        </Button>
+      </div>
+    );
   }
 
   return (
