@@ -9,6 +9,8 @@ import { Loader2, Building2 } from "lucide-react";
 import { OrganizationStats } from "@/components/dashboard/OrganizationStats";
 import { OrganizationsTable } from "@/components/dashboard/OrganizationsTable";
 import { UserStats } from "@/components/dashboard/UserStats";
+import { AchievementCard } from "@/components/dashboard/AchievementCard";
+import { Leaderboard } from "@/components/dashboard/Leaderboard";
 
 const fetchUserProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -152,6 +154,60 @@ export default function Dashboard() {
     enabled: profile?.role !== 'super_admin',
   });
 
+  const { data: achievements = [] } = useQuery({
+    queryKey: ['achievements'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('achievements')
+        .select('*');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: userAchievements = [] } = useQuery({
+    queryKey: ['userAchievements'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select('achievement_id')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      return data.map(ua => ua.achievement_id);
+    },
+  });
+
+  const { data: leaderboard = [] } = useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile?.organization_id) throw new Error('No organization found');
+
+      const { data, error } = await supabase
+        .from('organization_leaderboard')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .order('total_points', { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   useEffect(() => {
     if (profileError) {
       console.error("Profile error:", profileError);
@@ -221,33 +277,48 @@ export default function Dashboard() {
             isLoadingCourses={isLoadingCourses}
             isLoadingCompliance={isLoadingCompliance}
           />
-          <div className="mt-4">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-primary">
-                  Security Metrics Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={campaignMetrics}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke="#1a365d"
-                        strokeWidth={2}
-                        dot={{ fill: '#1a365d' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+          
+          <div className="grid gap-6 mt-6">
+            <div className="grid md:grid-cols-3 gap-4">
+              {achievements.map((achievement) => (
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                  earned={userAchievements.includes(achievement.id)}
+                />
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-primary">
+                    Security Metrics Overview
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={campaignMetrics}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke="#1a365d"
+                          strokeWidth={2}
+                          dot={{ fill: '#1a365d' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Leaderboard entries={leaderboard} />
+            </div>
           </div>
         </>
       )}
