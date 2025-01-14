@@ -676,6 +676,77 @@ export type Database = {
           },
         ]
       }
+      training_events: {
+        Row: {
+          content_id: string | null
+          created_at: string | null
+          description: string | null
+          end_time: string
+          id: string
+          organization_id: string | null
+          quiz_id: string | null
+          start_time: string
+          title: string
+          training_path_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time: string
+          id?: string
+          organization_id?: string | null
+          quiz_id?: string | null
+          start_time: string
+          title: string
+          training_path_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: string
+          id?: string
+          organization_id?: string | null
+          quiz_id?: string | null
+          start_time?: string
+          title?: string
+          training_path_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_events_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "training_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_events_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_events_training_path_id_fkey"
+            columns: ["training_path_id"]
+            isOneToOne: false
+            referencedRelation: "training_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_path_items: {
         Row: {
           content_id: string | null
@@ -1082,7 +1153,12 @@ export type Database = {
       }
     }
     Enums: {
-      notification_type: "info" | "warning" | "success" | "error"
+      notification_type:
+        | "info"
+        | "warning"
+        | "success"
+        | "error"
+        | "calendar_event"
       user_role: "super_admin" | "org_admin" | "user"
     }
     CompositeTypes: {

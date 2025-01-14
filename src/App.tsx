@@ -9,6 +9,7 @@ import Campaigns from "./pages/Campaigns";
 import Training from "./pages/Training";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
+import Calendar from "./pages/Calendar";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/campaigns" element={<Campaigns />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/calendar" element={<Calendar />} />
       </Routes>
     </Router>
   );
