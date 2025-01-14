@@ -16,10 +16,12 @@ export function RiskList() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // First get the user's profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id, organization_id')
         .eq('user_id', user.id)
+        .limit(1)
         .maybeSingle();
 
       if (profileError) {
@@ -29,6 +31,7 @@ export function RiskList() {
       if (!profile) throw new Error('No profile found');
       if (!profile.organization_id) throw new Error('No organization found');
 
+      // Then get risk assessments for the organization
       const { data, error } = await supabase
         .from('risk_assessments')
         .select(`
