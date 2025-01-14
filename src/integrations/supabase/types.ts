@@ -2630,6 +2630,33 @@ export type Database = {
       }
     }
     Views: {
+      governance_metrics: {
+        Row: {
+          documents_updated_last_30_days: number | null
+          organization_id: string | null
+          pending_documents: number | null
+          pending_policies: number | null
+          policy_approval_rate: number | null
+          total_documents: number | null
+          total_policies: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_compliance_overview: {
         Row: {
           audit_score: number | null
