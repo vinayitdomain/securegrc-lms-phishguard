@@ -79,7 +79,9 @@ export function TrainingPaths() {
       <CardContent className="space-y-6">
         {paths.map((path) => {
           const totalItems = path.training_path_items?.length || 0;
-          const completedItems = path.user_training_progress?.[0]?.completed_items?.length || 0;
+          const completedItems = Array.isArray(path.user_training_progress?.[0]?.completed_items) 
+            ? path.user_training_progress[0].completed_items.length 
+            : 0;
           const progress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
           const isCompleted = path.user_training_progress?.[0]?.completed_at;
 
