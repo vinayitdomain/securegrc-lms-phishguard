@@ -3,6 +3,7 @@ import { AchievementsGrid } from "./AchievementsGrid";
 import { UserStats } from "./UserStats";
 import { Leaderboard } from "./Leaderboard";
 import { UserSegments } from "./UserSegments";
+import { TrainingPaths } from "./TrainingPaths";
 
 interface UserDashboardProps {
   activeCampaigns: number;
@@ -41,6 +42,8 @@ export function UserDashboard({
       />
       
       <div className="grid gap-6 mt-6">
+        <TrainingPaths />
+        
         <AchievementsGrid 
           achievements={achievements}
           earnedAchievements={userAchievements}

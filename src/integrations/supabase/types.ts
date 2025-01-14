@@ -528,6 +528,99 @@ export type Database = {
           },
         ]
       }
+      training_path_items: {
+        Row: {
+          content_id: string | null
+          created_at: string | null
+          id: string
+          order_number: number
+          path_id: string | null
+          quiz_id: string | null
+          required: boolean | null
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string | null
+          id?: string
+          order_number: number
+          path_id?: string | null
+          quiz_id?: string | null
+          required?: boolean | null
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string | null
+          id?: string
+          order_number?: number
+          path_id?: string | null
+          quiz_id?: string | null
+          required?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_path_items_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "training_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_path_items_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "training_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_path_items_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_paths: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          organization_id: string | null
+          status: string | null
+          target_role: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          target_role: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          target_role?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_paths_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -730,6 +823,57 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_training_progress: {
+        Row: {
+          completed_at: string | null
+          completed_items: Json | null
+          created_at: string | null
+          current_item_id: string | null
+          id: string
+          path_id: string | null
+          started_at: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_items?: Json | null
+          created_at?: string | null
+          current_item_id?: string | null
+          id?: string
+          path_id?: string | null
+          started_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completed_items?: Json | null
+          created_at?: string | null
+          current_item_id?: string | null
+          id?: string
+          path_id?: string | null
+          started_at?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_training_progress_current_item_id_fkey"
+            columns: ["current_item_id"]
+            isOneToOne: false
+            referencedRelation: "training_path_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_training_progress_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "training_paths"
             referencedColumns: ["id"]
           },
         ]
