@@ -27,7 +27,7 @@ export default function Dashboard() {
           )
         `)
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       if (!data) throw new Error('Profile not found');
@@ -35,25 +35,7 @@ export default function Dashboard() {
     },
   });
 
-  // Then fetch permissions only if we have an organization_id
-  const { data: permissions, isLoading: isLoadingPermissions } = useQuery({
-    queryKey: ['permissions', profile?.organization_id],
-    queryFn: async () => {
-      if (!profile?.organization_id) return [];
-
-      const { data, error } = await supabase
-        .from('role_permissions')
-        .select('permission')
-        .eq('organization_id', profile.organization_id)
-        .eq('role', profile.role);
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!profile?.organization_id, // Only run this query if we have an organization_id
-  });
-
-  if (isLoadingProfile || isLoadingPermissions) {
+  if (isLoadingProfile) {
     return (
       <DashboardLayout>
         <div className="space-y-6">

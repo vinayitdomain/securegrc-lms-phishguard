@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 export function Navbar({ organization }: { organization?: { brand_logo_url?: string | null; name: string; } | null }) {
   const navigate = useNavigate();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +19,7 @@ export function Navbar({ organization }: { organization?: { brand_logo_url?: str
         .from('profiles')
         .select('full_name, role')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
@@ -97,7 +97,7 @@ export function Navbar({ organization }: { organization?: { brand_logo_url?: str
           <div className="flex items-center gap-4 bg-gray-100 px-4 py-2 rounded-full">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <User className="h-4 w-4" />
-              <span>{profile?.full_name || 'Loading...'}</span>
+              <span>{isLoading ? 'Loading...' : profile?.full_name || 'User'}</span>
             </div>
             <Button 
               variant="destructive" 
