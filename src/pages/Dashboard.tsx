@@ -9,7 +9,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export default function Dashboard() {
-  const { data: profile, isLoading, error } = useQuery({
+  // First fetch the user profile
+  const { data: profile, isLoading: isLoadingProfile, error: profileError } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -29,11 +30,30 @@ export default function Dashboard() {
         .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('Profile not found');
       return data;
     },
   });
 
-  if (isLoading) {
+  // Then fetch permissions only if we have an organization_id
+  const { data: permissions, isLoading: isLoadingPermissions } = useQuery({
+    queryKey: ['permissions', profile?.organization_id],
+    queryFn: async () => {
+      if (!profile?.organization_id) return [];
+
+      const { data, error } = await supabase
+        .from('role_permissions')
+        .select('permission')
+        .eq('organization_id', profile.organization_id)
+        .eq('role', profile.role);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!profile?.organization_id, // Only run this query if we have an organization_id
+  });
+
+  if (isLoadingProfile || isLoadingPermissions) {
     return (
       <DashboardLayout>
         <div className="space-y-6">
@@ -44,13 +64,13 @@ export default function Dashboard() {
     );
   }
 
-  if (error) {
+  if (profileError) {
     return (
       <DashboardLayout>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Error loading dashboard: {error.message}
+            Error loading dashboard: {profileError.message}
           </AlertDescription>
         </Alert>
       </DashboardLayout>
