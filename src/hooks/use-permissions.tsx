@@ -17,54 +17,52 @@ export type PermissionType =
   | 'audit_manage';
 
 export function usePermissions() {
-  const { data: permissions, isLoading } = useQuery({
-    queryKey: ['permissions'],
+  // First get the profile to ensure we have organization_id
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['profile'],
     queryFn: async () => {
-      // First check if we have an authenticated user
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) return null;
 
-      // Get user profile, using maybeSingle() to handle no profile case
-      const { data: profile, error: profileError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('organization_id, role')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Then fetch permissions only if we have a valid organization_id
+  const { data: permissions, isLoading: isLoadingPermissions } = useQuery({
+    queryKey: ['permissions', profile?.organization_id],
+    queryFn: async () => {
+      if (!profile?.organization_id || !profile?.role) {
         return [];
       }
 
-      if (!profile) {
-        console.warn('No profile found for user');
-        return [];
-      }
-
-      // Get role permissions
-      const { data: rolePermissions, error: permissionsError } = await supabase
+      const { data, error } = await supabase
         .from('role_permissions')
         .select('permission')
         .eq('organization_id', profile.organization_id)
         .eq('role', profile.role);
 
-      if (permissionsError) {
-        console.error('Error fetching permissions:', permissionsError);
-        return [];
-      }
-
-      return rolePermissions?.map(p => p.permission) || [];
+      if (error) throw error;
+      return data?.map(p => p.permission) || [];
     },
+    enabled: !!profile?.organization_id && !!profile?.role,
   });
 
   const hasPermission = (permission: PermissionType) => {
-    if (isLoading || !permissions) return false;
+    if (isLoadingProfile || isLoadingPermissions || !permissions) return false;
     return permissions.includes(permission);
   };
 
   return {
     hasPermission,
-    isLoading,
+    isLoading: isLoadingProfile || isLoadingPermissions,
     permissions
   };
 }
