@@ -1,65 +1,103 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { DashboardMetrics } from "./DashboardMetrics";
-import { DashboardCharts } from "./DashboardCharts";
+import { TrainingPaths } from "./TrainingPaths";
 import { AchievementsGrid } from "./AchievementsGrid";
 import { Leaderboard } from "./Leaderboard";
-import { RecentIncidents } from "../incidents/RecentIncidents";
-import { RiskAssessmentOverview } from "../risk/RiskAssessmentOverview";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface UserDashboardProps {
-  activeCampaigns: number;
-  courseCompletion: number;
-  complianceStatus: number;
-  isLoadingCampaigns: boolean;
-  isLoadingCourses: boolean;
-  isLoadingCompliance: boolean;
-  campaignMetrics: Array<{ name: string; value: number }>;
-  achievements: any[];
-  earnedAchievements: string[];
-  leaderboard: any[];
-}
+export function UserDashboard() {
+  const { data: userMetrics, isLoading: isLoadingMetrics } = useQuery({
+    queryKey: ['user-metrics'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
-export function UserDashboard({
-  activeCampaigns,
-  courseCompletion,
-  complianceStatus,
-  isLoadingCampaigns,
-  isLoadingCourses,
-  isLoadingCompliance,
-  campaignMetrics,
-  achievements,
-  earnedAchievements,
-  leaderboard,
-}: UserDashboardProps) {
-  return (
-    <div className="space-y-8">
-      <DashboardMetrics
-        activeCampaigns={activeCampaigns}
-        courseCompletion={courseCompletion}
-        complianceStatus={complianceStatus}
-        isLoadingCampaigns={isLoadingCampaigns}
-        isLoadingCourses={isLoadingCourses}
-        isLoadingCompliance={isLoadingCompliance}
-      />
+      const { data, error } = await supabase
+        .from('user_metrics')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      <DashboardCharts campaignMetrics={campaignMetrics} />
+      if (error) throw error;
+      return data;
+    },
+  });
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <RecentIncidents />
-        <RiskAssessmentOverview />
+  const { data: achievements } = useQuery({
+    queryKey: ['user-achievements'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select(`
+          *,
+          achievements (*)
+        `)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoadingMetrics) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-[200px]" />
+        <Skeleton className="h-[400px]" />
       </div>
+    );
+  }
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight mb-4">Achievements</h2>
-          <AchievementsGrid
-            achievements={achievements}
-            earnedAchievements={earnedAchievements}
-          />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight mb-4">Leaderboard</h2>
-          <Leaderboard entries={leaderboard} />
-        </div>
+  const metrics = {
+    activeCampaigns: 0,
+    courseCompletion: userMetrics?.courses_completed || 0,
+    complianceStatus: userMetrics?.security_score || 0,
+    isLoadingCampaigns: false,
+    isLoadingCourses: isLoadingMetrics,
+    isLoadingCompliance: isLoadingMetrics,
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">My Dashboard</h1>
+      
+      <DashboardMetrics {...metrics} />
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Training Paths</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TrainingPaths />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Achievements</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AchievementsGrid 
+              achievements={achievements?.map(a => a.achievements) || []}
+              earnedAchievements={achievements?.map(a => a.id) || []}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Leaderboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Leaderboard />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
