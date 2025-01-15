@@ -5,9 +5,11 @@ import { SuperAdminDashboard } from "@/components/dashboard/SuperAdminDashboard"
 import { OrgAdminDashboard } from "@/components/dashboard/OrgAdminDashboard";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Dashboard() {
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -15,9 +17,9 @@ export default function Dashboard() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, organizations (*)')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -35,12 +37,38 @@ export default function Dashboard() {
     );
   }
 
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Error loading dashboard: {error.message}
+          </AlertDescription>
+        </Alert>
+      </DashboardLayout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <DashboardLayout>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No profile found. Please contact support.
+          </AlertDescription>
+        </Alert>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
-        {profile?.role === 'super_admin' && <SuperAdminDashboard />}
-        {profile?.role === 'org_admin' && <OrgAdminDashboard />}
-        {profile?.role === 'user' && <UserDashboard />}
+        {profile.role === 'super_admin' && <SuperAdminDashboard />}
+        {profile.role === 'org_admin' && <OrgAdminDashboard />}
+        {profile.role === 'user' && <UserDashboard />}
       </div>
     </DashboardLayout>
   );
