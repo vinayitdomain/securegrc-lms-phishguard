@@ -22,6 +22,8 @@ export function GovernanceAuditWorkflow() {
         .eq('user_id', profile.user.id)
         .single();
 
+      if (!userProfile) throw new Error('Profile not found');
+
       const { data, error } = await supabase
         .from('audit_programs')
         .select(`
@@ -44,11 +46,11 @@ export function GovernanceAuditWorkflow() {
             )
           )
         `)
-        .eq('organization_id', userProfile?.organization_id)
+        .eq('organization_id', userProfile.organization_id)
         .eq('status', 'in_progress');
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -85,52 +87,52 @@ export function GovernanceAuditWorkflow() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Governance Audits</h2>
       
-      {auditTasks?.map((audit) => (
-        <Card key={audit.id}>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <ClipboardList className="h-5 w-5" />
-                <span>{audit.title}</span>
-              </div>
-              <Badge>{audit.status}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{audit.description}</p>
-              
-              {audit.workflow_instances?.map((instance) => (
-                <div key={instance.id} className="border rounded-lg p-4">
-                  <WorkflowInstanceViewer entityId={audit.id} />
-                  
-                  {instance.workflow_assignments?.map((assignment) => (
-                    <div key={assignment.id} className="flex items-center justify-between mt-4">
-                      <div className="flex items-center space-x-2">
-                        <AlertCircle className="h-5 w-5" />
-                        <span>{assignment.action_type}</span>
-                        <span className="text-sm text-muted-foreground">
-                          - {assignment.profiles?.full_name}
-                        </span>
-                      </div>
-                      
-                      {assignment.status === 'pending' && (
-                        <Button
-                          onClick={() => handleAuditTaskComplete(audit.id, assignment.id)}
-                        >
-                          Complete Task
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+      {auditTasks && auditTasks.length > 0 ? (
+        auditTasks.map((audit) => (
+          <Card key={audit.id}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <ClipboardList className="h-5 w-5" />
+                  <span>{audit.title}</span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      {(!auditTasks || auditTasks.length === 0) && (
+                <Badge>{audit.status}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">{audit.description}</p>
+                
+                {audit.workflow_instances?.map((instance) => (
+                  <div key={instance.id} className="border rounded-lg p-4">
+                    <WorkflowInstanceViewer entityId={audit.id} />
+                    
+                    {instance.workflow_assignments?.map((assignment) => (
+                      <div key={assignment.id} className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-2">
+                          <AlertCircle className="h-5 w-5" />
+                          <span>{assignment.action_type}</span>
+                          <span className="text-sm text-muted-foreground">
+                            - {assignment.profiles?.full_name}
+                          </span>
+                        </div>
+                        
+                        {assignment.status === 'pending' && (
+                          <Button
+                            onClick={() => handleAuditTaskComplete(audit.id, assignment.id)}
+                          >
+                            Complete Task
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
         <Card>
           <CardContent className="p-6 text-center text-muted-foreground">
             No active governance audits

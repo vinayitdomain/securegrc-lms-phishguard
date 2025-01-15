@@ -22,6 +22,8 @@ export function DocumentReviewWorkflow() {
         .eq('user_id', profile.user.id)
         .single();
 
+      if (!userProfile) throw new Error('Profile not found');
+
       const { data, error } = await supabase
         .from('compliance_documents')
         .select(`
@@ -44,11 +46,11 @@ export function DocumentReviewWorkflow() {
             )
           )
         `)
-        .eq('organization_id', userProfile?.organization_id)
-        .eq('status', 'pending_review');
+        .eq('organization_id', userProfile.organization_id)
+        .eq('status', 'draft');
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -85,52 +87,52 @@ export function DocumentReviewWorkflow() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Document Reviews</h2>
       
-      {pendingReviews?.map((document) => (
-        <Card key={document.id}>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <FileText className="h-5 w-5" />
-                <span>{document.title}</span>
-              </div>
-              <Badge>{document.status}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{document.description}</p>
-              
-              {document.workflow_instances?.map((instance) => (
-                <div key={instance.id} className="border rounded-lg p-4">
-                  <WorkflowInstanceViewer entityId={document.id} />
-                  
-                  {instance.workflow_assignments?.map((assignment) => (
-                    <div key={assignment.id} className="flex items-center justify-between mt-4">
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-5 w-5" />
-                        <span>{assignment.action_type}</span>
-                        <span className="text-sm text-muted-foreground">
-                          - {assignment.profiles?.full_name}
-                        </span>
-                      </div>
-                      
-                      {assignment.status === 'pending' && (
-                        <Button
-                          onClick={() => handleReviewComplete(document.id, assignment.id)}
-                        >
-                          Complete Review
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+      {pendingReviews && pendingReviews.length > 0 ? (
+        pendingReviews.map((document) => (
+          <Card key={document.id}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FileText className="h-5 w-5" />
+                  <span>{document.title}</span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      {(!pendingReviews || pendingReviews.length === 0) && (
+                <Badge>{document.status}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">{document.description}</p>
+                
+                {document.workflow_instances?.map((instance) => (
+                  <div key={instance.id} className="border rounded-lg p-4">
+                    <WorkflowInstanceViewer entityId={document.id} />
+                    
+                    {instance.workflow_assignments?.map((assignment) => (
+                      <div key={assignment.id} className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-5 w-5" />
+                          <span>{assignment.action_type}</span>
+                          <span className="text-sm text-muted-foreground">
+                            - {assignment.profiles?.full_name}
+                          </span>
+                        </div>
+                        
+                        {assignment.status === 'pending' && (
+                          <Button
+                            onClick={() => handleReviewComplete(document.id, assignment.id)}
+                          >
+                            Complete Review
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
         <Card>
           <CardContent className="p-6 text-center text-muted-foreground">
             No pending document reviews

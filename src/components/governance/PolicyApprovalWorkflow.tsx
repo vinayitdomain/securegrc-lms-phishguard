@@ -22,6 +22,8 @@ export function PolicyApprovalWorkflow() {
         .eq('user_id', profile.user.id)
         .single();
 
+      if (!userProfile) throw new Error('Profile not found');
+
       const { data, error } = await supabase
         .from('compliance_policies')
         .select(`
@@ -45,11 +47,11 @@ export function PolicyApprovalWorkflow() {
             )
           )
         `)
-        .eq('organization_id', userProfile?.organization_id)
-        .eq('approval_status', 'pending_approval');
+        .eq('organization_id', userProfile.organization_id)
+        .eq('approval_status', 'pending_review');
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -86,57 +88,57 @@ export function PolicyApprovalWorkflow() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Pending Policy Approvals</h2>
       
-      {pendingPolicies?.map((policy) => (
-        <Card key={policy.id}>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>{policy.title}</span>
-              <Badge variant={policy.approval_status === 'approved' ? 'default' : 'secondary'}>
-                {policy.approval_status}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{policy.description}</p>
-              
-              {policy.workflow_instances?.map((instance) => (
-                <div key={instance.id} className="border rounded-lg p-4">
-                  <WorkflowInstanceViewer entityId={policy.id} />
-                  
-                  {instance.workflow_assignments?.map((assignment) => (
-                    <div key={assignment.id} className="flex items-center justify-between mt-4">
-                      <div className="flex items-center space-x-2">
-                        {assignment.status === 'pending' ? (
-                          <Clock className="h-5 w-5 text-yellow-500" />
-                        ) : assignment.status === 'completed' ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-500" />
+      {pendingPolicies && pendingPolicies.length > 0 ? (
+        pendingPolicies.map((policy) => (
+          <Card key={policy.id}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <span>{policy.title}</span>
+                <Badge variant={policy.approval_status === 'approved' ? 'default' : 'secondary'}>
+                  {policy.approval_status}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">{policy.description}</p>
+                
+                {policy.workflow_instances?.map((instance) => (
+                  <div key={instance.id} className="border rounded-lg p-4">
+                    <WorkflowInstanceViewer entityId={policy.id} />
+                    
+                    {instance.workflow_assignments?.map((assignment) => (
+                      <div key={assignment.id} className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-2">
+                          {assignment.status === 'pending' ? (
+                            <Clock className="h-5 w-5 text-yellow-500" />
+                          ) : assignment.status === 'completed' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
+                          <span>{assignment.action_type}</span>
+                          <span className="text-sm text-muted-foreground">
+                            - {assignment.profiles?.full_name}
+                          </span>
+                        </div>
+                        
+                        {assignment.status === 'pending' && (
+                          <Button
+                            onClick={() => handleApprove(policy.id, assignment.id)}
+                          >
+                            Approve
+                          </Button>
                         )}
-                        <span>{assignment.action_type}</span>
-                        <span className="text-sm text-muted-foreground">
-                          - {assignment.profiles?.full_name}
-                        </span>
                       </div>
-                      
-                      {assignment.status === 'pending' && (
-                        <Button
-                          onClick={() => handleApprove(policy.id, assignment.id)}
-                        >
-                          Approve
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      {(!pendingPolicies || pendingPolicies.length === 0) && (
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
         <Card>
           <CardContent className="p-6 text-center text-muted-foreground">
             No pending policy approvals
