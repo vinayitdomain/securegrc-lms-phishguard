@@ -31,7 +31,7 @@ export function DocumentReviewWorkflow() {
           title,
           description,
           status,
-          workflow_instances!inner (
+          workflow_instances (
             id,
             status,
             current_step,

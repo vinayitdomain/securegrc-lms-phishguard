@@ -32,7 +32,7 @@ export function PolicyApprovalWorkflow() {
           description,
           approval_status,
           workflow_template_id,
-          workflow_instances!inner (
+          workflow_instances (
             id,
             status,
             current_step,

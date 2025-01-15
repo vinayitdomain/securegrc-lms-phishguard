@@ -2609,11 +2609,14 @@ export type Database = {
       }
       workflow_instances: {
         Row: {
+          audit_id: string | null
           completed_at: string | null
           created_at: string | null
           current_step: number | null
+          document_id: string | null
           id: string
           organization_id: string | null
+          policy_id: string | null
           started_at: string | null
           status: string | null
           template_id: string | null
@@ -2623,11 +2626,14 @@ export type Database = {
           workflow_data: Json | null
         }
         Insert: {
+          audit_id?: string | null
           completed_at?: string | null
           created_at?: string | null
           current_step?: number | null
+          document_id?: string | null
           id?: string
           organization_id?: string | null
+          policy_id?: string | null
           started_at?: string | null
           status?: string | null
           template_id?: string | null
@@ -2637,11 +2643,14 @@ export type Database = {
           workflow_data?: Json | null
         }
         Update: {
+          audit_id?: string | null
           completed_at?: string | null
           created_at?: string | null
           current_step?: number | null
+          document_id?: string | null
           id?: string
           organization_id?: string | null
+          policy_id?: string | null
           started_at?: string | null
           status?: string | null
           template_id?: string | null
@@ -2651,6 +2660,20 @@ export type Database = {
           workflow_data?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "workflow_instances_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audit_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_documents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workflow_instances_organization_id_fkey"
             columns: ["organization_id"]
@@ -2663,6 +2686,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_policies"
             referencedColumns: ["id"]
           },
           {
