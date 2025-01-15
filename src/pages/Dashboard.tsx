@@ -5,6 +5,7 @@ import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { AuditTrail } from "@/components/audit/AuditTrail";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 
 export default function Dashboard() {
   const { data: profile } = useQuery({
@@ -41,7 +42,6 @@ export default function Dashboard() {
     enabled: !!profile?.organization_id,
   });
 
-  // Default values for metrics that don't exist in the database
   const activeCampaigns = 0;
   const courseCompletion = metricsData?.courses_completed || 0;
   const complianceStatus = metricsData?.security_score || 0;
@@ -54,43 +54,45 @@ export default function Dashboard() {
   const leaderboard = [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <DashboardHeader />
       
       <div className="grid gap-8">
-        <UserDashboard
-          activeCampaigns={activeCampaigns}
-          courseCompletion={courseCompletion}
-          complianceStatus={complianceStatus}
-          isLoadingCampaigns={isLoadingCampaigns}
-          isLoadingCourses={isLoadingCourses}
-          isLoadingCompliance={isLoadingCompliance}
-          campaignMetrics={campaignMetrics}
-          achievements={achievements}
-          earnedAchievements={earnedAchievements}
-          leaderboard={leaderboard}
-        />
+        <Card className="p-6">
+          <UserDashboard
+            activeCampaigns={activeCampaigns}
+            courseCompletion={courseCompletion}
+            complianceStatus={complianceStatus}
+            isLoadingCampaigns={isLoadingCampaigns}
+            isLoadingCourses={isLoadingCourses}
+            isLoadingCompliance={isLoadingCompliance}
+            campaignMetrics={campaignMetrics}
+            achievements={achievements}
+            earnedAchievements={earnedAchievements}
+            leaderboard={leaderboard}
+          />
+        </Card>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold tracking-tight mb-6">
             Audit Trail
           </h2>
           <AuditTrail />
-        </div>
+        </Card>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold tracking-tight mb-6">
             Compliance Overview
           </h2>
           <ComplianceOverview />
-        </div>
+        </Card>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold tracking-tight">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold tracking-tight mb-6">
             Compliance Documents
           </h2>
           <ComplianceDocumentList />
-        </div>
+        </Card>
       </div>
     </div>
   );
