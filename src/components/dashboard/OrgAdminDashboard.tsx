@@ -14,7 +14,7 @@ export function OrgAdminDashboard() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .single();
+        .maybeSingle();
 
       if (!profile?.organization_id) throw new Error('No organization found');
 
@@ -34,7 +34,7 @@ export function OrgAdminDashboard() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .single();
+        .maybeSingle();
 
       if (!profile?.organization_id) throw new Error('No organization found');
 

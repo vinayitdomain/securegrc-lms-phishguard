@@ -18,10 +18,10 @@ export function UserDashboard() {
         .from('user_metrics')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data || null;
     },
   });
 
@@ -50,7 +50,7 @@ export function UserDashboard() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .single();
+        .maybeSingle();
 
       if (!profile?.organization_id) throw new Error('No organization found');
 
