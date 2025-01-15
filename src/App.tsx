@@ -13,6 +13,7 @@ import Calendar from "./pages/Calendar";
 import AuditManagement from "./pages/AuditManagement";
 import RiskManagement from "./pages/RiskManagement";
 import ComplianceManagement from "./pages/ComplianceManagement";
+import GovernanceManagement from "./pages/GovernanceManagement";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/audits/*" element={<AuditManagement />} />
         <Route path="/risks/*" element={<RiskManagement />} />
         <Route path="/compliance/*" element={<ComplianceManagement />} />
+        <Route path="/governance/*" element={<GovernanceManagement />} />
       </Routes>
     </Router>
   );
