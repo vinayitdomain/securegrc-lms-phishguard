@@ -4,16 +4,27 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { BarChart2, BookOpen, Mail, Play, Home, LogOut, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
-interface NavbarProps {
-  organization?: {
-    brand_logo_url?: string | null;
-    name: string;
-  } | null;
-}
-
-export function Navbar({ organization }: NavbarProps) {
+export function Navbar({ organization }: { organization?: { brand_logo_url?: string | null; name: string; } | null }) {
   const navigate = useNavigate();
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleSignOut = async () => {
     try {
@@ -86,7 +97,7 @@ export function Navbar({ organization }: NavbarProps) {
           <div className="flex items-center gap-4 bg-gray-100 px-4 py-2 rounded-full">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <User className="h-4 w-4" />
-              <span>John Doe</span>
+              <span>{profile?.full_name || 'Loading...'}</span>
             </div>
             <Button 
               variant="destructive" 
