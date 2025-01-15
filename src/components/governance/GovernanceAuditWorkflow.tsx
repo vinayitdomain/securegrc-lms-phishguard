@@ -31,7 +31,7 @@ export function GovernanceAuditWorkflow() {
           title,
           description,
           status,
-          workflow_instances (
+          workflow_instances!inner (
             id,
             status,
             current_step,
@@ -103,7 +103,7 @@ export function GovernanceAuditWorkflow() {
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">{audit.description}</p>
                 
-                {audit.workflow_instances?.map((instance) => (
+                {audit.workflow_instances && audit.workflow_instances.map((instance) => (
                   <div key={instance.id} className="border rounded-lg p-4">
                     <WorkflowInstanceViewer entityId={audit.id} />
                     

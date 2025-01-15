@@ -31,7 +31,7 @@ export function DocumentReviewWorkflow() {
           title,
           description,
           status,
-          workflow_instances (
+          workflow_instances!inner (
             id,
             status,
             current_step,
@@ -103,7 +103,7 @@ export function DocumentReviewWorkflow() {
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">{document.description}</p>
                 
-                {document.workflow_instances?.map((instance) => (
+                {document.workflow_instances && document.workflow_instances.map((instance) => (
                   <div key={instance.id} className="border rounded-lg p-4">
                     <WorkflowInstanceViewer entityId={document.id} />
                     

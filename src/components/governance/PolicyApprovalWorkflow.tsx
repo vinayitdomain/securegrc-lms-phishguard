@@ -103,7 +103,7 @@ export function PolicyApprovalWorkflow() {
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">{policy.description}</p>
                 
-                {policy.workflow_instances?.map((instance) => (
+                {policy.workflow_instances && policy.workflow_instances.map((instance) => (
                   <div key={instance.id} className="border rounded-lg p-4">
                     <WorkflowInstanceViewer entityId={policy.id} />
                     
