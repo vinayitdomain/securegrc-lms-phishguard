@@ -44,6 +44,28 @@ export function UserDashboard() {
     },
   });
 
+  const { data: leaderboardEntries } = useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: async () => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .single();
+
+      if (!profile?.organization_id) throw new Error('No organization found');
+
+      const { data, error } = await supabase
+        .from('organization_leaderboard')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .order('total_points', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   if (isLoadingMetrics) {
     return (
       <div className="space-y-6">
@@ -95,7 +117,7 @@ export function UserDashboard() {
             <CardTitle>Leaderboard</CardTitle>
           </CardHeader>
           <CardContent>
-            <Leaderboard />
+            <Leaderboard entries={leaderboardEntries || []} />
           </CardContent>
         </Card>
       </div>
