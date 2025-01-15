@@ -17,7 +17,14 @@ export default function Dashboard() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, organizations (*)')
+        .select(`
+          *,
+          organizations (
+            name,
+            brand_logo_url,
+            brand_primary_color
+          )
+        `)
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -66,6 +73,17 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">
+            Welcome, {profile.full_name || 'User'}
+          </h1>
+          {profile.organizations?.name && (
+            <p className="text-muted-foreground">
+              Organization: {profile.organizations.name}
+            </p>
+          )}
+        </div>
+
         {profile.role === 'super_admin' && <SuperAdminDashboard />}
         {profile.role === 'org_admin' && <OrgAdminDashboard />}
         {profile.role === 'user' && <UserDashboard />}
