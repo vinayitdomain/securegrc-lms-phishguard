@@ -1,57 +1,35 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
-import { AuthHeader } from "@/components/auth/AuthHeader";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { getErrorMessage } from "@/utils/auth";
-import { Loader2 } from "lucide-react";
+import { AuthHeader } from "@/components/auth/AuthHeader";
+import { toast } from "sonner";
 
-export default function AuthPage() {
+const Auth = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResetMode, setIsResetMode] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Session check error:", error);
-          // Handle refresh token errors by signing out
-          if (error.message.includes('refresh_token_not_found')) {
-            await supabase.auth.signOut();
-            setErrorMessage("Your session has expired. Please sign in again.");
-          } else {
-            setErrorMessage(getErrorMessage(error));
-          }
-        } else if (session) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
           navigate("/dashboard");
         }
       } catch (error) {
-        console.error("Session check failed:", error);
-        setErrorMessage("An unexpected error occurred. Please try again.");
+        console.error("Session check error:", error);
+        toast.error("An error occurred while checking your session");
       } finally {
         setIsLoading(false);
       }
     };
 
+    checkSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change:", event);
-      
-      if (event === 'SIGNED_IN' && session) {
+      if (event === "SIGNED_IN" && session) {
         navigate("/dashboard");
-      } else if (event === 'SIGNED_OUT') {
-        setErrorMessage("");
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log("Token refreshed successfully");
-      } else if (event === 'USER_UPDATED') {
-        console.log("User updated");
       }
     });
 
@@ -60,98 +38,20 @@ export default function AuthPage() {
     };
   }, [navigate]);
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage("");
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-
-      if (error) {
-        setErrorMessage(getErrorMessage(error));
-      } else {
-        toast.success("Password reset instructions have been sent to your email");
-        setIsResetMode(false);
-      }
-    } catch (error) {
-      console.error("Password reset error:", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage("");
-
-    const trimmedEmail = email.trim().toLowerCase();
-    const trimmedPassword = password.trim();
-
-    if (!trimmedEmail || !trimmedPassword) {
-      setErrorMessage("Please enter both email and password");
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      // First, ensure we're signed out to clear any stale session data
-      await supabase.auth.signOut();
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password: trimmedPassword,
-      });
-
-      if (error) {
-        console.error("Authentication error:", error);
-        setErrorMessage(getErrorMessage(error));
-      } else if (data?.user) {
-        console.log("Login successful:", data.user);
-        toast.success("Login successful!");
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("Unexpected error during sign in:", error);
-      setErrorMessage("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-2 text-sm text-gray-500">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <AuthHeader isResetMode={isResetMode} />
-      {errorMessage && (
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <Alert variant="destructive">
-            <AlertDescription className="whitespace-pre-line">{errorMessage}</AlertDescription>
-          </Alert>
-        </div>
-      )}
-      <AuthForm
-        email={email}
-        setEmail={setEmail}
-        password={password}
-        setPassword={setPassword}
-        isSubmitting={isSubmitting}
-        isResetMode={isResetMode}
-        handleSubmit={isResetMode ? handlePasswordReset : handleSubmit}
-        setIsResetMode={setIsResetMode}
-      />
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+      <AuthHeader />
+      <AuthForm />
     </div>
   );
-}
+};
+
+export default Auth;
