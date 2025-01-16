@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthHeader } from "@/components/auth/AuthHeader";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { getErrorMessage } from "@/utils/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
@@ -24,7 +25,11 @@ const Auth = () => {
         }
       } catch (error) {
         console.error("Session check error:", error);
-        toast.error("An error occurred while checking your session");
+        toast({
+          title: "Error",
+          description: "An error occurred while checking your session",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -42,13 +47,17 @@ const Auth = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Please enter both email and password");
+      toast({
+        title: "Error",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -61,7 +70,10 @@ const Auth = () => {
       if (isResetMode) {
         const { error } = await supabase.auth.resetPasswordForEmail(email);
         if (error) throw error;
-        toast.success("Password reset instructions have been sent to your email");
+        toast({
+          title: "Success",
+          description: "Password reset instructions have been sent to your email",
+        });
         setIsResetMode(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -71,9 +83,17 @@ const Auth = () => {
         
         if (error instanceof AuthApiError) {
           if (error.message.includes("Invalid login credentials")) {
-            toast.error("Either username or password is incorrect. Please try again.");
+            toast({
+              title: "Error",
+              description: "Either username or password is incorrect. Please try again.",
+              variant: "destructive",
+            });
           } else {
-            toast.error(getErrorMessage(error));
+            toast({
+              title: "Error",
+              description: getErrorMessage(error),
+              variant: "destructive",
+            });
           }
           return;
         }
@@ -83,9 +103,17 @@ const Auth = () => {
     } catch (error) {
       console.error("Auth error:", error);
       if (error instanceof AuthApiError) {
-        toast.error(getErrorMessage(error));
+        toast({
+          title: "Error",
+          description: getErrorMessage(error),
+          variant: "destructive",
+        });
       } else {
-        toast.error("An unexpected error occurred. Please try again.");
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsSubmitting(false);
