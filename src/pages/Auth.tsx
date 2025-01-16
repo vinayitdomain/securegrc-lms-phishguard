@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { toast } from "sonner";
+import { AuthError, AuthApiError } from "@supabase/supabase-js";
+import { getErrorMessage } from "@/utils/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -44,9 +46,18 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // First sign out to clear any existing session
+      await supabase.auth.signOut();
+      
       if (isResetMode) {
         const { error } = await supabase.auth.resetPasswordForEmail(email);
         if (error) throw error;
@@ -54,14 +65,18 @@ const Auth = () => {
         setIsResetMode(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: email.trim(),
+          password: password.trim(),
         });
         if (error) throw error;
       }
     } catch (error) {
       console.error("Auth error:", error);
-      toast.error("Invalid email or password");
+      if (error instanceof AuthApiError) {
+        toast.error(getErrorMessage(error));
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
