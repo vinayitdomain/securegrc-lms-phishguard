@@ -5,7 +5,7 @@ export const getErrorMessage = (error: AuthError | Error) => {
   
   if (error instanceof AuthApiError) {
     if (error.message.includes("Invalid login credentials")) {
-      return "Invalid email or password. Please check your credentials and try again.";
+      return "Either username or password is incorrect. Please try again.";
     }
     
     if (error.message.includes("refresh_token_not_found")) {
@@ -17,7 +17,7 @@ export const getErrorMessage = (error: AuthError | Error) => {
         if (error.message.includes("refresh_token")) {
           return "Your session has expired. Please sign in again.";
         }
-        return "Invalid email or password. Please check your credentials and try again.";
+        return "Either username or password is incorrect. Please try again.";
       case 422:
         return "Invalid email format. Please enter a valid email address.";
       case 429:
