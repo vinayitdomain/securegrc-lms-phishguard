@@ -5,7 +5,7 @@ export const getErrorMessage = (error: AuthError | Error) => {
   
   if (error instanceof AuthApiError) {
     if (error.message.includes("Invalid login credentials")) {
-      return "Invalid email or password. Please check your credentials and try again.\n\nTest accounts:\nsuper.admin@example.com\norg1.admin@example.com\norg1.user@example.com\nPassword: Password123!";
+      return "Invalid email or password. Please check your credentials and try again.";
     }
     
     if (error.message.includes("refresh_token_not_found")) {
