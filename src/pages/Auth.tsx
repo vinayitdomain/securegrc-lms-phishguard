@@ -68,7 +68,13 @@ const Auth = () => {
           email: email.trim(),
           password: password.trim(),
         });
-        if (error) throw error;
+        if (error) {
+          if (error instanceof AuthApiError && error.message.includes("Invalid login credentials")) {
+            toast.error("Either username or password is incorrect. Please try again.");
+          } else {
+            throw error;
+          }
+        }
       }
     } catch (error) {
       console.error("Auth error:", error);
