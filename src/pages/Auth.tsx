@@ -23,14 +23,19 @@ export default function AuthPage() {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Session check error:", error);
-          // Clear any invalid session data
-          await supabase.auth.signOut();
-          setErrorMessage(getErrorMessage(error));
+          // Handle refresh token errors by signing out
+          if (error.message.includes('refresh_token_not_found')) {
+            await supabase.auth.signOut();
+            setErrorMessage("Your session has expired. Please sign in again.");
+          } else {
+            setErrorMessage(getErrorMessage(error));
+          }
         } else if (session) {
           navigate("/dashboard");
         }
       } catch (error) {
         console.error("Session check failed:", error);
+        setErrorMessage("An unexpected error occurred. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +57,9 @@ export default function AuthPage() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -94,7 +101,8 @@ export default function AuthPage() {
     }
 
     try {
-      console.log("Attempting login with:", { email: trimmedEmail });
+      // First, ensure we're signed out to clear any stale session data
+      await supabase.auth.signOut();
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
@@ -103,13 +111,7 @@ export default function AuthPage() {
 
       if (error) {
         console.error("Authentication error:", error);
-        if (error.message.includes('refresh_token_not_found')) {
-          // Handle refresh token errors specifically
-          await supabase.auth.signOut();
-          setErrorMessage("Your session has expired. Please sign in again.");
-        } else {
-          setErrorMessage(getErrorMessage(error));
-        }
+        setErrorMessage(getErrorMessage(error));
       } else if (data?.user) {
         console.log("Login successful:", data.user);
         toast.success("Login successful!");
