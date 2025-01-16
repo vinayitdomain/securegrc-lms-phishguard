@@ -41,8 +41,6 @@ export default function AuthPage() {
       }
     };
 
-    checkSession();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change:", event);
       
