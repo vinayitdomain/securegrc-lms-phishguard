@@ -6,6 +6,7 @@ import { AuthHeader } from "@/components/auth/AuthHeader";
 import { useToast } from "@/hooks/use-toast";
 import { AuthError, AuthApiError } from "@supabase/supabase-js";
 import { getErrorMessage } from "@/utils/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -141,6 +142,7 @@ const Auth = () => {
         handleSubmit={handleSubmit}
         setIsResetMode={setIsResetMode}
       />
+      <Toaster />
     </div>
   );
 };
