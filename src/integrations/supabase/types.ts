@@ -1087,6 +1087,58 @@ export type Database = {
           },
         ]
       }
+      module_configurations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          module: Database["public"]["Enums"]["module_type"]
+          organization_id: string | null
+          restricted_to_roles: Database["public"]["Enums"]["user_role"][] | null
+          settings: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          module: Database["public"]["Enums"]["module_type"]
+          organization_id?: string | null
+          restricted_to_roles?:
+            | Database["public"]["Enums"]["user_role"][]
+            | null
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          module?: Database["public"]["Enums"]["module_type"]
+          organization_id?: string | null
+          restricted_to_roles?:
+            | Database["public"]["Enums"]["user_role"][]
+            | null
+          settings?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_configurations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "module_configurations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -1696,6 +1748,51 @@ export type Database = {
           },
           {
             foreignKeyName: "risk_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_default_permissions: {
+        Row: {
+          can_override_deadlines: boolean | null
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          permissions: Database["public"]["Enums"]["permission_type"][] | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          can_override_deadlines?: boolean | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          permissions?: Database["public"]["Enums"]["permission_type"][] | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          can_override_deadlines?: boolean | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          permissions?: Database["public"]["Enums"]["permission_type"][] | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_default_permissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_compliance_overview"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "role_default_permissions_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -2887,6 +2984,13 @@ export type Database = {
       compliance_document_status: "draft" | "published" | "archived"
       incident_priority: "low" | "medium" | "high" | "critical"
       incident_status: "open" | "investigating" | "resolved" | "closed"
+      module_type:
+        | "analytics"
+        | "phishing"
+        | "compliance"
+        | "training"
+        | "governance"
+        | "risk"
       notification_type:
         | "info"
         | "warning"

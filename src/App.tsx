@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import { ComplianceRoutes } from "./routes/ComplianceRoutes";
 import { TrainingRoutes } from "./routes/TrainingRoutes";
 import { GovernanceRoutes } from "./routes/GovernanceRoutes";
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         
         {/* Compliance Management Routes */}
         <Route path="/compliance/*" element={<ComplianceRoutes />} />
