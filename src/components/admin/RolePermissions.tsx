@@ -4,6 +4,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
+type PermissionType = 
+  | "policy_view" | "policy_create" | "policy_edit" | "policy_delete" | "policy_approve"
+  | "document_view" | "document_create" | "document_edit" | "document_delete" | "document_approve"
+  | "audit_view" | "audit_create" | "audit_manage";
+
 interface RolePermissionsProps {
   organizationId: string;
 }
@@ -22,13 +27,17 @@ export function RolePermissions({ organizationId }: RolePermissionsProps) {
     },
   });
 
-  const handlePermissionToggle = async (roleId: string, permission: string, enabled: boolean) => {
+  const handlePermissionToggle = async (roleId: string, permission: PermissionType, enabled: boolean) => {
+    const currentRole = rolePermissions?.find(r => r.id === roleId);
+    if (!currentRole) return;
+
+    const updatedPermissions = enabled
+      ? [...(currentRole.permissions as PermissionType[]), permission]
+      : (currentRole.permissions as PermissionType[]).filter(p => p !== permission);
+
     const { error } = await supabase
       .from('role_default_permissions')
-      .update({
-        permissions: enabled ? [...(rolePermissions?.find(r => r.id === roleId)?.permissions || []), permission]
-          : rolePermissions?.find(r => r.id === roleId)?.permissions.filter(p => p !== permission)
-      })
+      .update({ permissions: updatedPermissions })
       .eq('id', roleId);
 
     if (error) {
@@ -40,6 +49,12 @@ export function RolePermissions({ organizationId }: RolePermissionsProps) {
     return <div>Loading role permissions...</div>;
   }
 
+  const availablePermissions: PermissionType[] = [
+    'policy_view', 'policy_create', 'policy_edit', 'policy_delete', 'policy_approve',
+    'document_view', 'document_create', 'document_edit', 'document_delete', 'document_approve',
+    'audit_view', 'audit_create', 'audit_manage'
+  ];
+
   return (
     <div className="space-y-4">
       {rolePermissions?.map((rolePermission) => (
@@ -47,17 +62,17 @@ export function RolePermissions({ organizationId }: RolePermissionsProps) {
           <CardContent className="pt-6">
             <h3 className="text-lg font-medium mb-4">{rolePermission.role}</h3>
             <div className="grid grid-cols-3 gap-4">
-              {['view', 'create', 'edit', 'delete', 'approve'].map((permission) => (
+              {availablePermissions.map((permission) => (
                 <div key={permission} className="flex items-center space-x-2">
                   <Checkbox
                     id={`${rolePermission.id}-${permission}`}
-                    checked={rolePermission.permissions.includes(permission)}
+                    checked={(rolePermission.permissions as PermissionType[]).includes(permission)}
                     onCheckedChange={(checked) => 
                       handlePermissionToggle(rolePermission.id, permission, checked as boolean)
                     }
                   />
                   <Label htmlFor={`${rolePermission.id}-${permission}`}>
-                    {permission.charAt(0).toUpperCase() + permission.slice(1)}
+                    {permission.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                   </Label>
                 </div>
               ))}

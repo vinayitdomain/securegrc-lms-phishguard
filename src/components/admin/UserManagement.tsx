@@ -10,23 +10,41 @@ interface UserManagementProps {
   organizationId: string;
 }
 
+type UserRole = "super_admin" | "org_admin" | "user";
+
+interface Profile {
+  id: string;
+  user_id: string;
+  organization_id: string;
+  full_name: string;
+  role: UserRole;
+  email: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export function UserManagement({ organizationId }: UserManagementProps) {
-  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, UserRole>>({});
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['org-users', organizationId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profiles, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          *,
+          users:user_id (
+            email
+          )
+        `)
         .eq('organization_id', organizationId);
 
       if (error) throw error;
-      return data;
+      return profiles as Profile[];
     },
   });
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
     const { error } = await supabase
       .from('profiles')
       .update({ role: newRole })
@@ -76,12 +94,12 @@ export function UserManagement({ organizationId }: UserManagementProps) {
           {users?.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.full_name}</TableCell>
-              <TableCell>{user.email}</TableCell>
+              <TableCell>{(user as any).users?.email}</TableCell>
               <TableCell>
                 <select
                   className="border rounded p-1"
                   value={user.role}
-                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                  onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
                 >
                   <option value="user">User</option>
                   <option value="org_admin">Admin</option>

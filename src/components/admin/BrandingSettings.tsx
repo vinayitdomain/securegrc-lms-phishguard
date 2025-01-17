@@ -24,14 +24,17 @@ export function BrandingSettings({ organizationId }: BrandingSettingsProps) {
     },
   });
 
-  const handleBrandingUpdate = async (formData: FormData) => {
+  const handleBrandingUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
     const { error } = await supabase
       .from('organizations')
       .update({
-        brand_primary_color: formData.get('primaryColor'),
-        brand_secondary_color: formData.get('secondaryColor'),
-        brand_accent_color: formData.get('accentColor'),
-        brand_font_family: formData.get('fontFamily')
+        brand_primary_color: String(formData.get('primaryColor')),
+        brand_secondary_color: String(formData.get('secondaryColor')),
+        brand_accent_color: String(formData.get('accentColor')),
+        brand_font_family: String(formData.get('fontFamily'))
       })
       .eq('id', organizationId);
 
@@ -45,7 +48,7 @@ export function BrandingSettings({ organizationId }: BrandingSettingsProps) {
   }
 
   return (
-    <form action={handleBrandingUpdate}>
+    <form onSubmit={handleBrandingUpdate}>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
