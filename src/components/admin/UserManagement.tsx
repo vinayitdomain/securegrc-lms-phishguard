@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus, Trash2, Save } from "lucide-react";
+import { UserPlus, Trash2 } from "lucide-react";
 
 interface UserManagementProps {
   organizationId: string;
@@ -18,9 +18,11 @@ interface Profile {
   organization_id: string;
   full_name: string;
   role: UserRole;
-  email: string;
   created_at: string;
   updated_at: string;
+  users: {
+    email: string;
+  } | null;
 }
 
 export function UserManagement({ organizationId }: UserManagementProps) {
@@ -94,7 +96,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
           {users?.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.full_name}</TableCell>
-              <TableCell>{(user as any).users?.email}</TableCell>
+              <TableCell>{user.users?.email}</TableCell>
               <TableCell>
                 <select
                   className="border rounded p-1"
