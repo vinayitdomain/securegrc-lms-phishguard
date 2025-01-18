@@ -41,7 +41,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
           role,
           created_at,
           updated_at,
-          users:auth.users!profiles_user_id_fkey (
+          users:user_id (
             email
           )
         `)
