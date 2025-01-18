@@ -45,7 +45,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
       if (!profiles) return [] as Profile[];
 
       // Then get emails for these profiles from auth.users
-      const { data: authUsers, error: authError } = await supabase.auth.admin
+      const { data: { users: authUsers }, error: authError } = await supabase.auth.admin
         .listUsers();
 
       if (authError) throw authError;
@@ -53,7 +53,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
       // Combine the data
       const usersWithEmail = profiles.map(profile => ({
         ...profile,
-        email: authUsers.users.find(user => user.id === profile.user_id)?.email || ''
+        email: authUsers?.find(user => user.id === profile.user_id)?.email || ''
       }));
 
       return usersWithEmail as Profile[];
