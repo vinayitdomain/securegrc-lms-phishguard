@@ -20,9 +20,7 @@ interface Profile {
   role: UserRole;
   created_at: string;
   updated_at: string;
-  users: {
-    email: string;
-  } | null;
+  email?: string; // Make email optional since we'll get it from a separate query
 }
 
 export function UserManagement({ organizationId }: UserManagementProps) {
@@ -31,24 +29,27 @@ export function UserManagement({ organizationId }: UserManagementProps) {
   const { data: users, isLoading } = useQuery({
     queryKey: ['org-users', organizationId],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      // First get profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          user_id,
-          organization_id,
-          full_name,
-          role,
-          created_at,
-          updated_at,
-          users:user_id (
-            email
-          )
-        `)
+        .select('*')
         .eq('organization_id', organizationId);
 
-      if (error) throw error;
-      return profiles as Profile[];
+      if (profilesError) throw profilesError;
+
+      // Then get emails for these profiles from auth.users
+      const { data: authUsers, error: authError } = await supabase.auth.admin
+        .listUsers();
+
+      if (authError) throw authError;
+
+      // Combine the data
+      const usersWithEmail = profiles.map(profile => ({
+        ...profile,
+        email: authUsers.users.find(user => user.id === profile.user_id)?.email || ''
+      }));
+
+      return usersWithEmail as Profile[];
     },
   });
 
@@ -102,7 +103,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
           {users?.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.full_name}</TableCell>
-              <TableCell>{user.users?.email}</TableCell>
+              <TableCell>{user.email}</TableCell>
               <TableCell>
                 <select
                   className="border rounded p-1"
