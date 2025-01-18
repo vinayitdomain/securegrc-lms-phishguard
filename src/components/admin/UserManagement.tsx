@@ -35,7 +35,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
         .from('profiles')
         .select(`
           *,
-          users:user_id(
+          users:auth.users(
             email
           )
         `)
