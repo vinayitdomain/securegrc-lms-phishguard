@@ -20,7 +20,7 @@ interface Profile {
   role: UserRole;
   created_at: string;
   updated_at: string;
-  email?: string; // Make email optional since we'll get it from a separate query
+  email?: string;
 }
 
 interface AuthUser {
@@ -46,7 +46,7 @@ export function UserManagement({ organizationId }: UserManagementProps) {
 
       // Then get emails for these profiles from auth.users
       const { data: { users: authUsers }, error: authError } = await supabase.auth.admin
-        .listUsers();
+        .listUsers() as { data: { users: AuthUser[] }, error: null };
 
       if (authError) throw authError;
 
