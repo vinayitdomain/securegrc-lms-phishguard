@@ -23,6 +23,11 @@ interface Profile {
   email?: string; // Make email optional since we'll get it from a separate query
 }
 
+interface AuthUser {
+  id: string;
+  email?: string;
+}
+
 export function UserManagement({ organizationId }: UserManagementProps) {
   const [selectedRoles, setSelectedRoles] = useState<Record<string, UserRole>>({});
 
@@ -36,6 +41,8 @@ export function UserManagement({ organizationId }: UserManagementProps) {
         .eq('organization_id', organizationId);
 
       if (profilesError) throw profilesError;
+
+      if (!profiles) return [] as Profile[];
 
       // Then get emails for these profiles from auth.users
       const { data: authUsers, error: authError } = await supabase.auth.admin
