@@ -52,6 +52,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        brand: {
+          orange: "#ff6b00",
+          blue: "#1a365d",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
