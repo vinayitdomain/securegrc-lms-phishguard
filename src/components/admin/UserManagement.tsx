@@ -34,8 +34,14 @@ export function UserManagement({ organizationId }: UserManagementProps) {
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select(`
-          *,
-          users:auth.users(
+          id,
+          user_id,
+          organization_id,
+          full_name,
+          role,
+          created_at,
+          updated_at,
+          users:auth.users (
             email
           )
         `)
