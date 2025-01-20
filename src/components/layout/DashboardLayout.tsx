@@ -4,12 +4,47 @@ import { AppSidebar } from "./Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+  const navigate = useNavigate();
+
+  // First check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (!session) {
+          navigate("/");
+          return;
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+        toast.error("Authentication error. Please sign in again.");
+        navigate("/");
+      }
+    };
+
+    checkAuth();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate("/");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
   const { data: profile } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
@@ -55,14 +90,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       root.style.setProperty('--text', organization.brand_text_color);
       root.style.setProperty('--background', organization.brand_background_color);
       
-      // Apply dark mode if enabled
       if (organization.dark_mode_enabled) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
 
-      // Apply custom font if specified
       if (organization.brand_font_family && organization.brand_font_family !== 'Inter') {
         const link = document.createElement('link');
         link.href = `https://fonts.googleapis.com/css2?family=${organization.brand_font_family.replace(' ', '+')}&display=swap`;
@@ -72,7 +105,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         root.style.setProperty('--font-family', organization.brand_font_family);
       }
 
-      // Apply logo if specified
       const favicon = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
       if (favicon && organization.brand_logo_url) {
         favicon.href = organization.brand_logo_url;
