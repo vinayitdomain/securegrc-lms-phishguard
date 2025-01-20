@@ -81,83 +81,79 @@ export function UserDashboardV2() {
   // Calculate total learning hours (assuming 1 hour per content)
   const learningHours = courseProgress?.length || 0;
 
-  // Group courses by type for the pie chart
-  const courseTypes = courseProgress?.reduce((acc: Record<string, number>, curr) => {
-    const type = curr.training_content.content_type;
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {}) || {};
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Learning Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-gradient-to-br from-[#E5DEFF] to-[#D6BCFA]">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Enrolled Courses</p>
-                <h3 className="text-2xl font-bold">{courseProgress?.length || 0}</h3>
+                <p className="text-sm font-medium text-[#1A1F2C]">Enrolled Courses</p>
+                <h3 className="text-2xl font-bold text-[#7E69AB]">{courseProgress?.length || 0}</h3>
               </div>
-              <BookOpen className="h-8 w-8 text-primary opacity-75" />
+              <BookOpen className="h-8 w-8 text-[#6E59A5] opacity-75" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-[#F2FCE2] to-[#FEF7CD]">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Learning Hours</p>
-                <h3 className="text-2xl font-bold">{learningHours}</h3>
+                <p className="text-sm font-medium text-[#1A1F2C]">Learning Hours</p>
+                <h3 className="text-2xl font-bold text-[#7E69AB]">{learningHours}</h3>
               </div>
-              <Clock className="h-8 w-8 text-primary opacity-75" />
+              <Clock className="h-8 w-8 text-[#6E59A5] opacity-75" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-[#D3E4FD] to-[#FFDEE2]">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Certificates</p>
-                <h3 className="text-2xl font-bold">{certificates?.length || 0}</h3>
+                <p className="text-sm font-medium text-[#1A1F2C]">Certificates</p>
+                <h3 className="text-2xl font-bold text-[#7E69AB]">{certificates?.length || 0}</h3>
               </div>
-              <Award className="h-8 w-8 text-primary opacity-75" />
+              <Award className="h-8 w-8 text-[#6E59A5] opacity-75" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-[#FDE1D3] to-[#FEC6A1]">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Achievements</p>
-                <h3 className="text-2xl font-bold">{achievements?.length || 0}</h3>
+                <p className="text-sm font-medium text-[#1A1F2C]">Achievements</p>
+                <h3 className="text-2xl font-bold text-[#7E69AB]">{achievements?.length || 0}</h3>
               </div>
-              <Trophy className="h-8 w-8 text-primary opacity-75" />
+              <Trophy className="h-8 w-8 text-[#6E59A5] opacity-75" />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Course Progress */}
-      <Card>
+      <Card className="bg-white">
         <CardHeader>
-          <CardTitle>My Courses</CardTitle>
+          <CardTitle className="text-[#1A1F2C]">My Courses</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {courseProgress?.map((course) => (
             <div key={course.id} className="space-y-2">
               <div className="flex justify-between items-center">
                 <div>
-                  <h4 className="font-medium">{course.training_content.title}</h4>
-                  <p className="text-sm text-muted-foreground">{course.training_content.description}</p>
+                  <h4 className="font-medium text-[#1A1F2C]">{course.training_content.title}</h4>
+                  <p className="text-sm text-[#8E9196]">{course.training_content.description}</p>
                 </div>
-                <span className="text-sm font-medium">{course.progress_percentage}%</span>
+                <span className="text-sm font-medium text-[#7E69AB]">{course.progress_percentage}%</span>
               </div>
-              <Progress value={course.progress_percentage} className="h-2" />
-              <Button variant="outline" className="w-full">
+              <Progress value={course.progress_percentage} className="h-2 bg-[#F1F0FB]" />
+              <Button 
+                variant="outline" 
+                className="w-full border-[#9b87f5] text-[#7E69AB] hover:bg-[#E5DEFF] hover:text-[#6E59A5]"
+              >
                 Continue Learning
               </Button>
             </div>
@@ -166,19 +162,23 @@ export function UserDashboardV2() {
       </Card>
 
       {/* Upcoming Deadlines */}
-      <Card>
+      <Card className="bg-white">
         <CardHeader>
-          <CardTitle>Upcoming Deadlines</CardTitle>
+          <CardTitle className="text-[#1A1F2C]">Upcoming Deadlines</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {courseProgress?.map((course) => (
               <div key={course.id} className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">{course.training_content.title}</h4>
-                  <p className="text-sm text-muted-foreground">Due in {Math.floor(Math.random() * 7) + 1} days</p>
+                  <h4 className="font-medium text-[#1A1F2C]">{course.training_content.title}</h4>
+                  <p className="text-sm text-[#8E9196]">Due in {Math.floor(Math.random() * 7) + 1} days</p>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-[#9b87f5] text-[#7E69AB] hover:bg-[#E5DEFF] hover:text-[#6E59A5]"
+                >
                   View Details
                 </Button>
               </div>

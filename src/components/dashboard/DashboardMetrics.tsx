@@ -19,28 +19,28 @@ export function DashboardMetrics({
   isLoadingCompliance,
 }: DashboardMetricsProps) {
   return (
-    <Card className="p-6 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/50">
+    <Card className="p-6 bg-[#F1F0FB]/50 backdrop-blur supports-[backdrop-filter]:bg-[#F1F0FB]/50">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Active Campaigns"
           value={activeCampaigns}
           description="Current phishing campaigns"
           isLoading={isLoadingCampaigns}
-          className="bg-gradient-to-br from-blue-50 to-blue-100"
+          className="bg-gradient-to-br from-[#E5DEFF] to-[#D6BCFA]"
         />
         <StatCard
           title="Course Completion"
           value={`${courseCompletion}%`}
           description="Average completion rate"
           isLoading={isLoadingCourses}
-          className="bg-gradient-to-br from-green-50 to-green-100"
+          className="bg-gradient-to-br from-[#F2FCE2] to-[#FEF7CD]"
         />
         <StatCard
           title="Compliance Status"
           value={`${complianceStatus}%`}
           description="Overall compliance score"
           isLoading={isLoadingCompliance}
-          className="bg-gradient-to-br from-purple-50 to-purple-100"
+          className="bg-gradient-to-br from-[#D3E4FD] to-[#FFDEE2]"
         />
       </div>
     </Card>

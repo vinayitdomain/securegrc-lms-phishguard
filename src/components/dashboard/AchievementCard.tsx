@@ -30,22 +30,22 @@ export function AchievementCard({ achievement, earned = false }: AchievementCard
   return (
     <Card className={`transition-all duration-200 ${
       earned 
-        ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-lg' 
-        : 'bg-accent/10 hover:bg-accent/20'
+        ? 'bg-gradient-to-br from-[#E5DEFF] to-[#D6BCFA] border-[#9b87f5] hover:shadow-lg' 
+        : 'bg-[#F1F0FB]/50 hover:bg-[#F1F0FB]'
     }`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-foreground">
+        <CardTitle className="text-sm font-medium text-[#1A1F2C]">
           {achievement.name}
         </CardTitle>
         {Icon && (
           <Icon className={`h-5 w-5 ${
-            earned ? 'text-yellow-600' : 'text-muted-foreground'
+            earned ? 'text-[#6E59A5]' : 'text-[#8E9196]'
           }`} />
         )}
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-foreground/80">{achievement.description}</p>
-        <div className="mt-2 text-sm font-semibold text-primary dark:text-white">
+        <p className="text-sm text-[#1A1F2C]/80">{achievement.description}</p>
+        <div className="mt-2 text-sm font-semibold text-[#7E69AB]">
           {achievement.points} points
         </div>
       </CardContent>
