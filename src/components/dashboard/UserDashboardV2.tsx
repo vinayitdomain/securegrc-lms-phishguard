@@ -6,8 +6,11 @@ import { Award, BookOpen, Clock, Trophy, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MetricsChart } from "./MetricsChart";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { useNavigate } from "react-router-dom";
 
 export function UserDashboardV2() {
+  const navigate = useNavigate();
+  
   const { data: profile } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
@@ -106,7 +109,10 @@ export function UserDashboardV2() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Learning Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-[#E5DEFF] to-[#D6BCFA]">
+        <Card 
+          className="bg-gradient-to-br from-[#E5DEFF] to-[#D6BCFA] cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training')}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -118,7 +124,10 @@ export function UserDashboardV2() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#F2FCE2] to-[#FEF7CD]">
+        <Card 
+          className="bg-gradient-to-br from-[#F2FCE2] to-[#FEF7CD] cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training')}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -130,7 +139,10 @@ export function UserDashboardV2() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#D3E4FD] to-[#FFDEE2]">
+        <Card 
+          className="bg-gradient-to-br from-[#D3E4FD] to-[#FFDEE2] cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training/certificates')}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -142,7 +154,10 @@ export function UserDashboardV2() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#FDE1D3] to-[#FEC6A1]">
+        <Card 
+          className="bg-gradient-to-br from-[#FDE1D3] to-[#FEC6A1] cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training/achievements')}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -157,7 +172,10 @@ export function UserDashboardV2() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Course Distribution Donut Chart */}
-        <Card className="bg-white">
+        <Card 
+          className="bg-white cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training')}
+        >
           <CardHeader>
             <CardTitle className="text-[#1A1F2C]">Course Distribution</CardTitle>
           </CardHeader>
@@ -184,7 +202,10 @@ export function UserDashboardV2() {
         </Card>
 
         {/* Video Content */}
-        <Card className="bg-white">
+        <Card 
+          className="bg-white cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => navigate('/training/videos')}
+        >
           <CardHeader>
             <CardTitle className="text-[#1A1F2C]">Training Videos</CardTitle>
           </CardHeader>
@@ -206,7 +227,10 @@ export function UserDashboardV2() {
       </div>
 
       {/* Course Progress */}
-      <Card className="bg-white">
+      <Card 
+        className="bg-white cursor-pointer hover:shadow-lg transition-all duration-200"
+        onClick={() => navigate('/training')}
+      >
         <CardHeader>
           <CardTitle className="text-[#1A1F2C]">My Courses</CardTitle>
         </CardHeader>
@@ -233,7 +257,10 @@ export function UserDashboardV2() {
       </Card>
 
       {/* Upcoming Deadlines */}
-      <Card className="bg-white">
+      <Card 
+        className="bg-white cursor-pointer hover:shadow-lg transition-all duration-200"
+        onClick={() => navigate('/calendar')}
+      >
         <CardHeader>
           <CardTitle className="text-[#1A1F2C]">Upcoming Deadlines</CardTitle>
         </CardHeader>
