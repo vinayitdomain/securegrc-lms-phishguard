@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { Navbar } from "./Navbar";
+import { AppSidebar } from "./Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -79,16 +81,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [organization]);
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        backgroundColor: organization?.brand_background_color || '#f3f4f6',
-        color: organization?.brand_text_color || '#000000',
-        fontFamily: organization?.brand_font_family || 'Inter, sans-serif'
-      }}
-    >
-      <Navbar organization={organization} />
-      <main className="container mx-auto py-6">{children}</main>
-    </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col">
+          <Navbar organization={organization} />
+          <main className="flex-1 bg-[#F8F9FB]">{children}</main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }
