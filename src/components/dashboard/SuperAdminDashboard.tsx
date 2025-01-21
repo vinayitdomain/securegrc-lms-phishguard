@@ -11,7 +11,12 @@ export function SuperAdminDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select('*')
+        .select(`
+          *,
+          profiles:profiles(count),
+          documents:compliance_documents(count),
+          incidents:incidents(count)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
