@@ -1,74 +1,58 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { LayoutDashboard, BookOpen, Video, Award, Calendar, ChartBar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { 
+  Home, 
+  Users, 
+  Settings, 
+  MessageSquare, 
+  BarChart2, 
+  Layout,
+  FileText,
+  Bell
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
-export function AppSidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
+const menuItems = [
+  { icon: Home, label: "Dashboard", href: "/dashboard" },
+  { icon: Users, label: "Customers", href: "/customers" },
+  { icon: Layout, label: "Projects", href: "/projects" },
+  { icon: MessageSquare, label: "Messages", href: "/messages" },
+  { icon: BarChart2, label: "Analytics", href: "/analytics" },
+  { icon: FileText, label: "Files", href: "/files" },
+  { icon: Bell, label: "Notifications", href: "/notifications" },
+  { icon: Settings, label: "Settings", href: "/settings" },
+];
 
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: LayoutDashboard,
-      path: "/dashboard",
-    },
-    {
-      title: "Training",
-      icon: BookOpen,
-      path: "/training",
-    },
-    {
-      title: "Videos",
-      icon: Video,
-      path: "/training/videos",
-    },
-    {
-      title: "Achievements",
-      icon: Award,
-      path: "/training/achievements",
-    },
-    {
-      title: "Calendar",
-      icon: Calendar,
-      path: "/calendar",
-    },
-    {
-      title: "Analytics",
-      icon: ChartBar,
-      path: "/analytics",
-    },
-  ];
-
+export function Sidebar() {
   return (
-    <Sidebar>
-      <SidebarHeader className="h-16 flex items-center px-6 border-b">
-        <span className="text-xl font-bold text-[#1A1F2C]">SecureGRC</span>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.path}>
-              <SidebarMenuButton
-                onClick={() => navigate(item.path)}
-                isActive={location.pathname === item.path}
-                className="w-full flex items-center gap-3 px-3 py-2 text-[#8E9196] hover:text-[#1A1F2C] hover:bg-[#F1F0FB] transition-colors"
-                tooltip={item.title}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-    </Sidebar>
+    <div className="fixed left-0 top-0 h-screen w-64 bg-[#6E59A5] text-white p-4">
+      <div className="flex items-center gap-2 mb-8 px-2">
+        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+          F
+        </div>
+        <span className="text-lg font-semibold">Fillow</span>
+      </div>
+      
+      <nav className="space-y-2">
+        {menuItems.map((item) => (
+          <Link 
+            key={item.href} 
+            to={item.href}
+            className="block"
+          >
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start text-white hover:text-white hover:bg-white/10",
+                "flex items-center gap-3 px-2 py-2 rounded-lg transition-colors"
+              )}
+            >
+              <item.icon className="h-5 w-5" />
+              {item.label}
+            </Button>
+          </Link>
+        ))}
+      </nav>
+    </div>
   );
 }

@@ -2,9 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { MoreVertical, TrendingUp, Users, FolderPlus } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { MoreVertical, TrendingUp, Users, Building2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+
+const monthlyData = [
+  { name: 'Jan', value: 65 },
+  { name: 'Feb', value: 59 },
+  { name: 'Mar', value: 80 },
+  { name: 'Apr', value: 81 },
+  { name: 'May', value: 56 },
+  { name: 'Jun', value: 70 },
+];
+
+const projectStats = [
+  { title: "Total Clients", value: "68", growth: "+4.5%", chart: monthlyData },
+  { title: "Total Projects", value: "562", subtitle: "This Month Stats", chart: monthlyData },
+  { title: "New Projects", value: "892", subtitle: "+8.5% Last month", chart: monthlyData },
+];
 
 export function SuperAdminDashboard() {
   const { data: organizations, isLoading } = useQuery({
@@ -12,12 +27,7 @@ export function SuperAdminDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('organizations')
-        .select(`
-          *,
-          profiles:profiles(count),
-          documents:compliance_documents(count),
-          incidents:incidents(count)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -25,27 +35,14 @@ export function SuperAdminDashboard() {
     },
   });
 
-  // Sample data for the charts
-  const monthlyData = [
-    { name: 'Jan', value: 65 },
-    { name: 'Feb', value: 59 },
-    { name: 'Mar', value: 80 },
-    { name: 'Apr', value: 81 },
-    { name: 'May', value: 56 },
-    { name: 'Jun', value: 68 },
-  ];
-
-  const projectStats = [
-    { title: "Total Clients", value: "68", growth: "+4.5%", chart: monthlyData },
-    { title: "Total Projects", value: "562", subtitle: "This Month Stats", chart: monthlyData },
-    { title: "New Projects", value: "892", subtitle: "+8.5% Last month", chart: monthlyData },
-  ];
-
   return (
     <div className="p-6 space-y-6 bg-[#F8F9FC] min-h-screen">
       {/* Header Section */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <Building2 className="h-8 w-8 text-purple-600" />
+          <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+        </div>
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm">
             Monthly
@@ -73,7 +70,7 @@ export function SuperAdminDashboard() {
           </div>
           <div className="hidden lg:block">
             <img 
-              src="/lovable-uploads/654cd379-1c62-45c2-a0bf-f78d36eb1206.png" 
+              src="/lovable-uploads/7150c82a-3141-47eb-a510-c610809e28d0.png" 
               alt="Dashboard illustration" 
               className="w-64 h-auto"
             />
@@ -118,7 +115,7 @@ export function SuperAdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Company Profile Website Project</CardTitle>
+            <CardTitle>Fillow Company Profile Website Project</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-500 mb-4">
