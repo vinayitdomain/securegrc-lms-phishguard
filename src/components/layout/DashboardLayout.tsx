@@ -33,10 +33,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       return data;
     },
     retry: false,
-    onError: (error) => {
-      console.error("Profile loading error:", error);
-      toast.error("Please sign in to access this page");
-      navigate("/");
+    meta: {
+      errorMessage: "Please sign in to access this page",
+      onError: () => {
+        navigate("/");
+      }
     }
   });
 
