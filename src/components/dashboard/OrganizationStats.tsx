@@ -1,34 +1,58 @@
-import { StatCard } from "./StatCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Brain, Shield, Target, BookOpen } from "lucide-react";
 
-interface OrganizationStatsProps {
-  organizations: any[];
-  isLoading: boolean;
-}
+const segmentIcons = {
+  lms: BookOpen,
+  compliance: Shield,
+  risk: Target,
+  governance: Brain,
+};
 
-export function OrganizationStats({ organizations, isLoading }: OrganizationStatsProps) {
-  if (isLoading) return null;
+const segmentTitles = {
+  lms: "Learning Progress",
+  compliance: "Compliance Status",
+  risk: "Risk Assessment",
+  governance: "Governance Score",
+};
 
-  const totalOrgs = organizations.length;
-  const totalLicenses = organizations.reduce((acc, org) => acc + (org.license_count || 0), 0);
-  const activeOrgs = organizations.filter(org => org.status === 'active').length;
+export function UserSegments() {
+  const { data: segments = [], isLoading } = useUserSegments();
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading segments...</CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <StatCard
-        title="Total Organizations"
-        value={totalOrgs}
-        className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:from-blue-100 hover:to-blue-200"
-      />
-      <StatCard
-        title="Active Licenses"
-        value={totalLicenses}
-        className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:from-purple-100 hover:to-purple-200"
-      />
-      <StatCard
-        title="Active Organizations"
-        value={activeOrgs}
-        className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:from-green-100 hover:to-green-200"
-      />
-    </div>
+    <Card className="border-t-4 border-t-purple-400">
+      <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100">
+        <CardTitle>Behavioral Segments</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4 pt-4">
+        {segments.map((segment) => {
+          const Icon = segmentIcons[segment.segment_type as keyof typeof segmentIcons];
+          const title = segmentTitles[segment.segment_type as keyof typeof segmentTitles];
+          
+          return (
+            <div key={segment.segment_type} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon className="h-5 w-5 text-purple-600" />
+                  <span className="font-medium">{title}</span>
+                </div>
+                <span className="text-sm font-bold">{segment.segment_score}%</span>
+              </div>
+              <Progress value={segment.segment_score} className="h-2" />
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }
