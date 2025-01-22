@@ -18,7 +18,7 @@ const colors = {
 
 export function SuperAdminDashboard() {
   return (
-    <div className="w-full bg-white rounded-lg shadow-lg min-h-[800px] flex"> 
+    <div className="flex w-full min-h-screen"> 
       {/* Sidebar */}
       <aside className="w-64 bg-[#6E59A5] text-white flex flex-col p-6">
         <h2 className="text-xl font-semibold mb-6">Navigation</h2>
