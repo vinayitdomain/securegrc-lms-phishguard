@@ -1,6 +1,9 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 // Define color constants
 const primary = {
@@ -14,6 +17,24 @@ const neutral = {
 };
 
 export function SuperAdminDashboard() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/");
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Failed to log out");
+    }
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <div id="webcrumbs"> 
       <div className="w-[1200px] bg-white rounded-lg shadow-lg min-h-[800px] flex">
@@ -21,10 +42,30 @@ export function SuperAdminDashboard() {
         <aside className="w-[250px] bg-[#7E69AB] text-white rounded-l-lg flex flex-col p-6">
           <h2 className="text-xl font-semibold mb-6">Navigation</h2>
           <nav className="flex flex-col gap-4">
-            <a href="#dashboard" className="text-white hover:text-neutral-300">Dashboard</a>
-            <a href="#users" className="text-white hover:text-neutral-300">User Management</a>
-            <a href="#reports" className="text-white hover:text-neutral-300">Reports</a>
-            <a href="#settings" className="text-white hover:text-neutral-300">Settings</a>
+            <button 
+              onClick={() => handleNavigation("/dashboard")} 
+              className="text-white hover:text-neutral-300 text-left"
+            >
+              Dashboard
+            </button>
+            <button 
+              onClick={() => handleNavigation("/users")} 
+              className="text-white hover:text-neutral-300 text-left"
+            >
+              User Management
+            </button>
+            <button 
+              onClick={() => handleNavigation("/reports")} 
+              className="text-white hover:text-neutral-300 text-left"
+            >
+              Reports
+            </button>
+            <button 
+              onClick={() => handleNavigation("/settings")} 
+              className="text-white hover:text-neutral-300 text-left"
+            >
+              Settings
+            </button>
           </nav>
         </aside>
         
@@ -32,7 +73,12 @@ export function SuperAdminDashboard() {
         <div className="flex-1">
           <header className="flex justify-between items-center p-6 border-b border-neutral-200">
             <h1 className="text-2xl font-semibold text-neutral-950">Admin Dashboard</h1>
-            <button className="px-4 py-2 bg-[#7E69AB] text-white rounded-md text-sm">Log Out</button>
+            <button 
+              onClick={handleLogout}
+              className="px-4 py-2 bg-[#7E69AB] text-white rounded-md text-sm hover:bg-[#6a5991] transition-colors"
+            >
+              Log Out
+            </button>
           </header>
       
           <div className="grid grid-cols-3 gap-6 p-6">
