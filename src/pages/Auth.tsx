@@ -129,7 +129,7 @@ const Auth = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 bg-gray-50"
+                  className="pl-10 bg-gray-50 text-gray-900"
                   placeholder="Enter your email"
                   disabled={isSubmitting}
                 />
@@ -148,7 +148,7 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 bg-gray-50"
+                  className="pl-10 bg-gray-50 text-gray-900"
                   placeholder="Enter your password"
                   disabled={isSubmitting}
                 />
@@ -161,7 +161,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="link"
-                  className="text-sm text-[#ff6b00]"
+                  className="text-sm text-[#ff6b00] hover:text-[#ff6b00]/90"
                   onClick={() => setIsSignUp(true)}
                 >
                   Forgot password?
