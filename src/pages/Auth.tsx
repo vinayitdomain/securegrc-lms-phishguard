@@ -21,17 +21,19 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          // Don't show error toast for initial session check
+          return;
+        }
+
         if (session) {
           navigate("/dashboard");
         }
       } catch (error) {
         console.error("Session check error:", error);
-        toast({
-          title: "Error",
-          description: "An error occurred while checking your session",
-          variant: "destructive",
-        });
       } finally {
         setIsLoading(false);
       }
@@ -42,25 +44,28 @@ const Auth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session) {
         navigate("/dashboard");
+      } else if (event === "SIGNED_OUT") {
+        navigate("/");
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      await supabase.auth.signOut();
-      
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
           password: password.trim(),
+          options: {
+            emailRedirectTo: window.location.origin
+          }
         });
         if (error) throw error;
         toast({
@@ -156,19 +161,6 @@ const Auth = () => {
               </div>
             </div>
 
-            {!isSignUp && (
-              <div className="text-right">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="text-sm text-[#ff6b00] hover:text-[#ff6b00]/90"
-                  onClick={() => setIsSignUp(true)}
-                >
-                  Forgot password?
-                </Button>
-              </div>
-            )}
-
             <Button
               type="submit"
               className="w-full bg-[#ff6b00] hover:bg-[#ff6b00]/90 text-white"
@@ -179,7 +171,7 @@ const Auth = () => {
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 </div>
               ) : (
-                isSignUp ? "Sign up now" : "Login now"
+                isSignUp ? "Sign up" : "Login"
               )}
             </Button>
 
@@ -198,7 +190,7 @@ const Auth = () => {
               className="w-full border-[#ff6b00] text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white"
               onClick={() => setIsSignUp(!isSignUp)}
             >
-              {isSignUp ? "Login now" : "Sign up now"}
+              {isSignUp ? "Login instead" : "Sign up instead"}
             </Button>
           </form>
         </div>
