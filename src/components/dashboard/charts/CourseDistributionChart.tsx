@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { useNavigate } from "react-router-dom";
 
 const DONUT_COLORS = ['#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA'];
 
@@ -12,13 +11,8 @@ interface CourseDistributionChartProps {
 }
 
 export function CourseDistributionChart({ data }: CourseDistributionChartProps) {
-  const navigate = useNavigate();
-
   return (
-    <Card 
-      className="bg-white cursor-pointer hover:shadow-lg transition-all duration-200"
-      onClick={() => navigate('/training')}
-    >
+    <Card className="bg-white">
       <CardHeader>
         <CardTitle className="text-[#1A1F2C]">Course Distribution</CardTitle>
       </CardHeader>
@@ -34,7 +28,10 @@ export function CourseDistributionChart({ data }: CourseDistributionChartProps) 
                 dataKey="value"
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={DONUT_COLORS[index % DONUT_COLORS.length]} 
+                  />
                 ))}
               </Pie>
               <Legend />

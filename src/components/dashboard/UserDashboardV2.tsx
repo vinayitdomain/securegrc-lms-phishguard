@@ -5,6 +5,7 @@ import { CourseDistributionChart } from "./charts/CourseDistributionChart";
 import { VideoContentList } from "./training/VideoContentList";
 import { CourseProgressList } from "./courses/CourseProgressList";
 import { DeadlinesList } from "./deadlines/DeadlinesList";
+import { toast } from "sonner";
 
 export function UserDashboardV2() {
   const { data: profile } = useQuery({
@@ -17,9 +18,12 @@ export function UserDashboardV2() {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Error fetching profile');
+        throw error;
+      }
       return data;
     },
   });
@@ -42,7 +46,10 @@ export function UserDashboardV2() {
         `)
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Error fetching course progress');
+        throw error;
+      }
       return data;
     },
   });
@@ -58,7 +65,10 @@ export function UserDashboardV2() {
         .select('*')
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Error fetching certificates');
+        throw error;
+      }
       return data;
     },
   });
@@ -74,7 +84,10 @@ export function UserDashboardV2() {
         .select('*')
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        toast.error('Error fetching achievements');
+        throw error;
+      }
       return data;
     },
   });
