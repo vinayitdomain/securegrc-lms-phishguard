@@ -8,6 +8,7 @@ import { GovernanceRoutes } from "./routes/GovernanceRoutes";
 import { RiskRoutes } from "./routes/RiskRoutes";
 import { ReportingRoutes } from "./routes/ReportingRoutes";
 import Calendar from "./pages/Calendar";
+import AuditManagement from "./pages/AuditManagement";
 
 function App() {
   return (
@@ -32,8 +33,12 @@ function App() {
         {/* Reporting & Analytics Routes */}
         <Route path="/reporting/*" element={<ReportingRoutes />} />
         
-        {/* Calendar remains a standalone route */}
+        {/* Calendar Route */}
         <Route path="/calendar" element={<Calendar />} />
+
+        {/* Audit Management Routes */}
+        <Route path="/audits/*" element={<AuditManagement />} />
+        <Route path="/course-progress" element={<Dashboard />} />
       </Routes>
     </Router>
   );
