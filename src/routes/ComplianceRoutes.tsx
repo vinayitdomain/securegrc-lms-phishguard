@@ -7,12 +7,12 @@ import ComplianceManagement from "@/pages/ComplianceManagement";
 export function ComplianceRoutes() {
   return (
     <Routes>
-      <Route index element={<ComplianceManagement />} />
-      <Route path="documents" element={<ComplianceDocumentList />} />
-      <Route path="documents/review" element={<ComplianceDocumentList />} />
-      <Route path="policies" element={<PolicyList />} />
-      <Route path="policies/approval" element={<PolicyList />} />
-      <Route path="frameworks" element={<ComplianceFrameworks />} />
+      <Route path="/" element={<ComplianceManagement />} />
+      <Route path="/documents" element={<ComplianceDocumentList />} />
+      <Route path="/documents/review" element={<ComplianceDocumentList />} />
+      <Route path="/policies" element={<PolicyList />} />
+      <Route path="/policies/approval" element={<PolicyList />} />
+      <Route path="/frameworks" element={<ComplianceFrameworks />} />
     </Routes>
   );
 }

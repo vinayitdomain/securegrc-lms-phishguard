@@ -8,11 +8,11 @@ import VendorCompliance from "@/pages/VendorCompliance";
 export function GovernanceRoutes() {
   return (
     <Routes>
-      <Route index element={<GovernanceManagement />} />
-      <Route path="policies/approval" element={<PolicyApprovalWorkflow />} />
-      <Route path="documents/review" element={<DocumentReviewWorkflow />} />
-      <Route path="audits" element={<GovernanceAuditWorkflow />} />
-      <Route path="vendors/*" element={<VendorCompliance />} />
+      <Route path="/" element={<GovernanceManagement />} />
+      <Route path="/policies/approval" element={<PolicyApprovalWorkflow />} />
+      <Route path="/documents/review" element={<DocumentReviewWorkflow />} />
+      <Route path="/audits" element={<GovernanceAuditWorkflow />} />
+      <Route path="/vendors/*" element={<VendorCompliance />} />
     </Routes>
   );
 }
