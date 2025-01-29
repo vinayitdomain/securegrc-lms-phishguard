@@ -17,7 +17,7 @@ export function UserDashboardV2() {
 
   if (isLoadingMetrics) {
     return (
-      <div className="h-full w-full p-6 space-y-6">
+      <div className="w-full p-6 space-y-6">
         <Skeleton className="h-[200px]" />
         <Skeleton className="h-[400px]" />
       </div>
@@ -73,7 +73,7 @@ export function UserDashboardV2() {
   };
 
   return (
-    <div className="min-h-screen w-full p-6 space-y-8 bg-gray-50">
+    <div className="w-full p-6 space-y-8 bg-gray-50">
       <DashboardStats {...metrics} />
 
       <div className="grid gap-8 md:grid-cols-2">
