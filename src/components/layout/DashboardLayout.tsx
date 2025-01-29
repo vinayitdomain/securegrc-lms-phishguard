@@ -92,10 +92,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-auto">
-          {children}
+        <main className="flex-1 overflow-auto bg-gray-50">
+          <div className="container mx-auto px-4 py-6">
+            {children}
+          </div>
         </main>
       </div>
     </SidebarProvider>
