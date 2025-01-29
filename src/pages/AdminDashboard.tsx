@@ -28,81 +28,90 @@ export default function AdminDashboard() {
   });
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[600px]" />;
+    return <Skeleton className="w-full h-screen" />;
   }
 
   if (profile?.role !== 'org_admin') {
-    return <div>You don't have permission to access this page.</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
+          <p className="mt-2 text-gray-600">You don't have permission to access this page.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Organization Administration</h1>
-      
-      <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="users">User Management</TabsTrigger>
-          <TabsTrigger value="modules">Module Settings</TabsTrigger>
-          <TabsTrigger value="roles">Role Permissions</TabsTrigger>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-gray-50">
+      <div className="px-4 py-6 mx-auto max-w-[1400px]">
+        <h1 className="mb-6 text-3xl font-bold text-gray-900">Organization Administration</h1>
+        
+        <Tabs defaultValue="users" className="w-full space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="users">User Management</TabsTrigger>
+            <TabsTrigger value="modules">Module Settings</TabsTrigger>
+            <TabsTrigger value="roles">Role Permissions</TabsTrigger>
+            <TabsTrigger value="branding">Branding</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <UserManagement organizationId={profile.organization_id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="users">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserManagement organizationId={profile.organization_id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="modules">
-          <Card>
-            <CardHeader>
-              <CardTitle>Module Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ModuleSettings organizationId={profile.organization_id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="modules">
+            <Card>
+              <CardHeader>
+                <CardTitle>Module Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ModuleSettings organizationId={profile.organization_id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="roles">
-          <Card>
-            <CardHeader>
-              <CardTitle>Role & Permission Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RolePermissions organizationId={profile.organization_id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="roles">
+            <Card>
+              <CardHeader>
+                <CardTitle>Role & Permission Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RolePermissions organizationId={profile.organization_id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="branding">
-          <Card>
-            <CardHeader>
-              <CardTitle>Branding Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BrandingSettings organizationId={profile.organization_id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="branding">
+            <Card>
+              <CardHeader>
+                <CardTitle>Branding Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BrandingSettings organizationId={profile.organization_id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Platform Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <AdminAnalytics organizationId={profile.organization_id} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle>Platform Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AdminAnalytics organizationId={profile.organization_id} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
