@@ -3,7 +3,7 @@ import GovernanceManagement from "@/pages/GovernanceManagement";
 import { PolicyApprovalWorkflow } from "@/components/governance/PolicyApprovalWorkflow";
 import { DocumentReviewWorkflow } from "@/components/governance/DocumentReviewWorkflow";
 import { GovernanceAuditWorkflow } from "@/components/governance/GovernanceAuditWorkflow";
-import { VendorCompliance } from "@/pages/VendorCompliance";
+import VendorCompliance from "@/pages/VendorCompliance";
 
 export function GovernanceRoutes() {
   return (
