@@ -1,133 +1,52 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardStats } from "./stats/DashboardStats";
 import { CourseDistributionChart } from "./charts/CourseDistributionChart";
 import { VideoContentList } from "./training/VideoContentList";
 import { CourseProgressList } from "./courses/CourseProgressList";
 import { DeadlinesList } from "./deadlines/DeadlinesList";
+import { useUserMetrics } from "@/hooks/dashboard/useUserMetrics";
+import { useUserProfile } from "@/hooks/dashboard/useUserProfile";
+import { useUserAchievements } from "@/hooks/dashboard/useUserAchievements";
+import { useLeaderboard } from "@/hooks/dashboard/useLeaderboard";
 import { toast } from "sonner";
 
 export function UserDashboardV2() {
-  const { data: profile } = useQuery({
-    queryKey: ['userProfile'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+  const { data: userMetrics, isLoading: isLoadingMetrics } = useUserMetrics();
+  const { data: profile } = useUserProfile();
+  const { data: achievements } = useUserAchievements();
+  const { data: leaderboardEntries } = useLeaderboard();
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+  if (isLoadingMetrics) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-[200px]" />
+        <Skeleton className="h-[400px]" />
+      </div>
+    );
+  }
 
-      if (error) {
-        toast.error('Error fetching profile');
-        throw error;
-      }
-      return data;
-    },
-  });
-
-  const { data: courseProgress } = useQuery({
-    queryKey: ['courseProgress'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('user_content_progress')
-        .select(`
-          *,
-          training_content (
-            title,
-            description,
-            content_type
-          )
-        `)
-        .eq('user_id', user.id);
-
-      if (error) {
-        toast.error('Error fetching course progress');
-        throw error;
-      }
-      return data;
-    },
-  });
-
-  const { data: certificates } = useQuery({
-    queryKey: ['certificates'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('issued_certificates')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) {
-        toast.error('Error fetching certificates');
-        throw error;
-      }
-      return data;
-    },
-  });
-
-  const { data: achievements } = useQuery({
-    queryKey: ['achievements'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('user_achievements')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) {
-        toast.error('Error fetching achievements');
-        throw error;
-      }
-      return data;
-    },
-  });
-
-  // Calculate course type distribution for donut chart
-  const courseTypes = courseProgress?.reduce((acc, course) => {
-    const type = course.training_content.content_type;
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
-
-  const donutData = Object.entries(courseTypes).map(([name, value]) => ({
-    name,
-    value
-  }));
-
-  // Calculate total learning hours
-  const learningHours = courseProgress?.length || 0;
-
-  // Separate video content
-  const videoContent = courseProgress?.filter(
-    course => course.training_content.content_type === 'video'
-  ) || [];
+  const metrics = {
+    activeCampaigns: 0,
+    courseCompletion: userMetrics?.courses_completed || 0,
+    complianceStatus: userMetrics?.security_score || 0,
+    isLoadingCampaigns: false,
+    isLoadingCourses: isLoadingMetrics,
+    isLoadingCompliance: isLoadingMetrics,
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <DashboardStats
-        courseCount={courseProgress?.length || 0}
-        learningHours={learningHours}
-        certificateCount={certificates?.length || 0}
-        achievementCount={achievements?.length || 0}
-      />
+    <div className="space-y-6">
+      <DashboardStats {...metrics} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <CourseDistributionChart data={donutData} />
-        <VideoContentList videoContent={videoContent} />
+      <div className="grid gap-6 md:grid-cols-2">
+        <CourseDistributionChart />
+        <VideoContentList />
       </div>
 
-      <CourseProgressList courseProgress={courseProgress || []} />
-      <DeadlinesList courseProgress={courseProgress || []} />
+      <div className="grid gap-6 md:grid-cols-2">
+        <CourseProgressList />
+        <DeadlinesList />
+      </div>
     </div>
   );
 }
