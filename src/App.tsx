@@ -9,6 +9,7 @@ import { RiskRoutes } from "./routes/RiskRoutes";
 import { ReportingRoutes } from "./routes/ReportingRoutes";
 import Calendar from "./pages/Calendar";
 import AuditManagement from "./pages/AuditManagement";
+import VendorCompliance from "./pages/VendorCompliance";
 
 function App() {
   return (
@@ -38,7 +39,12 @@ function App() {
 
         {/* Audit Management Routes */}
         <Route path="/audits/*" element={<AuditManagement />} />
+        
+        {/* Course Progress Route */}
         <Route path="/course-progress" element={<Dashboard />} />
+
+        {/* Vendor Assessment Routes */}
+        <Route path="/assessments/*" element={<VendorCompliance />} />
       </Routes>
     </Router>
   );
